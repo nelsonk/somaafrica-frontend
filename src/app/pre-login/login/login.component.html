@@ -1,0 +1,116 @@
+<nav class="navbar navbar-expand-lg bg-primary-subtle sticky-top m-2 rounded">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">
+        <img src="img/logo.png" alt="SomaAfrica" width="230">
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navBarSoma"
+      aria-controls="navBarSoma" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navBarSoma">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link active" href="#" aria-current="page"> Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#"> About</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#"> Contact</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="schoolsDropDown" data-bs-toggle="dropdown" role="button" aria-expanded="false">
+              Schools
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="schoolsDropDown">
+              <li><a class="dropdown-item" href="#"> All </a></li>
+              <hr class="dropdown-divider">
+              <li><a class="dropdown-item" href="#"> Tertiary </a></li>
+              <hr class="dropdown-divider">
+              <li><a class="dropdown-item" href="#"> Secondary </a></li>
+              <hr class="dropdown-divider">
+              <li><a class="dropdown-item" href="#"> Primary </a></li>
+              <hr class="dropdown-divider">
+              <li><a class="dropdown-item" href="#"> Nursery/Kindergarten </a></li>
+            </ul>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="teachersDropDown" data-bs-toggle="dropdown" role="button" aria-expanded="false">
+              Teachers
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="teachersDropDown">
+              <li><a class="dropdown-item" href="#"> All </a></li>
+              <hr class="dropdown-divider">
+              <li><a class="dropdown-item" href="#"> Tertiary </a></li>
+              <hr class="dropdown-divider">
+              <li><a class="dropdown-item" href="#"> Secondary </a></li>
+              <hr class="dropdown-divider">
+              <li><a class="dropdown-item" href="#"> Primary </a></li>
+              <hr class="dropdown-divider">
+              <li><a class="dropdown-item" href="#"> Nursery/Kindergarten </a></li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">eLearning</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">eExams</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Bursaries</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Career</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Guide</a>
+          </li>
+          <li class="nav-item">
+            <button class="btn btn-outline-success me-2 my-hover-text-light" type="button" (click)="navigateToPage('')" >
+              Login
+            </button>
+          </li>
+        </ul>
+        <form class="d-flex" role="search">
+          <input class="form-control me-2 text-success" type="search" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>
+      </div>
+    </div>
+</nav>
+<div class="container d-flex justify-content-center align-items-center">
+    <div class="w-50">
+        <div class="card p-4 shadow border-primary-subtle">
+            <div class="mb-3 text-center">
+                <h3>Login</h3>
+            </div>
+            <form class="form" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+                <div class="form-floating mb-3">
+                    <input class="form-control form-control-lg" id="username" type="text" formControlName="username" placeholder="Enter email or username">
+                    <label class="form-label" for="username"> Username / Email / Account ID</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input class="form-control form-control-lg" id="password" type="password" formControlName="password" placeholder="Enter Password">
+                    <label class="form-label" for="password">Password</label>
+                </div>
+                <button class="btn btn-outline-success w-100" type="submit" [disabled]="!loginForm.valid">Submit</button>
+            </form>
+            <h6 class="text-center mt-3">OR</h6>
+            <a href="google.com" class="text-center">Login with Google</a>
+            <a href="facebook.com" class="text-center">Login with Facebook</a>
+            <p> Hey {{loginForm.get('username')?.value}}!</p>
+            <div class="alert" *ngIf="loginForm.invalid && (loginForm.touched || loginForm.dirty)">
+                <div class="alert alert-primary" *ngIf="loginForm.get('username')?.hasError('required')">
+                    Username required
+                </div>
+                <div class="alert alert-primary" *ngIf="loginForm.get('password')?.hasError('required')">
+                    Password required
+                </div>
+                <div class="alert alert-danger" *ngIf="loginForm.get('password')?.hasError('minlength')">
+                    Password must be at least 8 characters long
+                </div>
+            </div>
+            <button class="btn btn-outline-success" (click)="navigateToPage('register')">Register</button>
+        </div>
+    </div>
+</div>
