@@ -1,13 +1,32 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { HeaderComponent } from './commons/header/header.component';
+import { FloatingButtonComponent } from "./commons/floating-button/floating-button.component";
+import { filter } from 'rxjs';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, HeaderComponent, FloatingButtonComponent, CommonModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
-export class AppComponent {
+export class AppComponent implements OnInit{
   title = 'somaafrica-frontend';
+  showHeader = true;
+
+  constructor(private router: Router){}
+
+  ngOnInit(): void {
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe((event: NavigationEnd) => {
+      const currentUrl = this.router.url.split("?")[0]
+      const hiddenUrls = ["/login", "/register"]
+
+      this.showHeader = !hiddenUrls.includes(currentUrl)
+    })
+  }
+
 }

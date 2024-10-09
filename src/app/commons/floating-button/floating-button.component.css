@@ -1,0 +1,14 @@
+.guide-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 50px;
+  }
+
+  .guide-btn:hover {
+    background-color: #007bff;
+    color: #fff;
+  }

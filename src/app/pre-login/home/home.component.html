@@ -1,83 +1,38 @@
-<div class="container-fluid w-100">
-  <nav class="navbar navbar-expand-lg bg-primary-subtle sticky-top m-2 rounded">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="#">
-        <img src="img/logo.png" alt="SomaAfrica" width="230">
-      </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navBarSoma"
-      aria-controls="navBarSoma" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navBarSoma">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
-            <a class="nav-link active" href="#" aria-current="page"> Home</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#"> About</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#"> Contact</a>
-          </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="schoolsDropDown" data-bs-toggle="dropdown" role="button" aria-expanded="false">
-              Schools
-            </a>
-            <ul class="dropdown-menu" aria-labelledby="schoolsDropDown">
-              <li><a class="dropdown-item" href="#"> All </a></li>
-              <hr class="dropdown-divider">
-              <li><a class="dropdown-item" href="#"> Tertiary </a></li>
-              <hr class="dropdown-divider">
-              <li><a class="dropdown-item" href="#"> Secondary </a></li>
-              <hr class="dropdown-divider">
-              <li><a class="dropdown-item" href="#"> Primary </a></li>
-              <hr class="dropdown-divider">
-              <li><a class="dropdown-item" href="#"> Nursery/Kindergarten </a></li>
-            </ul>
-          </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="teachersDropDown" data-bs-toggle="dropdown" role="button" aria-expanded="false">
-              Teachers
-            </a>
-            <ul class="dropdown-menu" aria-labelledby="teachersDropDown">
-              <li><a class="dropdown-item" href="#"> All </a></li>
-              <hr class="dropdown-divider">
-              <li><a class="dropdown-item" href="#"> Tertiary </a></li>
-              <hr class="dropdown-divider">
-              <li><a class="dropdown-item" href="#"> Secondary </a></li>
-              <hr class="dropdown-divider">
-              <li><a class="dropdown-item" href="#"> Primary </a></li>
-              <hr class="dropdown-divider">
-              <li><a class="dropdown-item" href="#"> Nursery/Kindergarten </a></li>
-            </ul>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">eLearning</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">eExams</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Bursaries</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Career</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Guide</a>
-          </li>
-          <li class="nav-item">
-            <button class="btn btn-outline-success me-2 my-hover-text-light" type="button" (click)="navigateToPage('login')" >
-              Login
-            </button>
-          </li>
-        </ul>
-        <form class="d-flex" role="search">
-          <input class="form-control me-2 text-success" type="search" placeholder="Search" aria-label="Search">
-          <button class="btn btn-outline-success" type="submit">Search</button>
-        </form>
-      </div>
+<div class="container-fluid">
+    <div class="row d-flex justify-content-between align-items-center bg-light-subtle ">
+        <div class="col-7 ps-5">
+            <h1 class="text-dark-emphasis"> Unlock the future of education with SomaAfrica!</h1>
+            <p class="pt-3"> Enjoy seamless education services tailored to your needs, are you a teacher, parent, student or a school? You are in the right place.</p>
+            <div class="list-group pt-3">
+                <a class="list-group-item page-link d-flex justify-content-between" [routerLink]="['/admissions']" >
+                    Online Admissions
+                    <span class="badge text-bg-primary rounded-pill">14,000 processed</span>
+                </a>
+                <a class="list-group-item page-link d-flex justify-content-between" [routerLink]="['/learning']" >
+                    eLearning - Written, Video, Audio
+                    <span class="badge text-bg-primary rounded-pill">5,000 available</span>
+                </a>
+                <a class="list-group-item page-link d-flex justify-content-between" [routerLink]="['/learning/exams']">
+                    eExams - Quiz
+                    <span class="badge text-bg-primary rounded-pill">2,000 available</span>
+                </a>
+                <a class="list-group-item page-link d-flex justify-content-between" [routerLink]="['/teachers']">
+                    Teachers - learning materials, coaching
+                    <span class="badge text-bg-primary rounded-pill">4,000 active</span>
+                </a>
+                <a class="list-group-item page-link d-flex justify-content-between" [routerLink]="['/learning/exams']">
+                    Auto grading - schools & teachers
+                    <span class="badge text-bg-primary rounded-pill">1,000 users</span>
+                </a>
+                <a class="list-group-item page-link d-flex justify-content-between" [routerLink]="['/learning/exams']">
+                    Reports - auto generation & sending to parents
+                    <span class="badge text-bg-primary rounded-pill">100,000 students</span>
+                </a>
+            </div>
+        </div>
+        <div class="col-5">
+            <img src="img/girl_pointing.png">
+        </div>
     </div>
-  </nav>
 
 </div>
