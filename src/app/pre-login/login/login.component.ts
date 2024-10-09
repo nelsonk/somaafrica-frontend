@@ -1,22 +1,37 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { AuthService } from '../../services/auth/auth-service.service';
+import { catchError, of } from 'rxjs';
+
+export enum STATUS_TYPE {
+  NOT_LOADING = 'NOT_LOADING',
+  LOADING = 'LOADING',
+  SUCCESS = 'SUCCESS',
+  ERROR = 'ERROR'
+};
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, RouterLink],
   providers:[AuthService],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit{
   loginForm!: FormGroup;
-  data!: {}
-  constructor(private fb: FormBuilder, private router: Router, private title: Title, private authService: AuthService){
+  data!: {};
+  status: STATUS_TYPE = STATUS_TYPE.NOT_LOADING;
+
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private title: Title,
+    private authService: AuthService
+  ){
     title.setTitle("SomaAfrica - Login");
   }
 
@@ -28,17 +43,27 @@ export class LoginComponent implements OnInit{
 ngOnInit(): void {
   this.loginForm = this.fb.group({
     username: ['', Validators.required],
-    password: ['', [Validators.minLength(8), Validators.required]]
+    password: ['', [Validators.required]]
   });
 }
 
 onSubmit(): void {
+  this.status = STATUS_TYPE.LOADING
+  let data: {};
   this.data = {
     "username": this.loginForm.get('username')?.value,
     "password": this.loginForm.get('password')?.value
   }
-  this.authService.login(this.data).subscribe(
+  this.authService.login(this.data).pipe(
+    catchError(
+      (error) => {
+        this.status = STATUS_TYPE.ERROR
+        return of({})
+      }
+    )
+  ).subscribe(
     (response) => {
+      this.status = STATUS_TYPE.SUCCESS
       console.log(response);
     }
   );
@@ -46,7 +71,7 @@ onSubmit(): void {
 
 }
 
-navigateToPage(page: string){
+navigateToPage(page?: string){
   this.router.navigate([`/${page}`], {queryParams: {source: 'login'}});
 }
 
