@@ -5,6 +5,9 @@ import { Router, RouterLink } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { AuthService } from '../../services/auth/auth-service.service';
 import { catchError, of } from 'rxjs';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { ApiHealthService } from '../../services/api/api-health.service';
 
 export enum STATUS_TYPE {
   NOT_LOADING = 'NOT_LOADING',
@@ -16,8 +19,8 @@ export enum STATUS_TYPE {
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, RouterLink],
-  providers:[AuthService],
+  imports: [ReactiveFormsModule, CommonModule, RouterLink, FontAwesomeModule],
+  providers:[AuthService, ApiHealthService],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
@@ -25,12 +28,17 @@ export class LoginComponent implements OnInit{
   loginForm!: FormGroup;
   data!: {};
   status: STATUS_TYPE = STATUS_TYPE.NOT_LOADING;
+  showPassword: boolean = false;
+  faEye = faEye
+  faEyeSlash = faEyeSlash
+  apiNotHealthy:boolean = true
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
     private title: Title,
-    private authService: AuthService
+    private authService: AuthService,
+    private healthService: ApiHealthService
   ){
     title.setTitle("SomaAfrica - Login");
   }
@@ -45,10 +53,26 @@ ngOnInit(): void {
     username: ['', Validators.required],
     password: ['', [Validators.required]]
   });
+
+  this.healthService.isHealthy$.pipe(
+    catchError(
+      (error) => {
+        console.log("Error returned: ", error)
+        this.apiNotHealthy = true
+        return of(false)
+      }
+    )
+  ).subscribe(
+    (isHealthy: boolean) => {
+      this.apiNotHealthy = !isHealthy;
+    }
+  );
+
+  console.log(`API not Healthy: ${this.apiNotHealthy}}`)
 }
 
 onSubmit(): void {
-  this.status = STATUS_TYPE.LOADING
+  this.status = STATUS_TYPE.LOADING;
   let data: {};
   this.data = {
     "username": this.loginForm.get('username')?.value,

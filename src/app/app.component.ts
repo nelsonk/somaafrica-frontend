@@ -4,11 +4,12 @@ import { HeaderComponent } from './commons/header/header.component';
 import { FloatingButtonComponent } from "./commons/floating-button/floating-button.component";
 import { filter } from 'rxjs';
 import { CommonModule } from '@angular/common';
+import { FontAwesomeModule, FaIconLibrary} from '@fortawesome/angular-fontawesome';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, HeaderComponent, FloatingButtonComponent, CommonModule],
+  imports: [RouterOutlet, HeaderComponent, FloatingButtonComponent, CommonModule, FontAwesomeModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })

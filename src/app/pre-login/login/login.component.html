@@ -1,11 +1,16 @@
-<div class="container-fluid vh-100 d-flex justify-content-center align-items-center bg" style="background-image: url('img/boy_with_book.jpg'); background-position: center; background-size:contain;">
+<div class="container-fluid vh-100 d-flex justify-content-center align-items-center bg-image">
     <div class="w-50">
         <div class="card p-4 shadow border-primary-subtle">
+            <a routerLink="/" class="d-flex justify-content-center"><img src="img/logo.png"> </a>
+            <hr>
             <div class="mb-3 text-center">
                 <h3>Login</h3>
             </div>
             <p> Hey!</p>
-            <div class="alert" *ngIf="loginForm.invalid && (loginForm.touched || loginForm.dirty)">
+            <div class="alert" *ngIf="(loginForm.invalid || apiNotHealthy) && (loginForm.touched || loginForm.dirty)">
+                <div class="alert alert-danger" *ngIf="apiNotHealthy">
+                    API not healthy, try again later
+                </div>
                 <div class="alert alert-primary" *ngIf="loginForm.get('username')?.hasError('required')">
                     Username required
                 </div>
@@ -19,10 +24,19 @@
                     <label class="form-label" for="username"> Username / Email / Account ID</label>
                 </div>
                 <div class="form-floating mb-3">
-                    <input class="form-control form-control-lg" id="password" type="password" formControlName="password" placeholder="Enter Password">
+                    <input class="form-control form-control-lg" id="password" [type]="showPassword ? 'text' : 'password'" formControlName="password" placeholder="Enter Password">
                     <label class="form-label" for="password">Password</label>
+                    <button
+                        type="button"
+                        class="btn btn-outline-secondary position-absolute top-50 end-0 translate-middle-y"
+                        (click)="showPassword = !showPassword"
+                        tabindex="-1"
+                        style="border: none; background: none;">
+                        <!-- Change the icon based on visibility state -->
+                        <fa-icon [icon]="showPassword ? faEyeSlash : faEye"></fa-icon>
+                    </button>
                 </div>
-                <button class="btn btn-outline-primary w-100" type="submit" [disabled]="!loginForm.valid">
+                <button class="btn btn-outline-primary w-100" type="submit" [disabled]="!loginForm.valid || apiNotHealthy">
                   Login
                   <div class="spinner-border" role="status" *ngIf="status == 'LOADING'" >
                     <span class="visually-hidden">Loading...</span>
