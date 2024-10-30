@@ -14,7 +14,7 @@ export class AuthService {
   constructor(private httpClient: HttpClient) { }
 
   login(data: {}){
-    return this.httpClient.post(`${this.baseUrl}/token`, data);
+    return this.httpClient.post(`${this.baseUrl}/login`, data);
   }
 
   register(data: {}){

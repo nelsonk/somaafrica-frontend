@@ -1,0 +1,15 @@
+.alert {
+    padding: 0.5rem; /* Reduce padding */
+    font-size: 0.9rem; /* Reduce font size */
+    margin-bottom: 0.5rem; /* Adjust margin to make space smaller between alerts */
+}
+
+button.btn-outline-secondary:hover fa-icon {
+    opacity: 1;
+}
+
+button.btn-outline-secondary fa-icon {
+    transition: opacity 0.2s ease-in-out;
+    opacity: 0.8;
+}
+

@@ -1,0 +1,14 @@
+.card-items {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .card-item {
+    flex: 1 1 30%;
+    margin: 10px;
+    text-align: center;
+  }
+  .card-item-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+  }

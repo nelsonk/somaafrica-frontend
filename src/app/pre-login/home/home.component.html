@@ -1,32 +1,32 @@
 <div class="container-fluid">
-    <div class="row d-flex justify-content-between align-items-center bg-light-subtle ">
+    <div class="row d-flex justify-content-between align-items-center">
         <div class="col-7 ps-5">
-            <h1 class="text-dark-emphasis"> Unlock the future of education with SomaAfrica!</h1>
-            <p class="pt-3"> Enjoy seamless education services tailored to your needs, are you a teacher, parent, student or a school? You are in the right place.</p>
+            <h1 class="text-dark-emphasis text-capitalize"> Unlock the future of education with SomaAfrica!</h1>
+            <p class="pt-3"> Enjoy seamless education services tailored to your needs. Are you a Teacher, Parent, Student or a School? You are in the right place.</p>
             <div class="list-group pt-3">
-                <a class="list-group-item page-link d-flex justify-content-between" [routerLink]="['/admissions']" >
+                <a class="list-group-item border-primary-subtle page-link d-flex justify-content-between" [routerLink]="['/admissions']" >
                     Online Admissions
-                    <span class="badge text-bg-primary rounded-pill">14,000 processed</span>
+                    <span class="badge text-bg-primary rounded-pill">34,000+ processed</span>
                 </a>
-                <a class="list-group-item page-link d-flex justify-content-between" [routerLink]="['/learning']" >
-                    eLearning - Written, Video, Audio
-                    <span class="badge text-bg-primary rounded-pill">5,000 available</span>
+                <a class="list-group-item border-primary-subtle page-link d-flex justify-content-between" [routerLink]="['/learning']" >
+                    eLearning - Written & Video (Tutorials, UNEB papers, Books)
+                    <span class="badge text-bg-primary rounded-pill">1,000+ available</span>
                 </a>
-                <a class="list-group-item page-link d-flex justify-content-between" [routerLink]="['/learning/exams']">
+                <a class="list-group-item border-primary-subtle page-link d-flex justify-content-between" [routerLink]="['/learning/exams']">
                     eExams - Quiz
-                    <span class="badge text-bg-primary rounded-pill">2,000 available</span>
+                    <span class="badge text-bg-primary rounded-pill">500+ available</span>
                 </a>
-                <a class="list-group-item page-link d-flex justify-content-between" [routerLink]="['/teachers']">
-                    Teachers - learning materials, coaching
-                    <span class="badge text-bg-primary rounded-pill">4,000 active</span>
+                <a class="list-group-item border-primary-subtle page-link d-flex justify-content-between" [routerLink]="['/teachers']">
+                    Teachers - Coaching, Quizzes, Books, Tutorials
+                    <span class="badge text-bg-primary rounded-pill">300+ Teachers</span>
                 </a>
-                <a class="list-group-item page-link d-flex justify-content-between" [routerLink]="['/learning/exams']">
-                    Auto grading - schools & teachers
-                    <span class="badge text-bg-primary rounded-pill">1,000 users</span>
+                <a class="list-group-item border-primary-subtle page-link d-flex justify-content-between" [routerLink]="['/learning/exams']">
+                    Auto grading & Report generation
+                    <span class="badge text-bg-primary rounded-pill">100,000+ users</span>
                 </a>
-                <a class="list-group-item page-link d-flex justify-content-between" [routerLink]="['/learning/exams']">
-                    Reports - auto generation & sending to parents
-                    <span class="badge text-bg-primary rounded-pill">100,000 students</span>
+                <a class="list-group-item border-primary-subtle page-link d-flex justify-content-between" [routerLink]="['/learning/exams']">
+                    Seamless communications - Forums, Notifications, Live chats
+                    <span class="badge text-bg-primary rounded-pill">200,000+ messages</span>
                 </a>
             </div>
         </div>
@@ -34,5 +34,10 @@
             <img src="img/girl_pointing.png">
         </div>
     </div>
+    <app-reusable-card
+        [title]= "cardData.title"
+        [description] = "cardData.description"
+        [items]="cardData.items">
+    </app-reusable-card>
 
 </div>
