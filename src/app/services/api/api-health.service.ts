@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { timer, switchMap, of, catchError, Observable, BehaviorSubject } from 'rxjs';
+import { timer, switchMap, of, catchError, Observable, BehaviorSubject, Timestamp } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +15,7 @@ export class ApiHealthService {
   }
 
   private checkApiHealthPeriodically() {
-    timer(0, 60000) // Start immediately, then every 60 seconds
+    timer(0, 10000) // Start immediately, then every 60 seconds
       .pipe(
         switchMap(() => this.checkApiHealth())
       )
@@ -23,8 +23,11 @@ export class ApiHealthService {
   }
 
   checkApiHealth(): Observable<boolean> {
-    return this.httpClient.get<{ status: string }>(this.apiUrl).pipe(
-      switchMap(response => of(response.status === "healthy")),
+    return this.httpClient.get<{ status: string, time: string }>(this.apiUrl).pipe(
+      switchMap(response => {
+        console.log(`API Health status: ${response.status}, Server time: ${response.time}`)
+        return of(response.status === "healthy")
+      }),
       catchError(error => {
         console.log("Error connecting to API", error);
         return of(false); // Set isHealthy to false if there's an error

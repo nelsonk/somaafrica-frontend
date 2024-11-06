@@ -27,11 +27,13 @@ export enum STATUS_TYPE {
 export class LoginComponent implements OnInit{
   loginForm!: FormGroup;
   data!: {};
+  STATUS_TYPE = STATUS_TYPE
   status: STATUS_TYPE = STATUS_TYPE.NOT_LOADING;
   showPassword: boolean = false;
-  faEye = faEye
-  faEyeSlash = faEyeSlash
-  apiNotHealthy:boolean = true
+  faEye = faEye;
+  faEyeSlash = faEyeSlash;
+  apiNotHealthy:boolean = true;
+  errorMessage: string = "";
 
   constructor(
     private fb: FormBuilder,
@@ -67,8 +69,6 @@ ngOnInit(): void {
       this.apiNotHealthy = !isHealthy;
     }
   );
-
-  console.log(`API not Healthy: ${this.apiNotHealthy}}`)
 }
 
 onSubmit(): void {
@@ -78,20 +78,18 @@ onSubmit(): void {
     "username": this.loginForm.get('username')?.value,
     "password": this.loginForm.get('password')?.value
   }
-  this.authService.login(this.data).pipe(
-    catchError(
-      (error) => {
-        this.status = STATUS_TYPE.ERROR
-        return of({})
-      }
-    )
-  ).subscribe(
+  this.authService.login(this.data)
+  .subscribe(
     (response) => {
-      this.status = STATUS_TYPE.SUCCESS
+      if (response.status === STATUS_TYPE.ERROR) {
+        this.status = STATUS_TYPE.ERROR;
+        this.errorMessage = response.detail;
+        return;
+      }
+      this.status = STATUS_TYPE.SUCCESS;
       console.log(response);
     }
   );
-  console.log("sumitted ", this.loginForm.value);
 
 }
 
