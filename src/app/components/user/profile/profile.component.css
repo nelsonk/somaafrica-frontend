@@ -1,0 +1,214 @@
+/* Profile Bar */
+#profileBar {
+    position: relative;
+    background-color: #f8f9fa; /* Light gray background */
+    border-radius: 10px; /* Rounded corners */
+    border: 2px solid rgba(0, 123, 255, 0.2); /* Primary-subtle border */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+
+/* Input Group */
+.input-group .form-control {
+    border-radius: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Sidebar Navigation */
+.nav-pills .nav-link {
+    border-radius: 4px;
+    transition: all 0.3s;
+}
+
+.nav-pills .nav-link.active {
+    background-color: #0d6efd; /* Bootstrap primary color */
+    color: #fff;
+}
+
+/* Dropdown SVG Styling */
+#profileTrigger {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#profileTrigger:hover svg {
+    fill: #0056b3; /* Darker shade of primary on hover */
+}
+
+/* Customize dropdown menu */
+.dropdown-menu {
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Add spacing and color to items */
+.dropdown-item {
+    padding: 10px 15px;
+    transition: background-color 0.2s ease;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa; /* Light hover background */
+}
+
+
+
+/* body {
+    background: url('https://images.unsplash.com/photo-1420496368970-d83b063b5b48?fit=crop&fm=jpg&h=700&q=80&w=1225') no-repeat center center;
+    background-size: 1400px 700px;
+    background-position: 30%;
+    background-attachment: fixed;
+  } */
+
+  .text {
+    font-family: raleway;
+    font-size: 40px;
+    position: absolute center;
+    text-align: center;
+    padding-left: 0%;
+    color: #000;
+    margin-top: 43px;
+  }
+
+  .text1 {
+    font-family: raleway;
+    font-size: 21px;
+    text-align: center;
+    margin-top: -20px;
+    color: #000;
+  }
+
+  .image {
+    text-align: center;
+    width: 200px;
+    /* Container's dimensions */
+
+    height: 200px;
+    -webkit-border-radius: 75%;
+    -moz-border-radius: 75%;
+    border-radius: 75%;
+    box-shadow: 0 0 0 1px #eee;
+    background: url("https://images.unsplash.com/reserve/ysPfhVSzSP2m629CW0mw_selfPortrait.jpg?fit=crop&fm=jpg&h=700&q=80&w=1225") center center no-repeat;
+    background-size: cover;
+    margin: auto;
+    margin-top: 20px;
+    margin-bottom: -30px;
+    align-content: center;
+  }
+
+  .trick {
+    display: inline-block;
+    vertical-align: middle;
+    height: 150px;
+  }
+
+  .image:hover {
+    box-shadow: 0px 5px 20px .9px #3F3F3F;
+  }
+
+  .image:hover {
+    -webkit-transform: scale(1.12);
+    transform: scale(1.12);
+    -webkit-transition: 1.6s ease-in-out;
+    transition: 1.6s ease-in-out;
+  }
+
+  .trick:hover img {
+    -webkit-transform: scale(1);
+    transform: scale(1);
+  }
+
+  #overlay {
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    border-radius: 50%;
+    padding: 0 0 0 0;
+    opacity: 1.0;
+    -webkit-transition: opacity 2.25s ease;
+    -moz-transition: opacity 10.25s ease;
+    transition: opacity 2.25s ease;
+  }
+
+  #box:hover #overlay {
+    opacity: 1;
+  }
+
+  .panel-group{
+    width:350px;
+    margin:auto;
+    /*margin:50px 400px 50px 400px;*/
+    max-width:100%;
+  }
+
+  .panel-heading{
+    background-color:transparent !important;
+  }
+
+  .title{
+    text-align: center;
+    background-color:transparent;
+    color:#000;
+    font-family:lato;
+    font-weight:300;
+    font-size:15px;
+    max-width:100%;
+  }
+
+  #accordion{
+    background-color: transparent;
+    max-width:100%;
+    margin-bottom:20px;
+  }
+
+  .btn-outline {
+    color: inherit;
+    transition: all 1.4s;
+    background-color: transparent;
+  }
+  /* button CSS */
+
+  .btn-primary.btn-outline {
+    margin-top: 9px;
+    background-color: transparent;
+    color: #000;
+    padding:auto;
+    padding:10px 0px 10px 0px;
+    margin: 1px 5px 1px 0px;
+    width: 100%;
+    text-align:center;
+    font-family: raleway;
+    font-weight: 300;
+    max-width:100%;
+  }
+
+  .modal-dialog {
+    max-width: 600px; /* Adjust modal width */
+}
+
+.modal-body {
+    overflow-y: auto;
+    max-height: calc(100vh - 200px); /* Subtract modal header/footer heights */
+    padding: 1rem; /* Optional adjustment */
+}
+
+.box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.custom-alert {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 20px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}

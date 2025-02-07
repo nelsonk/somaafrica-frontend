@@ -1,0 +1,69 @@
+<div *ngIf="isVisible" class="modal show" tabindex="-1" style="display: block; z-index: 9999;">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div
+        class="modal-content p-3"
+        [ngStyle]="{
+          'border-color': type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : type === 'info' ? '#0d6efd' : '#ffc107'
+        }"
+        [ngClass]="{
+          'border-success text-success': type === 'success',
+          'border-danger text-danger': type === 'error',
+          'border-info text-primary': type === 'info',
+          'border-warning text-warning': type === 'warning'
+        }"
+        style="border-width: 1px; border-radius: 8px;"
+      >
+        <!-- Header -->
+        <div class="modal-header border-bottom-0">
+          <div class="d-flex align-items-center">
+            <i
+              class="me-2"
+              [ngClass]="{
+                'bi bi-check-circle-fill': type === 'success',
+                'bi bi-exclamation-triangle-fill': type === 'error',
+                'bi bi-info-circle-fill': type === 'info',
+                'bi bi-question-circle-fill': type === 'warning'
+              }"
+              style="font-size: 1.5rem;"
+            ></i>
+            <h5 class="modal-title mb-0">{{ title }}</h5>
+          </div>
+          <button
+            type="button"
+            class="btn-close"
+            aria-label="Close"
+            (click)="onCancel()"
+          ></button>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body">
+          <p>{{ message }}</p>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer border-top-0">
+          <button
+            type="button"
+            class="btn btn-outline-secondary btn-sm"
+            (click)="onCancel()"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="btn btn-sm"
+            [ngClass]="{
+              'btn-success': type === 'success',
+              'btn-danger': type === 'error',
+              'btn-primary': type === 'info',
+              'btn-warning': type === 'warning'
+            }"
+            (click)="onConfirm()"
+          >
+            Confirm
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>

@@ -2,11 +2,17 @@ import { Component, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormControl } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule} from '@angular/forms';
 import { FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { ApiHealthService } from '../../services/api/api-health.service';
 import { catchError, of } from 'rxjs';
+import { STATUS_TYPE } from '../../utils/status-type';
+import { AuthService } from '../../services/auth/auth-service.service';
+import { SessionStorageService } from '../../services/storage/session-storage.service';
+import { ConfirmationService } from '../../services/info/confirmation.service';
+import { NotificationService } from '../../services/info/notification.service';
+import { checkPasswordMatch } from '../../utils/password-match';
 
 @Component({
   selector: 'app-register',
@@ -27,15 +33,26 @@ export class RegisterComponent implements OnInit{
   showPassword2: boolean = false;
   faEye = faEye;
   faEyeSlash = faEyeSlash;
-  apiNotHealthy:boolean = true
+  apiNotHealthy:boolean = true;
+  STATUS_TYPE = STATUS_TYPE;
+  status: STATUS_TYPE = STATUS_TYPE.NOT_LOADING;
+  errorMessage: string = "";
 
   constructor(
     private router: Router,
     title: Title,
     private fb: FormBuilder,
-    private healthService: ApiHealthService
+    private healthService: ApiHealthService,
+    private authService: AuthService,
+    private sessionStorage: SessionStorageService,
+    private confirmationService: ConfirmationService,
+    private notificationService: NotificationService
   ) {
     title.setTitle("SomaAfrica - Register");
+
+    if (this.sessionStorage.getItem("isAuthenticated")){
+      this.authService.navigateToPage("user/profile", "register");
+    }
   }
 
   ngOnInit(): void {
@@ -50,21 +67,11 @@ export class RegisterComponent implements OnInit{
       this.displayAlerts()
     })
 
-    this.healthService.isHealthy$.pipe(
-      catchError(
-        (error) => {
-          console.log("Error returned: ", error)
-          this.apiNotHealthy = true
-          return of(false)
-        }
-      )
-    ).subscribe(
-      (isHealthy: boolean) => {
-        this.apiNotHealthy = !isHealthy;
+    this.healthService.isHealthy$.subscribe(
+      (apiHealthy: boolean) => {
+        this.apiNotHealthy = !apiHealthy;
       }
     );
-
-    console.log(`API not Healthy: ${this.apiNotHealthy}}`)
   }
 
   displayAlerts(){
@@ -77,22 +84,72 @@ export class RegisterComponent implements OnInit{
     this.emailInvalid = !!email?.invalid && !!email
     this.passwordRequired = !!password1?.hasError('required')
     this.passwordMinLength = !!password1?.hasError('minlength')
-    this.passwordMismatch = !this.checkPasswordMatch(password1?.value, password2?.value)
+    this.passwordMismatch = !checkPasswordMatch(password1?.value, password2?.value)
 
-  }
-
-  checkPasswordMatch(password1: string, password2: string){
-    console.log(`password1 - ${password1}`)
-    console.log(`password2 - ${password2}`)
-    const passwordsMatch = password1 === password2
-    console.log(passwordsMatch)
-    return passwordsMatch
   }
 
   navigateToPage(page: string){
     this.router.navigate([`/${page}`], {queryParams: {source: "register"}});
   }
 
-  onSubmit(){}
+  onSubmit(){
+    this.status = STATUS_TYPE.LOADING;
+    let data = {
+      "username": this.registerForm.get('username')?.value,
+      "email": this.registerForm.get('email')?.value,
+      "password1": this.registerForm.get('password1')?.value,
+      "password2": this.registerForm.get('password2')?.value
+    }
+
+    this.authService.register(data)
+    .subscribe(
+      (response) => {
+        if (response.status === STATUS_TYPE.ERROR) {
+          this.status = STATUS_TYPE.ERROR;
+          this.errorMessage = response.detail;
+          this.notificationService.showNotification('Error', this.errorMessage, 'error');
+          return;
+        }
+
+        this.status = STATUS_TYPE.SUCCESS;
+        let login = false;
+
+        this.confirmationService.confirm(
+          'Login',
+          'Registered, would you like to be logged in?',
+          'success',
+          () => {
+            login = true;
+          },
+          () => {})
+
+
+        if(login){
+          let loginData = {
+            username: data.username? data.username : data.email,
+            password: data.password1
+          }
+
+          this.authService.login(loginData)
+          .subscribe(
+            (response) => {
+              if (response.status === STATUS_TYPE.ERROR) {
+                this.status = STATUS_TYPE.ERROR;
+                this.errorMessage = response.detail;
+                return;
+              }
+
+              this.status = STATUS_TYPE.SUCCESS;
+              this.authService.navigateToPage("user/profile", "register");
+            }
+          );
+        }else{
+          this.sessionStorage.clearEntireSession();
+          this.authService.navigateToPage("/", "register");
+        }
+
+      }
+    );
+  }
 
 }

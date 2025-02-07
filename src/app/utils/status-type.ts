@@ -1,0 +1,6 @@
+export enum STATUS_TYPE {
+    NOT_LOADING = 'NOT_LOADING',
+    LOADING = 'LOADING',
+    SUCCESS = 'SUCCESS',
+    ERROR = 'ERROR'
+  };
