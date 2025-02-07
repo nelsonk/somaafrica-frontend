@@ -1,0 +1,77 @@
+.group-selection-container {
+  display: flex; /* Enables flexbox */
+  flex-direction: column; /* Stacks the title and cards vertically */
+  justify-content: center; /* Centers content vertically */
+  align-items: center; /* Centers content horizontally */
+  min-height: 100vh; /* Ensures the container fills the full viewport height */
+  background-color: #f3f4f6; /* Neutral background */
+  padding: 20px; /* Adds spacing around the content */
+  box-sizing: border-box; /* Includes padding in the height calculation */
+}
+
+.title {
+  font-size: 2rem;
+  color: #0d6efd;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  color: #6c757d;
+  margin-bottom: 20px;
+}
+
+.group-grid {
+  display: grid; /* Enables grid layout */
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Responsive columns */
+  gap: 20px; /* Spacing between cards */
+  justify-content: center; /* Centers the grid horizontally */
+  width: 100%; /* Ensures the grid spans the full width */
+  max-width: 900px; /* Optional: limit the width of the grid for better layout */
+}
+
+.group-card {
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+  border-radius: 16px;
+  background: white;
+  border: 2px solid transparent;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border 0.3s ease;
+}
+
+.group-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  border: 2px solid #0d6efd; /* Bootstrap primary color */
+}
+
+.group-icon {
+  width: 80px;
+  height: 80px;
+  margin: 20px auto;
+}
+
+fa-icon {
+  font-size: 70px;
+}
+
+.group-overlay {
+  text-align: center;
+  padding: 10px;
+  background: linear-gradient(to top, rgba(40, 199, 111, 0.8), rgba(40, 199, 111, 0.4)); /* Fresh green gradient */
+  color: white;
+}
+
+.group-name {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin: 10px 0;
+  color: #0d6efd;
+}
+
+.group-description {
+  font-size: 0.9rem;
+  color: #6c757d;
+}

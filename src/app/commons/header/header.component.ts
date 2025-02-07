@@ -32,7 +32,7 @@ export class HeaderComponent implements OnInit {
   updateSource() {
     // Update the current source to the last visited URL (previous URL)
     this.currentSource = this.previousUrl || 'defaultSource';
-    console.log("Updated Source: ", this.currentSource);
+    // console.log("Updated Source: ", this.currentSource);
   }
 
   getUpdatedQueryParams(): any {

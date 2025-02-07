@@ -1,1 +1,537 @@
-<p>profile works!</p>
+<div class="row vh-100">
+    <!-- Sidebar -->
+    <div class="col-2 p-3">
+        <div class="nav flex-column nav-pills" role="tablist" aria-orientation="vertical">
+            <ng-container *ngFor="let link of links; let i = index">
+                <a
+                    class="nav-link mb-1"
+                    [class.active]="activeLink === i"
+                    (click)="setActiveLink(i)"
+                    [id]="link.id"
+                    [href]="link.href"
+                    [attr.data-bs-toggle]="link.dataToggle"
+                    [attr.aria-expanded]="activeLink === i"
+                    [attr.aria-controls]="link.controls">
+                    {{ link.label }}
+                </a>
+                <ul class="collapse list-unstyled ms-4" [id]="link.controls" [class.show]="activeLink === i">
+                    <li *ngFor="let subItem of link.subItems"><a href="#">{{ subItem }}</a></li>
+                </ul>
+            </ng-container>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="col-10">
+        <!-- Profile Bar -->
+        <div class="row bg-light py-3 px-4 me-3 mt-3 rounded align-items-center" id="profileBar">
+            <div class="d-flex align-items-center">
+                <!-- Search Input -->
+                <div class="input-group col pe-3">
+                    <span class="input-group-text bg-transparent border-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 512 512">
+                            <path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"></path>
+                        </svg>
+                    </span>
+                    <input type="search" class="form-control border-0 shadow-sm" placeholder="Search" #wildcardsearch>
+                </div>
+                <!-- User Icons -->
+                <div class="ms-auto d-flex gap-3 align-items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="text-primary" viewBox="0 0 512 512">
+                        <path d="M64 112c-8.8 0-16 7.2-16 16l0 22.1L220.5 291.7c20.7 17 50.4 17 71.1 0L464 150.1l0-22.1c0-8.8-7.2-16-16-16L64 112zM48 212.2L48 384c0 8.8 7.2 16 16 16l384 0c8.8 0 16-7.2 16-16l0-171.8L322 328.8c-38.4 31.5-93.7 31.5-132 0L48 212.2zM0 128C0 92.7 28.7 64 64 64l384 0c35.3 0 64 28.7 64 64l0 256c0 35.3-28.7 64-64 64L64 448c-35.3 0-64-28.7-64-64L0 128z"></path>
+                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="text-primary" viewBox="0 0 448 512">
+                        <path d="M224 0c-17.7 0-32 14.3-32 32l0 19.2C119 66 64 130.6 64 208l0 25.4c0 45.4-15.5 89.5-43.8 124.9L5.3 377c-5.8 7.2-6.9 17.1-2.9 25.4S14.8 416 24 416l400 0c9.2 0 17.6-5.3 21.6-13.6s2.9-18.2-2.9-25.4l-14.9-18.6C399.5 322.9 384 278.8 384 233.4l0-25.4c0-77.4-55-142-128-156.8L256 32c0-17.7-14.3-32-32-32z"></path>
+                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="text-primary rounded-circle" viewBox="0 0 448 512">
+                        <path d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l388.6 0c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304l-91.4 0z"/>
+                    </svg>
+                    <div class="dropdown">
+                        <button
+                            type="button"
+                            class="btn p-0 border-0 bg-transparent"
+                            id="profileTrigger"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="text-primary" viewBox="0 0 320 512">
+                                <path d="M137.4 374.6c12.5 12.5 32.8 12.5 45.3 0l128-128c9.2-9.2 11.9-22.9 6.9-34.9s-16.6-19.8-29.6-19.8L32 192c-12.9 0-24.6 7.8-29.6 19.8s-2.2 25.7 6.9 34.9l128 128z"></path>
+                            </svg>
+                        </button>
+
+                        <!-- Dropdown Menu -->
+                        <div class="dropdown-menu dropdown-menu-end border-primary-subtle" aria-labelledby="profileTrigger">
+                            <a class="dropdown-item" href="#profileModal" data-bs-toggle="modal" data-bs-target="#profileModal">Profile</a>
+                            <a class="dropdown-item" href="#settings">Settings</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item text-danger" href="login" (click)="logout()">Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered ">
+                <div class="modal-content">
+                    <div class="modal-header border-primary-subtle">
+                        <h5 class="modal-title" id="profileModalLabel">Profile</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="box">
+                            <div id="overlay">
+                                <div class="image">
+                                    <div class="trick">
+                                    </div>
+                                </div>
+                                <ul class="text text-capitalize">{{person.first_name}} {{person.last_name}}</ul>
+                                <div class="toast-container position-fixed top-50 start-50 translate-middle-x"
+                                style="z-index: 1050; transform: translate(-50%, -50%);">
+                                    <div
+                                    class="toast show"
+                                    *ngIf="apiNotHealthy"
+                                    role="alert"
+                                    aria-live="assertive"
+                                    aria-atomic="true"
+                                    >
+                                        <div class="toast-header">
+                                            <strong class="me-auto">Notification</strong>
+                                            <small>Just now</small>
+                                            <button
+                                            type="button"
+                                            class="btn-close"
+                                            data-bs-dismiss="toast"
+                                            aria-label="Close">
+                                            </button>
+                                        </div>
+                                        <div class="toast-body">
+                                            <div class="alert alert-danger" *ngIf="apiNotHealthy">
+                                                API not healthy, try again later
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading " role="tab" id="headingAboutMe">
+                                            <h4 class="panel-title ">
+                                                <a role="button" data-bs-toggle="collapse" data-bs-parent="#accordion" href="#collapseAboutMe" aria-expanded="" aria-controls="collapseAboutMe">
+                                                <div class="title  btn btn-primary btn-outline btn-lg">USER</div>
+                                                </a>
+                                            </h4>
+                                        </div>
+                                        <div id="collapseAboutMe" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingAboutMe">
+                                            <hr>
+                                            <div class="panel-body">
+                                                <form>
+                                                    <div class="mb-3" *ngIf="user.guid">
+                                                        <label for="aboutMeGuid" class="form-label">User GUID:</label>
+                                                        <input
+                                                            type="text"
+                                                            id="aboutMeGuid"
+                                                            class="form-control"
+                                                            [(ngModel)]="user.guid"
+                                                            name="guid"
+                                                            readonly>
+                                                    </div>
+                                                    <div class="mb-3" *ngIf="user.guid">
+                                                        <label for="aboutMeUsername" class="form-label">Username:</label>
+                                                        <input
+                                                            type="text"
+                                                            id="aboutMeUsername"
+                                                            class="form-control"
+                                                            [(ngModel)]="user.username"
+                                                            name="username">
+                                                    </div>
+                                                    <div class="mb-3" *ngIf="user.guid">
+                                                        <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#changePasswordModal">Change Password</button>
+                                                    </div>
+                                                    <div class="mb-3" *ngIf="user.guid">
+                                                        <label for="contactEmail" class="form-label">Email:</label>
+                                                        <input
+                                                            type="text"
+                                                            id="contactEmail"
+                                                            class="form-control"
+                                                            [(ngModel)]="user.email"
+                                                            name="email">
+                                                    </div>
+                                                    <!-- Is Active Toggle -->
+                                                    <div class="form-check form-switch mb-3" *ngIf="user.guid">
+                                                        <label class="form-check-label" for="isActive">Is Active</label>
+                                                        <input
+                                                        class="form-check-input"
+                                                        type="checkbox"
+                                                        id="isActive"
+                                                        [(ngModel)]="user.is_active"
+                                                        name="is_active"
+                                                        readonly>
+                                                    </div>
+                                                    <!-- Last Login -->
+                                                    <div class="mb-3" *ngIf="user.guid">
+                                                        <label for="lastLogin" class="form-label">Last Login</label>
+                                                        <input
+                                                        type="text"
+                                                        id="lastLogin"
+                                                        class="form-control"
+                                                        [(ngModel)]="user.last_login"
+                                                        name="last_login"
+                                                        readonly>
+                                                    </div>
+                                                    <button type="button" class="btn btn-primary mt-2" (click)="saveUser()" *ngIf="(user.guid && !apiNotHealthy)" >Save User</button>
+                                                    <div class="alert alert-danger" *ngIf="!user.guid">
+                                                        Something wrong happened, try logging out and in again to see user details
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <hr>
+                                        </div>
+                                    </div>
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading" role="tab" id="headingAccount">
+                                            <h4 class="panel-title">
+                                                <a class="collapsed" role="button" data-bs-toggle="collapse" data-bs-parent="#accordion" href="#collapseAccount" aria-expanded="false" aria-controls="collapseAccount">
+                                                <div class="title btn btn-primary btn-outline btn-lg">PERSON</div>
+                                                </a>
+                                            </h4>
+                                        </div>
+                                        <div id="collapseAccount" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingAccount">
+                                            <hr>
+                                            <div class="panel-body">
+                                                <form>
+                                                    <div class="mb-3">
+                                                        <label for="aboutMeFirstName" class="form-label">First Name:</label>
+                                                        <input
+                                                            type="text"
+                                                            id="aboutMeFirstName"
+                                                            class="form-control"
+                                                            [(ngModel)]="person.first_name"
+                                                            name="first_name">
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="aboutMeLastName" class="form-label">Last Name:</label>
+                                                        <input
+                                                            type="text"
+                                                            id="aboutMeLastName"
+                                                            class="form-control"
+                                                            [(ngModel)]="person.last_name"
+                                                            name="last_name">
+                                                    </div>
+                                                    <div class="d-flex flex-column gap-2 mb-2">
+                                                        <div class="form-check">
+                                                            <input
+                                                                class="form-check-input"
+                                                                type="radio"
+                                                                id="genderMale"
+                                                                name="gender"
+                                                                value="M"
+                                                                [(ngModel)]="person.gender">
+                                                            <label class="form-check-label" for="genderMale">Male</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input
+                                                                class="form-check-input"
+                                                                type="radio"
+                                                                id="genderFemale"
+                                                                name="gender"
+                                                                value="F"
+                                                                [(ngModel)]="person.gender">
+                                                            <label class="form-check-label" for="genderFemale">Female</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="aboutMeDateOfBirth" class="form-label">Date of Birth:</label>
+                                                        <input
+                                                            type="date"
+                                                            id="aboutMeDateOfBirth"
+                                                            class="form-control"
+                                                            [(ngModel)]="person.date_of_birth"
+                                                            name="date_of_birth">
+                                                    </div>
+                                                    <!-- Created By -->
+                                                    <div class="mb-3">
+                                                        <label for="createdBy" class="form-label">Created By</label>
+                                                        <input
+                                                        type="text"
+                                                        id="createdBy"
+                                                        class="form-control"
+                                                        [(ngModel)]="person.created_by"
+                                                        name="created_by"
+                                                        readonly>
+                                                    </div>
+                                                    <!-- Created At -->
+                                                    <div class="mb-3">
+                                                        <label for="createdAt" class="form-label">Created At</label>
+                                                        <input
+                                                        type="text"
+                                                        id="createdAt"
+                                                        class="form-control"
+                                                        [(ngModel)]="person.created_at"
+                                                        name="created_at"
+                                                        readonly>
+                                                    </div>
+                                                    <!-- Updated By -->
+                                                    <div class="mb-3">
+                                                        <label for="updatedBy" class="form-label">Updated By</label>
+                                                        <input
+                                                        type="text"
+                                                        id="updatedBy"
+                                                        class="form-control"
+                                                        [(ngModel)]="person.updated_by"
+                                                        name="updated_by"
+                                                        readonly>
+                                                    </div>
+                                                    <!-- Updated At -->
+                                                    <div class="mb-3">
+                                                        <label for="updatedAt" class="form-label">Updated At</label>
+                                                        <input
+                                                        type="text"
+                                                        id="updatedAt"
+                                                        class="form-control"
+                                                        [(ngModel)]="person.updated_at"
+                                                        name="updated_at"
+                                                        readonly>
+                                                    </div>
+                                                    <!-- Account Status -->
+                                                    <div class="mb-3">
+                                                        <label for="accountStatus" class="form-label">Account Status</label>
+                                                        <div class="d-flex align-items-center">
+                                                        <input
+                                                            type="text"
+                                                            id="accountStatus"
+                                                            class="form-control"
+                                                            [(ngModel)]="person.account_status"
+                                                            name="account_status"
+                                                            readonly>
+                                                        <button
+                                                            type="button"
+                                                            class="btn btn-outline-primary ms-2"
+                                                            *ngIf="person.account_status === 'Incomplete'"
+                                                            (click)="openAccordion()">Open Details</button>
+                                                        </div>
+                                                    </div>
+                                                    <button type="button" class="btn btn-primary mt-2" (click)="savePerson()" *ngIf="person.guid && !apiNotHealthy" >Save Person</button>
+                                                    <button type="button" class="btn btn-primary mt-2" (click)="addPerson()" *ngIf="!person.guid && !apiNotHealthy">Add Person</button>
+                                                    <div class="alert alert-primary mt-2" *ngIf="!person.guid || apiNotHealthy">
+                                                        <div class="alert alert-danger" *ngIf="apiNotHealthy">
+                                                            API not healthy, try again later
+                                                        </div>
+                                                        <div class="alert alert-primary" *ngIf="!person.guid && !apiNotHealthy">
+                                                            Please fill in the details to create person.
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <hr>
+                                        </div>
+                                    </div>
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading" role="tab" id="headingContact">
+                                            <h4 class="panel-title">
+                                                <a class="collapsed" role="button" data-bs-toggle="collapse" data-bs-parent="#accordion" href="#collapseContact" aria-expanded="false" aria-controls="collapseContact">
+                                                <div class="title btn btn-primary btn-outline btn-lg">CONTACT</div>
+                                                </a>
+                                            </h4>
+                                        </div>
+                                        <div id="collapseContact" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingContact">
+                                            <hr>
+                                            <div class="panel-body">
+                                                <form>
+                                                    <div class="alert alert-primary">
+                                                        You may add, change or erase the phone numbers in their respective fields and save
+                                                    </div>
+                                                    <div class="alert alert-primary mt-2 mb-2" *ngIf="!person.guid || apiNotHealthy || phoneError">
+                                                        <div class="alert alert-danger" *ngIf="apiNotHealthy">
+                                                            API not healthy, try again later
+                                                        </div>
+                                                        <div class="alert alert-danger" *ngIf="phoneError">
+                                                            Error/s below occurred: {{phoneError}}
+                                                        </div>
+                                                        <div class="alert alert-primary" *ngIf="!person.guid && !apiNotHealthy">
+                                                            First save person details to be able to add phone
+                                                        </div>
+                                                    </div>
+                                                    <div class="mb-3" *ngFor="let phone of person.phone; index as i">
+                                                        <label for="contactPhone{{i}}" class="form-label" *ngIf="phone.number">Phone {{i+1}}:</label>
+                                                        <input
+                                                            type="text"
+                                                            id="contactPhone{{i}}"
+                                                            class="form-control"
+                                                            [(ngModel)]="phone.number"
+                                                            *ngIf="phone.number"
+                                                            name="phone{{i}}">
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="contactPhone" class="form-label">Add New Numbers:</label>
+                                                        <input
+                                                            type="text"
+                                                            id="contactPhone"
+                                                            class="form-control"
+                                                            [(ngModel)]="phoneNumbers"
+                                                            placeholder="Separated by ; e.g +256778562836; +256705294718"
+                                                            name="phone">
+                                                        <button type="button" class="btn btn-primary mt-2" (click)="savePhone()" *ngIf="(phoneNumbers || person?.phone?.[0]?.guid) && !apiNotHealthy">Save Phone</button>
+                                                    </div>
+                                                    <div class="alert alert-primary">
+                                                        You may add, change or erase the addresses in their respective fields and save
+                                                    </div>
+                                                    <div class="alert alert-primary mt-2 mb-2" *ngIf="!person.guid || apiNotHealthy || addressError">
+                                                        <div class="alert alert-danger" *ngIf="apiNotHealthy">
+                                                            API not healthy, try again later
+                                                        </div>
+                                                        <div class="alert alert-danger" *ngIf="addressError">
+                                                            Error/s below occurred: {{addressError}}
+                                                        </div>
+                                                        <div class="alert alert-primary" *ngIf="!person.guid && !apiNotHealthy">
+                                                            First save person details to be able to add address
+                                                        </div>
+                                                    </div>
+                                                    <div class="mb-3" *ngFor="let address of person.address; index as i">
+                                                        <label for="contactAddress{{i}}" class="form-label" *ngIf="address.address">Address {{i+1}}:</label>
+                                                        <input
+                                                            type="text"
+                                                            id="contactAddress{{i}}"
+                                                            class="form-control"
+                                                            [(ngModel)]="address.address"
+                                                            *ngIf="address.address"
+                                                            name="address{{i}}">
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="contactAddress" class="form-label">Add New Addresses:</label>
+                                                        <input
+                                                            type="text"
+                                                            id="contactAddress"
+                                                            class="form-control"
+                                                            [(ngModel)]="addresses"
+                                                            placeholder="Separated by ; e.g Banda, Kampala; Kireka, Wakiso"
+                                                            name="address">
+                                                        <button type="button" class="btn btn-primary mt-2" (click)="saveAddress()" *ngIf="(addresses || person?.address?.[0]?.guid) && !apiNotHealthy">Save Address</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <hr>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-primary-subtle">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Change Password Modal -->
+        <div class="modal fade" id="changePasswordModal" tabindex="-2" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered ">
+                <div class="modal-content">
+                    <div class="modal-header border-primary-subtle">
+                        <h5 class="modal-title" id="changePasswordModalLabel">Change Password</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert" *ngIf="(passwordForm.invalid || passwordMismatch || apiNotHealthy || status === STATUS_TYPE.ERROR) && (passwordForm.touched || passwordForm.dirty)">
+                            <div class="alert alert-danger" *ngIf="apiNotHealthy">
+                                API not healthy, try again later
+                            </div>
+                            <div class="alert alert-danger" *ngIf="status === STATUS_TYPE.ERROR">
+                                Error occured: {{ errorMessage }}
+                            </div>
+                            <div class="alert alert-primary" *ngIf="currentRequired" aria-live="assertive">
+                                Current Password required
+                            </div>
+                            <div class="alert alert-primary" *ngIf="passwordRequired" aria-live="assertive">
+                                Password required
+                            </div>
+                            <div class="alert alert-danger" *ngIf="passwordMinLength" aria-live="assertive">
+                                Current or new password must be at least 8 characters long
+                            </div>
+                            <div class="alert alert-primary" *ngIf="passwordMismatch" aria-live="assertive">
+                            Password mismatch
+                            </div>
+                        </div>
+                        <form class="me-5 ms-5 form" [formGroup]="passwordForm">
+                            <div class="form-floating mb-3">
+                                <input
+                                    class="form-control form-control-lg"
+                                    id="current"
+                                    [type]="showCurrent ? 'test' : 'password'"
+                                    formControlName="current"
+                                    placeholder="Enter Current Password"
+                                >
+                                <label class="form-label" for="password">Current Password</label>
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-secondary position-absolute top-50 end-0 translate-middle-y"
+                                    (click)="showCurrent = !showCurrent"
+                                    tabindex="-1"
+                                    style="border: none; background: none;">
+                                    <!-- Change the icon based on visibility state -->
+                                    <fa-icon [icon]="showCurrent ? faEyeSlash : faEye"></fa-icon>
+                                </button>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input
+                                    class="form-control form-control-lg"
+                                    id="password"
+                                    [type]="showPassword ? 'test' : 'password'"
+                                    formControlName="password1"
+                                    placeholder="Enter Password"
+                                >
+                                <label class="form-label" for="password">Password</label>
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-secondary position-absolute top-50 end-0 translate-middle-y"
+                                    (click)="showPassword = !showPassword"
+                                    tabindex="-1"
+                                    style="border: none; background: none;">
+                                    <!-- Change the icon based on visibility state -->
+                                    <fa-icon [icon]="showPassword ? faEyeSlash : faEye"></fa-icon>
+                                </button>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input
+                                    class="form-control form-control-lg"
+                                    [type]="showPassword2? 'text': 'password'"
+                                    formControlName="password2"
+                                    id="password2"
+                                    placeholder="password"
+                                >
+                                <label class="form-label" for="password2">Confirm password</label>
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-secondary position-absolute top-50 end-0 translate-middle-y"
+                                    (click)="showPassword2 = !showPassword2"
+                                    tabindex="-1"
+                                    style="border: none; background: none;">
+                                    <!-- Change the icon based on visibility state -->
+                                    <fa-icon [icon]="showPassword2 ? faEyeSlash : faEye"></fa-icon>
+                                </button>
+                            </div>
+                            <div class="d-flex justify-content-center" *ngIf="!(passwordForm.invalid || passwordMismatch || apiNotHealthy)">
+                                <button type="button" class="btn btn-primary mt-2" (click)="updatePassword()">Change Password</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer border-primary-subtle">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="row mt-4">
+            <app-reusable-card
+                [items]="cardData.items">
+            </app-reusable-card>
+        </div>
+
+        <!-- <div style="max-width: 400px;">
+            <app-notify #notification></app-notify>
+        </div> -->
+    </div>
+</div>

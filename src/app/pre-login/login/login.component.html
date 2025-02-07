@@ -39,7 +39,7 @@
                         <fa-icon [icon]="showPassword ? faEyeSlash : faEye"></fa-icon>
                     </button>
                 </div>
-                <button class="btn btn-outline-primary w-100" type="submit" [disabled]="!loginForm.valid || apiNotHealthy">
+                <button class="btn btn-outline-primary w-100" type="submit" [hidden]="!loginForm.valid || apiNotHealthy">
                   Login
                   <div class="spinner-border" role="status" *ngIf="status == 'LOADING'" >
                     <span class="visually-hidden">Loading...</span>
@@ -51,6 +51,7 @@
             <a href="facebook.com" class="text-center">Login with Facebook</a>
             <hr>
             <a class="text-center"  [routerLink]="['/register']" >No account yet? Register here</a>
+            <a class="text-center"  [routerLink]="['/password_reset']" >Forgot password? Reset here</a>
         </div>
     </div>
 </div>
