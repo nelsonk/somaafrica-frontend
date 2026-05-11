@@ -2,12 +2,12 @@ import { Component, OnInit, HostListener } from '@angular/core';
 import { ActivatedRoute, Router, NavigationStart, RouterLink, RouterLinkActive } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { AuthService } from '../../services/auth/auth-service.service';
-import { CommonModule } from '@angular/common';
+
 import { NavigationService } from '../../services/navigation/navigation.service';
 
 @Component({
     selector: 'app-header',
-    imports: [RouterLink, RouterLinkActive, CommonModule],
+    imports: [RouterLink, RouterLinkActive],
     templateUrl: './header.component.html',
     styleUrls: ['./header.component.css']
 })

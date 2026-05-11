@@ -1,92 +1,93 @@
 <div class="container-fluid p-0 header">
-    <nav class="navbar navbar-expand-lg navbar-glass sticky-top m-2 rounded" [class.navbar-shrink]="isScrolled">
-      <div class="container-fluid">
-        <a class="navbar-brand logo-wrapper" [routerLink]="['/']" >
-          <img src="img/logo.png" alt="SomaAfrica" width="230">
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navBarSoma"
-          aria-controls="navBarSoma" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navBarSoma">
-          <ul class="navbar-nav w-100 justify-content-evenly">
-            <!-- ACTIVE INDICATOR -->
-            <div class="nav-indicator" [style.left.px]="indicatorLeft" [style.width.px]="indicatorWidth"></div>
+  <nav class="navbar navbar-expand-lg navbar-glass sticky-top m-2 rounded" [class.navbar-shrink]="isScrolled">
+    <div class="container-fluid">
+      <a class="navbar-brand logo-wrapper" [routerLink]="['/']" >
+        <img src="img/logo.png" alt="SomaAfrica" width="230">
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navBarSoma"
+        aria-controls="navBarSoma" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navBarSoma">
+        <ul class="navbar-nav w-100 justify-content-evenly">
+          <!-- ACTIVE INDICATOR -->
+          <div class="nav-indicator" [style.left.px]="indicatorLeft" [style.width.px]="indicatorWidth"></div>
 
+          <li class="nav-item">
+            <a class="nav-link"
+              [routerLink]="['/register']"
+              routerLinkActive="nav-active"
+              [routerLinkActiveOptions]="{ exact: true }"
+              (mouseenter)="moveIndicator($event)"
+              (click)="setActive($event)">
+              About
+            </a>
+          </li>
+          <li class="nav-item dropdown" routerLinkActive="nav-active" #rlaLearning="routerLinkActive">
+            <a class="nav-link dropdown-toggle"   id="learningDropDown"
+              role="button" aria-expanded="false"
+              [class.nav-active]="rlaLearning.isActive"
+              (mouseenter)="moveIndicator($event)">
+              e-Learning
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="learningDropDown">
+              <li><a class="dropdown-item" routerLink="/learning/reading"  routerLinkActive="active">Reading</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" routerLink="/learning/videos"  routerLinkActive="active">Video / Audio</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" routerLink="/learning/exams"  routerLinkActive="active">Quiz / Exams</a></li>
+            </ul>
+          </li>
+          <li class="nav-item dropdown" routerLinkActive="nav-active" #rlaSchool="routerLinkActive">
+            <a class="nav-link dropdown-toggle" id="schoolsDropDown"
+              role="button" aria-expanded="false"
+              [class.nav-active]="rlaSchool.isActive"
+              (mouseenter)="moveIndicator($event)">
+              Schools
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="schoolsDropDown">
+              <li><a class="dropdown-item" routerLink="/schools/all"  routerLinkActive="active">All</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" routerLink="/schools/tertiary"  routerLinkActive="active">Tertiary</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" routerLink="/schools/secondary"  routerLinkActive="active">Secondary</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" routerLink="/schools/primary"  routerLinkActive="active">Primary</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" routerLink="/schools/nursery"  routerLinkActive="active">Nursery/Kindergarten</a></li>
+            </ul>
+          </li>
+          <li class="nav-item dropdown" routerLinkActive="nav-active" #rlaTeacher="routerLinkActive">
+            <a class="nav-link dropdown-toggle" id="teachersDropDown"
+              role="button" aria-expanded="false"
+              [class.nav-active]="rlaTeacher.isActive"
+              (mouseenter)="moveIndicator($event)">
+              Teachers
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="teachersDropDown">
+              <li><a class="dropdown-item" routerLink="/teachers/all"  routerLinkActive="active">All</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" routerLink="/teachers/tertiary"  routerLinkActive="active">Tertiary</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" routerLink="/teachers/secondary"  routerLinkActive="active">Secondary</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" routerLink="/teachers/primary"  routerLinkActive="active">Primary</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" routerLink="/teachers/nursery"  routerLinkActive="active">Nursery/Kindergarten</a></li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              [routerLink]="['/register']"
+              routerLinkActive="nav-active"
+              [routerLinkActiveOptions]="{ exact: true }"
+              (mouseenter)="moveIndicator($event)">
+              Bursaries
+            </a>
+          </li>
+          @if (!this.authenticated) {
             <li class="nav-item">
-              <a class="nav-link"
-                [routerLink]="['/register']"
-                routerLinkActive="nav-active"
-                [routerLinkActiveOptions]="{ exact: true }"
-                (mouseenter)="moveIndicator($event)"
-                (click)="setActive($event)">
-                About
-              </a>
-            </li>
-            <li class="nav-item dropdown" routerLinkActive="nav-active" #rlaLearning="routerLinkActive">
-              <a class="nav-link dropdown-toggle"   id="learningDropDown"
-                role="button" aria-expanded="false"
-                [class.nav-active]="rlaLearning.isActive"
-                (mouseenter)="moveIndicator($event)">
-                e-Learning
-              </a>
-              <ul class="dropdown-menu" aria-labelledby="learningDropDown">
-                <li><a class="dropdown-item" routerLink="/learning/reading"  routerLinkActive="active">Reading</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" routerLink="/learning/videos"  routerLinkActive="active">Video / Audio</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" routerLink="/learning/exams"  routerLinkActive="active">Quiz / Exams</a></li>
-              </ul>
-            </li>
-            <li class="nav-item dropdown" routerLinkActive="nav-active" #rlaSchool="routerLinkActive">
-              <a class="nav-link dropdown-toggle" id="schoolsDropDown"
-                role="button" aria-expanded="false"
-                [class.nav-active]="rlaSchool.isActive"
-                (mouseenter)="moveIndicator($event)">
-                Schools
-              </a>
-              <ul class="dropdown-menu" aria-labelledby="schoolsDropDown">
-                <li><a class="dropdown-item" routerLink="/schools/all"  routerLinkActive="active">All</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" routerLink="/schools/tertiary"  routerLinkActive="active">Tertiary</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" routerLink="/schools/secondary"  routerLinkActive="active">Secondary</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" routerLink="/schools/primary"  routerLinkActive="active">Primary</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" routerLink="/schools/nursery"  routerLinkActive="active">Nursery/Kindergarten</a></li>
-              </ul>
-            </li>
-            <li class="nav-item dropdown" routerLinkActive="nav-active" #rlaTeacher="routerLinkActive">
-              <a class="nav-link dropdown-toggle" id="teachersDropDown"
-                role="button" aria-expanded="false"
-                [class.nav-active]="rlaTeacher.isActive"
-                (mouseenter)="moveIndicator($event)">
-                Teachers
-              </a>
-              <ul class="dropdown-menu" aria-labelledby="teachersDropDown">
-                <li><a class="dropdown-item" routerLink="/teachers/all"  routerLinkActive="active">All</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" routerLink="/teachers/tertiary"  routerLinkActive="active">Tertiary</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" routerLink="/teachers/secondary"  routerLinkActive="active">Secondary</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" routerLink="/teachers/primary"  routerLinkActive="active">Primary</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" routerLink="/teachers/nursery"  routerLinkActive="active">Nursery/Kindergarten</a></li>
-              </ul>
-            </li>
-            <li class="nav-item">
-              <a
-                class="nav-link"
-                [routerLink]="['/register']"
-                routerLinkActive="nav-active"
-                [routerLinkActiveOptions]="{ exact: true }"
-                (mouseenter)="moveIndicator($event)">
-                Bursaries
-              </a>
-            </li>
-            <li class="nav-item" *ngIf="!this.authenticated; else logoutBtn">
               <button
                 class="btn btn-outline-primary me-2 mb-2 my-hover-text-light"
                 type="button"
@@ -96,28 +97,28 @@
                 Login
               </button>
             </li>
+          } @else {
+            <li class="nav-item">
+              <button
+                class="btn btn-outline-info me-2 my-hover-text-light"
+                type="button"
+                (click)="profile()"
+                (mouseenter)="moveIndicator($event)">
+                Dashboard
+              </button>
+              <button
+                class="btn btn-outline-danger me-2 my-hover-text-light"
+                type="button"
+                (click)="logout()"
+                (mouseenter)="moveIndicator($event)">
+                Logout
+              </button>
+            </li>
+          }
 
-            <ng-template #logoutBtn>
-              <li class="nav-item">
-                <button
-                  class="btn btn-outline-info me-2 my-hover-text-light"
-                  type="button"
-                  (click)="profile()"
-                  (mouseenter)="moveIndicator($event)">
-                  Dashboard
-                </button>
-                <button
-                  class="btn btn-outline-danger me-2 my-hover-text-light"
-                  type="button"
-                  (click)="logout()"
-                  (mouseenter)="moveIndicator($event)">
-                  Logout
-                </button>
-              </li>
-            </ng-template>
 
-          </ul>
-        </div>
+        </ul>
       </div>
-    </nav>
-  </div>
+    </div>
+  </nav>
+</div>

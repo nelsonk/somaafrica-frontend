@@ -5,7 +5,7 @@ import { NotificationService } from '../../services/info/notification.service';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { STATUS_TYPE } from '../../utils/status-type';
 import { ApiHealthService } from '../../services/api/api-health.service';
-import { CommonModule } from '@angular/common';
+
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Title } from '@angular/platform-browser';
@@ -13,7 +13,7 @@ import { checkPasswordMatch } from '../../utils/password-match';
 
 @Component({
     selector: 'app-reset-password',
-    imports: [CommonModule, FontAwesomeModule, ReactiveFormsModule, RouterLink],
+    imports: [FontAwesomeModule, ReactiveFormsModule, RouterLink],
     templateUrl: './reset-password.component.html',
     styleUrl: './reset-password.component.css'
 })

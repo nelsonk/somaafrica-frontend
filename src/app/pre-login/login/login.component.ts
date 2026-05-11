@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { Title } from '@angular/platform-browser';
@@ -13,7 +13,7 @@ import { NavigationService } from '../../services/navigation/navigation.service'
 
 @Component({
     selector: 'app-login',
-    imports: [ReactiveFormsModule, CommonModule, RouterLink, FontAwesomeModule],
+    imports: [ReactiveFormsModule, RouterLink, FontAwesomeModule],
     providers: [AuthService, ApiHealthService],
     templateUrl: './login.component.html',
     styleUrls: ['./login.component.css']

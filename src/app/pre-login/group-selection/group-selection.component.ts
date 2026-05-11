@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, OnInit } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faChalkboardTeacher, faBookReader, faSchoolCircleExclamation, faSackDollar } from '@fortawesome/free-solid-svg-icons';
@@ -12,7 +12,7 @@ import { NavigationService } from '../../services/navigation/navigation.service'
 
 @Component({
     selector: 'app-group-selection',
-    imports: [CommonModule, FontAwesomeModule],
+    imports: [FontAwesomeModule],
     templateUrl: './group-selection.component.html',
     styleUrl: './group-selection.component.css'
 })

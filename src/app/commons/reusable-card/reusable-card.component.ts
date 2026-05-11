@@ -1,4 +1,4 @@
-import { CommonModule, NgFor } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component, Input} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CardItem } from '../../models/card.interface';

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { Title } from '@angular/platform-browser';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule} from '@angular/forms';
 import { FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
@@ -17,7 +17,7 @@ import { NavigationService } from '../../services/navigation/navigation.service'
 
 @Component({
     selector: 'app-register',
-    imports: [CommonModule, ReactiveFormsModule, RouterLink, FontAwesomeModule],
+    imports: [ReactiveFormsModule, RouterLink, FontAwesomeModule],
     providers: [ApiHealthService],
     templateUrl: './register.component.html',
     styleUrls: ['./register.component.css']

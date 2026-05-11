@@ -1,19 +1,23 @@
 <!-- Main Content -->
 <div class="d-flex align-items-start gap-3 mt-4 mx-2">
-    <!-- add min-width: 0 in adtion to the flex to allow dynamic shrinking and growing-->
-    <div *ngIf="teachersTable" [style.flex]="teacherData ? '0 0 40%' : '1'" style="min-width: 0;">
-        <app-table
-            [tableData]="teachersTable"
-            (rowClicked)="onRowClick($event)"
-            (actionClicked)="onActionClick($event)"
-            [compact]="!!teacherData"
-        ></app-table>
+  <!-- add min-width: 0 in adtion to the flex to allow dynamic shrinking and growing-->
+  @if (teachersTable) {
+    <div [style.flex]="teacherData ? '0 0 40%' : '1'" style="min-width: 0;">
+      <app-table
+        [tableData]="teachersTable"
+        (rowClicked)="onRowClick($event)"
+        (actionClicked)="onActionClick($event)"
+        [compact]="!!teacherData"
+      ></app-table>
     </div>
+  }
 
-    <div *ngIf="teacherData" style="flex: 1 1 auto; min-width: 0;">
-        <app-details-page
-            [detailsData]="teacherData"
-            (close)="onCloseDetail()"
-        ></app-details-page>
+  @if (teacherData) {
+    <div style="flex: 1 1 auto; min-width: 0;">
+      <app-details-page
+        [detailsData]="teacherData"
+        (close)="onCloseDetail()"
+      ></app-details-page>
     </div>
+  }
 </div>

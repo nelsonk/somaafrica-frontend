@@ -8,12 +8,12 @@ import { ConfirmationService } from '../../../services/info/confirmation.service
 import { environment } from '../../../../environments/environment';
 import { CrudService } from '../../../services/api/crud.service';
 import { DEFAULT_TEACHER, Teacher } from '../../../models/teacher.interface';
-import { CommonModule } from '@angular/common';
+
 import { NavigationService } from '../../../services/navigation/navigation.service';
 
 @Component({
     selector: 'app-teacher',
-    imports: [TableComponent, DetailsPageComponent, CommonModule],
+    imports: [TableComponent, DetailsPageComponent],
     templateUrl: './teacher.component.html',
     styleUrl: './teacher.component.css'
 })

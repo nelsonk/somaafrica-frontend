@@ -1,22 +1,29 @@
 <div class="card-selection-container">
-    <h2 class="title">{{title}}</h2>
-    <p class="subtitle">{{description}}</p>
-    <div class="card-grid">
+  <h2 class="title">{{title}}</h2>
+  <p class="subtitle">{{description}}</p>
+  <div class="card-grid">
+    @for (item of items; track item) {
       <div
-        *ngFor="let item of items"
         class="group-card"
         [routerLink]="item.link"
-      >
+        >
         <div class="card-item">
-            <img [src]="item.image" class="card-item-image" *ngIf="item.image">
+          @if (item.image) {
+            <img [src]="item.image" class="card-item-image">
+          }
         </div>
         <div class="card-overlay">
           <h3 class="card-name">{{item.title}}</h3>
-          <p *ngIf="item.desc" class="card-description"> {{item.desc | slice:0:length}} {{item.desc.length > length ? "..." : ""}}</p>
-          <a [routerLink]="item.link" *ngIf="item.link" class="card-description">Learn More</a>
+          @if (item.desc) {
+            <p class="card-description"> {{item.desc | slice:0:length}} {{item.desc.length > length ? "..." : ""}}</p>
+          }
+          @if (item.link) {
+            <a [routerLink]="item.link" class="card-description">Learn More</a>
+          }
         </div>
       </div>
-    </div>
+    }
+  </div>
 </div>
 
 

@@ -1,5 +1,5 @@
 import { Component, OnInit, ElementRef, ViewChild, Renderer2, Input} from '@angular/core';
-import { CommonModule, NgForOf } from '@angular/common';
+
 import { Title } from '@angular/platform-browser';
 import { ReactiveFormsModule, FormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterLink, NavigationEnd, ActivatedRoute } from '@angular/router';
@@ -24,7 +24,7 @@ declare var bootstrap: any;
 
 @Component({
     selector: 'app-profile',
-    imports: [CommonModule, FontAwesomeModule, ReactiveFormsModule, FormsModule, NgForOf, RouterLink],
+    imports: [FontAwesomeModule, ReactiveFormsModule, FormsModule, RouterLink],
     templateUrl: './profile.component.html',
     styleUrl: './profile.component.css'
 })

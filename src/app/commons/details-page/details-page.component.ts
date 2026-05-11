@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, Input, OnInit, Output } from '@angular/core';
 import { DetailsData } from '../../models/details.interface';
 import { TableComponent } from '../table/table.component';
@@ -6,7 +6,7 @@ import { EventEmitter } from '@angular/core';
 
 @Component({
     selector: 'app-details-page',
-    imports: [CommonModule, TableComponent],
+    imports: [TableComponent],
     templateUrl: './details-page.component.html',
     styleUrl: './details-page.component.css'
 })

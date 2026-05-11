@@ -6,12 +6,12 @@ import { FloatingButtonComponent } from "./commons/floating-button/floating-butt
 import { NotifyComponent } from './commons/notify/notify.component';
 import { ConfirmComponent } from './commons/confirm/confirm.component';
 import { filter } from 'rxjs';
-import { CommonModule } from '@angular/common';
+
 import { FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 
 @Component({
     selector: 'app-root',
-    imports: [RouterOutlet, HeaderComponent, FooterComponent, FloatingButtonComponent, ConfirmComponent, NotifyComponent, CommonModule, FontAwesomeModule],
+    imports: [RouterOutlet, HeaderComponent, FooterComponent, FloatingButtonComponent, ConfirmComponent, NotifyComponent, FontAwesomeModule],
     templateUrl: './app.component.html',
     styleUrl: './app.component.css'
 })

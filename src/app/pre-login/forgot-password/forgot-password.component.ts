@@ -5,13 +5,13 @@ import { EmailValidator, FormBuilder, FormGroup, ReactiveFormsModule, RequiredVa
 import { ApiHealthService } from '../../services/api/api-health.service';
 import { catchError, of} from 'rxjs';
 import { STATUS_TYPE } from '../../utils/status-type';
-import { CommonModule } from '@angular/common';
+
 import { NotificationService } from '../../services/info/notification.service';
 import { Title } from '@angular/platform-browser';
 
 @Component({
     selector: 'app-forgot-password',
-    imports: [RouterLink, ReactiveFormsModule, CommonModule],
+    imports: [RouterLink, ReactiveFormsModule],
     templateUrl: './forgot-password.component.html',
     styleUrl: './forgot-password.component.css'
 })
