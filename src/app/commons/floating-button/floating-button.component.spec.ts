@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 
 import { FloatingButtonComponent } from './floating-button.component';
 
@@ -8,7 +9,8 @@ describe('FloatingButtonComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [FloatingButtonComponent]
+      imports: [FloatingButtonComponent],
+      providers: [provideRouter([])]
     })
     .compileComponents();
 

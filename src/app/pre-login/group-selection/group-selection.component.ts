@@ -56,7 +56,7 @@ export class GroupSelectionComponent implements OnInit{
     private navInterceptor: NavigationService
   ){
     title.setTitle("SomaAfrica - Roles");
-    const role = sessionStorage.getItem("User").groups
+    const role = sessionStorage.getItem("User")?.groups
 
     if(Array.isArray(role) && role.length > 0){
       authService.navigateToPage("profile")

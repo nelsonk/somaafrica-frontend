@@ -14,7 +14,7 @@ export const DEFAULT_USER: User = {
   ...DEFAULT_TIMESTAMP_MODEL,
   username: null,
   email: null,
-  guid: '',
+  guid: 'ghshshjjsjsjkskksskjsnbjsdbbdbjd',
   groups: [],
   is_active: false,
   is_superuser: false,

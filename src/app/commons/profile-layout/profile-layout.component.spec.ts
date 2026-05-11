@@ -1,6 +1,17 @@
+import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
+import { RouterOutlet } from '@angular/router';
 
 import { ProfileLayoutComponent } from './profile-layout.component';
+
+
+@Component({
+  selector: 'app-profile',
+  standalone: true,
+  template: ''
+})
+class MockProfileComponent {}
 
 describe('ProfileLayoutComponent', () => {
   let component: ProfileLayoutComponent;
@@ -8,7 +19,13 @@ describe('ProfileLayoutComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ProfileLayoutComponent]
+      imports: [ProfileLayoutComponent],
+      providers: [provideRouter([])]
+    })
+    .overrideComponent(ProfileLayoutComponent, {
+      set: {
+        imports: [RouterOutlet, MockProfileComponent] // ✅ include mock here
+      }
     })
     .compileComponents();
 

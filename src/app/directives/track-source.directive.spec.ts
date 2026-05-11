@@ -1,3 +1,5 @@
+/// <reference types="jasmine" />
+
 import { TrackSourceDirective } from './track-source.directive';
 import { Router } from '@angular/router';
 
