@@ -11,11 +11,10 @@ import { ApiHealthService } from '../../services/api/api-health.service';
 import { NavigationService } from '../../services/navigation/navigation.service';
 
 @Component({
-  selector: 'app-group-selection',
-  standalone: true,
-  imports: [CommonModule, FontAwesomeModule],
-  templateUrl: './group-selection.component.html',
-  styleUrl: './group-selection.component.css'
+    selector: 'app-group-selection',
+    imports: [CommonModule, FontAwesomeModule],
+    templateUrl: './group-selection.component.html',
+    styleUrl: './group-selection.component.css'
 })
 export class GroupSelectionComponent implements OnInit{
   STATUS_TYPE = STATUS_TYPE;

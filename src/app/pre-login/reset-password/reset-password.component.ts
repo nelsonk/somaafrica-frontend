@@ -12,11 +12,10 @@ import { Title } from '@angular/platform-browser';
 import { checkPasswordMatch } from '../../utils/password-match';
 
 @Component({
-  selector: 'app-reset-password',
-  standalone: true,
-  imports: [CommonModule, FontAwesomeModule, ReactiveFormsModule, RouterLink],
-  templateUrl: './reset-password.component.html',
-  styleUrl: './reset-password.component.css'
+    selector: 'app-reset-password',
+    imports: [CommonModule, FontAwesomeModule, ReactiveFormsModule, RouterLink],
+    templateUrl: './reset-password.component.html',
+    styleUrl: './reset-password.component.css'
 })
 export class ResetPasswordComponent implements OnInit{
   faEye = faEye;

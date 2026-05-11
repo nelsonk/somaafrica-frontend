@@ -5,11 +5,10 @@ import { ReusableCardComponent } from '../../commons/reusable-card/reusable-card
 import { NavigationService } from '../../services/navigation/navigation.service';
 
 @Component({
-  selector: 'app-home',
-  standalone: true,
-  imports: [RouterLink, ReusableCardComponent],
-  templateUrl: './home.component.html',
-  styleUrl: './home.component.css'
+    selector: 'app-home',
+    imports: [RouterLink, ReusableCardComponent],
+    templateUrl: './home.component.html',
+    styleUrl: './home.component.css'
 })
 export class HomeComponent {
   cardData = {

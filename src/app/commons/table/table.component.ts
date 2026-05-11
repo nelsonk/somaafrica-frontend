@@ -4,11 +4,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 @Component({
-  selector: 'app-table',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
-  templateUrl: './table.component.html',
-  styleUrl: './table.component.css'
+    selector: 'app-table',
+    imports: [CommonModule, FormsModule],
+    templateUrl: './table.component.html',
+    styleUrl: './table.component.css'
 })
 export class TableComponent implements OnInit, OnChanges{
   @Input() tableData!: TableData;

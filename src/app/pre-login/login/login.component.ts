@@ -12,12 +12,11 @@ import { STATUS_TYPE } from '../../utils/status-type';
 import { NavigationService } from '../../services/navigation/navigation.service';
 
 @Component({
-  selector: 'app-login',
-  standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, RouterLink, FontAwesomeModule],
-  providers:[AuthService, ApiHealthService],
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+    selector: 'app-login',
+    imports: [ReactiveFormsModule, CommonModule, RouterLink, FontAwesomeModule],
+    providers: [AuthService, ApiHealthService],
+    templateUrl: './login.component.html',
+    styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit{
   loginForm!: FormGroup;

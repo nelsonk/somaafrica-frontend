@@ -3,11 +3,10 @@ import { CommonModule } from '@angular/common';
 import { NotificationService } from '../../services/info/notification.service';
 
 @Component({
-  selector: 'app-notify',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './notify.component.html',
-  styleUrl: './notify.component.css'
+    selector: 'app-notify',
+    imports: [CommonModule],
+    templateUrl: './notify.component.html',
+    styleUrl: './notify.component.css'
 })
 export class NotifyComponent implements OnInit{
   message: string = '';

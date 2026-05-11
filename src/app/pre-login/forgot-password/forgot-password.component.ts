@@ -10,11 +10,10 @@ import { NotificationService } from '../../services/info/notification.service';
 import { Title } from '@angular/platform-browser';
 
 @Component({
-  selector: 'app-forgot-password',
-  standalone: true,
-  imports: [RouterLink, ReactiveFormsModule, CommonModule],
-  templateUrl: './forgot-password.component.html',
-  styleUrl: './forgot-password.component.css'
+    selector: 'app-forgot-password',
+    imports: [RouterLink, ReactiveFormsModule, CommonModule],
+    templateUrl: './forgot-password.component.html',
+    styleUrl: './forgot-password.component.css'
 })
 export class ForgotPasswordComponent implements OnInit{
   forgotPasswordForm!: FormGroup;

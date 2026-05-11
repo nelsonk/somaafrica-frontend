@@ -16,12 +16,11 @@ import { checkPasswordMatch } from '../../utils/password-match';
 import { NavigationService } from '../../services/navigation/navigation.service';
 
 @Component({
-  selector: 'app-register',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, FontAwesomeModule],
-  providers: [ApiHealthService],
-  templateUrl: './register.component.html',
-  styleUrls: ['./register.component.css']
+    selector: 'app-register',
+    imports: [CommonModule, ReactiveFormsModule, RouterLink, FontAwesomeModule],
+    providers: [ApiHealthService],
+    templateUrl: './register.component.html',
+    styleUrls: ['./register.component.css']
 })
 export class RegisterComponent implements OnInit{
   registerForm!: FormGroup;

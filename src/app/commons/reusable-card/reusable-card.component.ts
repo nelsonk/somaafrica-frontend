@@ -5,11 +5,10 @@ import { CardItem } from '../../models/card.interface';
 
 
 @Component({
-  selector: 'app-reusable-card',
-  standalone: true,
-  imports: [RouterLink, CommonModule],
-  templateUrl: './reusable-card.component.html',
-  styleUrl: './reusable-card.component.css'
+    selector: 'app-reusable-card',
+    imports: [RouterLink, CommonModule],
+    templateUrl: './reusable-card.component.html',
+    styleUrl: './reusable-card.component.css'
 })
 
 export class ReusableCardComponent {

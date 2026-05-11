@@ -10,11 +10,10 @@ import { CommonModule } from '@angular/common';
 import { FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [RouterOutlet, HeaderComponent, FooterComponent, FloatingButtonComponent, ConfirmComponent, NotifyComponent, CommonModule, FontAwesomeModule],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+    selector: 'app-root',
+    imports: [RouterOutlet, HeaderComponent, FooterComponent, FloatingButtonComponent, ConfirmComponent, NotifyComponent, CommonModule, FontAwesomeModule],
+    templateUrl: './app.component.html',
+    styleUrl: './app.component.css'
 })
 export class AppComponent implements OnInit{
   title = 'SomaAfrica';

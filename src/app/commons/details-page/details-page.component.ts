@@ -5,11 +5,10 @@ import { TableComponent } from '../table/table.component';
 import { EventEmitter } from '@angular/core';
 
 @Component({
-  selector: 'app-details-page',
-  standalone: true,
-  imports: [CommonModule, TableComponent],
-  templateUrl: './details-page.component.html',
-  styleUrl: './details-page.component.css'
+    selector: 'app-details-page',
+    imports: [CommonModule, TableComponent],
+    templateUrl: './details-page.component.html',
+    styleUrl: './details-page.component.css'
 })
 export class DetailsPageComponent implements OnInit{
   @Input() detailsData!: DetailsData;

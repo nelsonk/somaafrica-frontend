@@ -12,11 +12,10 @@ import { CommonModule } from '@angular/common';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 
 @Component({
-  selector: 'app-teacher',
-  standalone: true,
-  imports: [TableComponent, DetailsPageComponent, CommonModule],
-  templateUrl: './teacher.component.html',
-  styleUrl: './teacher.component.css'
+    selector: 'app-teacher',
+    imports: [TableComponent, DetailsPageComponent, CommonModule],
+    templateUrl: './teacher.component.html',
+    styleUrl: './teacher.component.css'
 })
 export class TeacherComponent implements OnInit{
   teachersTable!: TableData;

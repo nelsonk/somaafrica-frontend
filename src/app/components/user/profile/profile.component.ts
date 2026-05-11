@@ -23,11 +23,10 @@ declare var bootstrap: any;
 
 
 @Component({
-  selector: 'app-profile',
-  standalone: true,
-  imports: [CommonModule, FontAwesomeModule, ReactiveFormsModule, FormsModule, NgForOf, RouterLink],
-  templateUrl: './profile.component.html',
-  styleUrl: './profile.component.css'
+    selector: 'app-profile',
+    imports: [CommonModule, FontAwesomeModule, ReactiveFormsModule, FormsModule, NgForOf, RouterLink],
+    templateUrl: './profile.component.html',
+    styleUrl: './profile.component.css'
 })
 export class ProfileComponent implements OnInit{
   apiNotHealthy:boolean = true;
