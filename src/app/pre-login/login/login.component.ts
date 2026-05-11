@@ -4,12 +4,12 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { RouterLink } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { AuthService } from '../../services/auth/auth-service.service';
-import { catchError, of } from 'rxjs';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { ApiHealthService } from '../../services/api/api-health.service';
 import { SessionStorageService } from '../../services/storage/session-storage.service';
 import { STATUS_TYPE } from '../../utils/status-type';
+import { NavigationService } from '../../services/navigation/navigation.service';
 
 @Component({
   selector: 'app-login',
@@ -39,7 +39,7 @@ export class LoginComponent implements OnInit{
     this.title.setTitle("SomaAfrica - Login");
 
     if (this.sessionStorage.getItem("isAuthenticated")){
-      this.authService.navigateToPage("user/profile", "login");
+      this.authService.navigateToPage("user/profile");
     }
   }
 
@@ -66,15 +66,15 @@ onSubmit(): void {
 
   this.authService.login(data)
   .subscribe(
-    (response) => {
-      if (response.status === STATUS_TYPE.ERROR) {
+    {
+      next: () => {
+        this.status = STATUS_TYPE.SUCCESS;
+        this.authService.navigateToPage("profile");
+      },
+      error: (err) => {
         this.status = STATUS_TYPE.ERROR;
-        this.errorMessage = response.detail;
-        return;
+        this.errorMessage = err.error.detail;
       }
-
-      this.status = STATUS_TYPE.SUCCESS;
-      this.authService.navigateToPage("user/profile", "login");
     }
   );
 

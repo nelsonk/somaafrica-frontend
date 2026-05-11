@@ -64,13 +64,14 @@ export class ForgotPasswordComponent implements OnInit{
     }
 
     this.authService.requestPasswordReset(data).subscribe(
-      (response) => {
-        if (response.status != STATUS_TYPE.ERROR){
+      {
+        next: (response) => {
           this.status = STATUS_TYPE.SUCCESS;
           this.notificationService.showNotification('Success', response.detail, 'success');
-        }else{
+        },
+        error: (err) => {
           this.status = STATUS_TYPE.ERROR;
-          this.notificationService.showNotification('Error', response.detail, 'error');
+          this.notificationService.showNotification('Error', err.error.detail, 'error');
         }
       }
     )

@@ -8,4 +8,7 @@
 <div style="max-width: 400px;">
     <app-notify></app-notify>
 </div>
-<router-outlet />
+<router-outlet></router-outlet>
+<ng-container *ngIf="showHeader">
+    <app-footer></app-footer>
+</ng-container>

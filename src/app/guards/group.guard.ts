@@ -9,7 +9,6 @@ export const groupGuard: CanActivateFn = (route, state) => {
 
   const groupSelected: boolean = Array.isArray(user.groups) && user.groups.length > 0;
 
-
   if(!groupSelected){
     router.navigate(['group']);
   }

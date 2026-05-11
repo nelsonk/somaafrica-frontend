@@ -81,13 +81,14 @@ export class ResetPasswordComponent implements OnInit{
     }
 
     this.authService.resetPassword(this.guid, this.token, data).subscribe(
-      (response) => {
-        if (response.status !== STATUS_TYPE.ERROR) {
+      {
+        next: () => {
           this.status = STATUS_TYPE.SUCCESS
           this.notificationService.showNotification("Success", "Password reset successfully", "success");
-        }else{
-          this.status = STATUS_TYPE.ERROR
-          this.notificationService.showNotification("Error", response.detail, "error");
+        },
+        error: (err) => {
+          this.status = STATUS_TYPE.ERROR;
+          this.notificationService.showNotification("Error", err.error.detail, "error");
         }
       }
     )

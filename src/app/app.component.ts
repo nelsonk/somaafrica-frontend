@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { NavigationEnd, NavigationError, Event, Router, RouterOutlet } from '@angular/router';
 import { HeaderComponent } from './commons/header/header.component';
+import { FooterComponent } from './commons/footer/footer.component';
 import { FloatingButtonComponent } from "./commons/floating-button/floating-button.component";
 import { NotifyComponent } from './commons/notify/notify.component';
 import { ConfirmComponent } from './commons/confirm/confirm.component';
@@ -11,12 +12,12 @@ import { FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, HeaderComponent, FloatingButtonComponent, ConfirmComponent, NotifyComponent, CommonModule, FontAwesomeModule],
+  imports: [RouterOutlet, HeaderComponent, FooterComponent, FloatingButtonComponent, ConfirmComponent, NotifyComponent, CommonModule, FontAwesomeModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
 export class AppComponent implements OnInit{
-  title = 'somaafrica-frontend';
+  title = 'SomaAfrica';
   showHeader = true;
 
   constructor(private router: Router){}
@@ -26,7 +27,7 @@ export class AppComponent implements OnInit{
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: NavigationEnd) => {
       const currentUrl = this.router.url.split("?")[0]
-      const shownUrls = ["home"]
+      const shownUrls = ["/"]
 
       this.showHeader = shownUrls.includes(currentUrl)
     });

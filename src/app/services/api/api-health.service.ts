@@ -1,18 +1,19 @@
-import { Injectable } from '@angular/core';
+import { EnvironmentInjector, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { timer, switchMap, of, catchError, Observable, BehaviorSubject } from 'rxjs';
 import { HttpContextToken, HttpContext } from '@angular/common/http';
-import { BYPASS_INTERCEPTOR } from '../../utils/http-context-tokens';
+import { BYPASS_AUTH_TOKEN } from '../../utils/http-context-tokens';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiHealthService {
-  apiUrl: string = "http://localhost:8000/api/health";
+  apiUrl: string = `${environment.BASE_URL}/api/health`;
   isHealthSubject = new BehaviorSubject<boolean>(false)
   isHealthy$ = this.isHealthSubject.asObservable();
   options = {
-        context: new HttpContext().set(BYPASS_INTERCEPTOR, true),
+        context: new HttpContext().set(BYPASS_AUTH_TOKEN, true),
       };
 
   constructor(private httpClient: HttpClient) {
@@ -20,7 +21,7 @@ export class ApiHealthService {
   }
 
   private checkApiHealthPeriodically() {
-    timer(0, 60000) // Start immediately, then every 60 seconds
+    timer(0, environment.health_frequency) // Start immediately, then every 60 seconds
       .pipe(
         switchMap(() => this.checkApiHealth())
       )

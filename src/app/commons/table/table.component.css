@@ -1,0 +1,80 @@
+/* .table-row-hover:hover {
+  background-color: #f8f9fc;
+  transition: background-color 0.2s ease-in-out;
+} */
+
+/* Make row feel selectable and selected */
+.table-row-hover {
+  cursor: pointer;
+}
+
+.table-row-hover:hover {
+  transform: scale(1.01);
+}
+
+.table-row-hover:active {
+  transform: scale(0.99);
+}
+
+.table-row-hover td {
+  transition: background-color 0.15s ease;
+}
+
+.table-row-hover:hover td {
+  background-color: #f1f3f5;
+  color: #0d6efd;
+}
+
+.selected-row td {
+  background-color: #e7f1ff;
+  color: #0d6efd !important;
+  font-weight: 500;
+}
+
+.selected-row:hover td {
+  background-color: #f1f3f5;
+  color: #0d6efd;
+}
+
+.table-container {
+  max-width: 100%;
+  position: relative;
+}
+
+/* Add fade effect on the edges, works with position: relative above */
+.table-container::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 20px;
+  height: 100%;
+  background: linear-gradient(to left, white, transparent);
+}
+
+/* Make sure table can grow beyond container to allow scrolling */
+table {
+  min-width: max-content;
+}
+
+/* Add subtle scroll hint */
+.table-responsive {
+  scrollbar-width: thin;
+}
+
+/* Add sticky header, nice for long tables*/
+thead th {
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 1;
+}
+
+th.sortable:hover {
+  background-color: #f1f3f5;
+  transition: background-color 0.2s ease-in-out;
+}
+
+th i {
+  font-size: 0.8rem;
+}
