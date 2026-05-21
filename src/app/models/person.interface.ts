@@ -17,7 +17,7 @@ export interface Person extends BaseModel{
   first_name: string;
   last_name: string;
   gender: string;
-  photo: string;
+  photo?: string | null;
   phone: Phone[];
   user: User;
 }
@@ -41,7 +41,7 @@ export const DEFAULT_PERSON: Person = {
   first_name: '',
   gender: '',
   last_name: '',
-  photo: '',
+  photo: null,
   phone: [ { ...PHONE } ],
   user: { ...DEFAULT_USER },
 };

@@ -123,7 +123,7 @@ export class RegisterComponent implements OnInit{
                   },
                   error: (err) => {
                     this.status = STATUS_TYPE.ERROR;
-                    this.errorMessage = err.error.detail;
+                    this.errorMessage = JSON.stringify(err.error);
                   }
                 }
               );
@@ -138,7 +138,7 @@ export class RegisterComponent implements OnInit{
         },
         error: (err) => {
           this.status = STATUS_TYPE.ERROR;
-          this.errorMessage = err.error.detail;
+          this.errorMessage = JSON.stringify(err.error);
         }
       }
     );
