@@ -3,12 +3,14 @@ import { Routes } from '@angular/router';
 import { HomeComponent } from './pre-login/home/home.component';
 import { RegisterComponent } from './pre-login/register/register.component';
 import { LoginComponent } from './pre-login/login/login.component';
-import { ProfileComponent } from './components/user/profile/profile.component';
 import { authGuardGuard } from './guards/auth-guard.guard';
 import { GroupSelectionComponent } from './pre-login/group-selection/group-selection.component';
 import { groupGuard } from './guards/group.guard';
 import { ForgotPasswordComponent } from './pre-login/forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from './pre-login/reset-password/reset-password.component';
+import { TeacherComponent } from './components/teacher/teacher/teacher.component';
+import { ProfileLayoutComponent } from './commons/profile-layout/profile-layout.component';
+import { DashboardComponent } from './commons/dashboard/dashboard.component';
 
 export const routes: Routes = [
     {
@@ -29,8 +31,18 @@ export const routes: Routes = [
         component: LoginComponent
     },
     {
-        path: 'user/profile',
-        component: ProfileComponent,
+        path: 'profile',
+        component: ProfileLayoutComponent,
+        children: [
+            {
+                path: '',
+                component: DashboardComponent
+            },
+            {
+                path: 'teacher',
+                component: TeacherComponent
+            }
+        ],
         canActivate: [authGuardGuard, groupGuard]
     },
     {

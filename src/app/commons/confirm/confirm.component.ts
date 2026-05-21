@@ -3,11 +3,10 @@ import { Component, EventEmitter, Input, NgZone, OnInit, Output } from '@angular
 import { ConfirmationService } from '../../services/info/confirmation.service';
 
 @Component({
-  selector: 'app-confirm',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './confirm.component.html',
-  styleUrl: './confirm.component.css'
+    selector: 'app-confirm',
+    imports: [CommonModule],
+    templateUrl: './confirm.component.html',
+    styleUrl: './confirm.component.css'
 })
 export class ConfirmComponent implements OnInit{
   isVisible: boolean = false;

@@ -1,57 +1,107 @@
-<div class="container-fluid vh-100 d-flex justify-content-center align-items-center bg-image">
-    <div class="w-50">
-        <div class="card p-4 shadow border-primary-subtle">
-            <a routerLink="/" class="d-flex justify-content-center"><img src="img/logo.png"> </a>
-            <hr>
-            <div class="mb-3 text-center">
-                <h3>Login</h3>
-            </div>
-            <p> Hey!</p>
-            <div class="alert" *ngIf="(loginForm.invalid || apiNotHealthy || status === STATUS_TYPE.ERROR) && (loginForm.touched || loginForm.dirty)">
-                <div class="alert alert-danger" *ngIf="apiNotHealthy">
-                    API not healthy, try again later
-                </div>
-                <div class="alert alert-danger" *ngIf="status === STATUS_TYPE.ERROR">
-                    Error occured: {{ errorMessage }}
-                </div>
-                <div class="alert alert-primary" *ngIf="loginForm.get('username')?.hasError('required')">
-                    Username required
-                </div>
-                <div class="alert alert-primary" *ngIf="loginForm.get('password')?.hasError('required')">
-                    Password required
-                </div>
-            </div>
-            <form class="form" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-                <div class="form-floating mb-3">
-                    <input class="form-control form-control-lg" id="username" type="text" formControlName="username" placeholder="Enter email or username">
-                    <label class="form-label" for="username"> Username / Email / Account ID</label>
-                </div>
-                <div class="form-floating mb-3">
-                    <input class="form-control form-control-lg" id="password" [type]="showPassword ? 'text' : 'password'" formControlName="password" placeholder="Enter Password">
-                    <label class="form-label" for="password">Password</label>
-                    <button
-                        type="button"
-                        class="btn btn-outline-secondary position-absolute top-50 end-0 translate-middle-y"
-                        (click)="showPassword = !showPassword"
-                        tabindex="-1"
-                        style="border: none; background: none;">
-                        <!-- Change the icon based on visibility state -->
-                        <fa-icon [icon]="showPassword ? faEyeSlash : faEye"></fa-icon>
-                    </button>
-                </div>
-                <button class="btn btn-outline-primary w-100" type="submit" [hidden]="!loginForm.valid || apiNotHealthy">
-                  Login
-                  <div class="spinner-border" role="status" *ngIf="status == 'LOADING'" >
-                    <span class="visually-hidden">Loading...</span>
-                  </div>
-                </button>
-            </form>
-            <h6 class="text-center mt-3">OR</h6>
-            <a href="google.com" class="text-center">Login with Google</a>
-            <a href="facebook.com" class="text-center">Login with Facebook</a>
-            <hr>
-            <a class="text-center"  [routerLink]="['/register']" >No account yet? Register here</a>
-            <a class="text-center"  [routerLink]="['/password_reset']" >Forgot password? Reset here</a>
+<div class="container-fluid min-vh-100 d-flex justify-content-center align-items-center soma-bg">
+  <div class="d-flex w-100 layout-wrapper">
+    <!-- LEFT --->
+    <div class="w-50 h-100 d-flex flex-column justify-content-center align-items-center bg-primary page left-page p-5 me-2">
+
+      <div class="center-stack text-center">
+
+        <!-- Branding -->
+        <div class="mb-4">
+          <h2 class="text-white fw-bold mb-2">Welcome to SomaAfrica</h2>
+          <p class="text-white-50 mb-0">
+            Apply. Learn. Teach. Track. Connect.
+          </p>
+          <p class="text-white-50 mb-0">
+            Rise beyond!
+          </p>
         </div>
+
+        <!-- Actions -->
+        <div class="d-flex flex-column gap-3 w-100 align-items-center action-row">
+
+          <a class="btn btn-outline-light action-btn"
+            [routerLink]="['/register']">
+            Register
+          </a>
+
+          <a class="btn btn-outline-light action-btn"
+            [routerLink]="['/forgot_password']">
+            Forgot Password
+          </a>
+
+        </div>
+
+      </div>
+
     </div>
+    <!-- RIGHT -->
+    <div class="w-50 d-flex login-card rounded-4 page right-page">
+      <div class="card p-4 shadow w-100 rounded-4 border-0">
+        <div class="d-flex justify-content-center">
+          <a routerLink="/" class="logo"><img src="img/logo.png" style="width: 14rem;"> </a>
+        </div>
+        <hr class="border-primary opacity-100">
+        <div class="flex-grow-1 d-flex flex-column justify-content-center">
+          <div class="mb-3 text-center text-bg-primary rounded-1">
+            <h3 class="text-white fw-bold">Login</h3>
+          </div>
+          <p> Hey!</p>
+          @if ((loginForm.invalid || apiNotHealthy || status === STATUS_TYPE.ERROR) && (loginForm.touched || loginForm.dirty)) {
+            <div class="alert">
+              @if (apiNotHealthy) {
+                <div class="alert alert-danger">
+                  API not healthy, try again later
+                </div>
+              }
+              @if (status === STATUS_TYPE.ERROR) {
+                <div class="alert alert-danger">
+                  Error Encountered: {{ errorMessage }}
+                </div>
+              }
+              @if (loginForm.get('username')?.hasError('required')) {
+                <div class="alert alert-primary">
+                  Username required
+                </div>
+              }
+              @if (loginForm.get('password')?.hasError('required')) {
+                <div class="alert alert-primary">
+                  Password required
+                </div>
+              }
+            </div>
+          }
+          <form class="form" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+            <div class="form-floating mb-3">
+              <input class="form-control form-control-lg" id="username" type="text" formControlName="username" placeholder="Enter email or username">
+              <label class="form-label" for="username"> Username / Email / Account ID</label>
+            </div>
+            <div class="form-floating mb-3">
+              <input class="form-control form-control-lg" id="password" [type]="showPassword ? 'text' : 'password'" formControlName="password" placeholder="Enter Password">
+              <label class="form-label" for="password">Password</label>
+              <button
+                type="button"
+                class="btn btn-outline-secondary position-absolute top-50 end-0 translate-middle-y"
+                (click)="showPassword = !showPassword"
+                tabindex="-1"
+                style="border: none; background: none;">
+                <!-- Change the icon based on visibility state -->
+                <fa-icon [icon]="showPassword ? faEyeSlash : faEye"></fa-icon>
+              </button>
+            </div>
+            <button class="btn btn-outline-primary action-btn w-100" type="submit" [disabled]="!loginForm.valid || apiNotHealthy" >
+              Login
+              @if (status == 'LOADING') {
+                <div class="spinner-border" role="status" >
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+              }
+            </button>
+          </form>
+          <h6 class="text-center mt-3">OR</h6>
+          <a href="google.com" class="text-center">Login with Google</a>
+          <a href="facebook.com" class="text-center">Login with Facebook</a>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

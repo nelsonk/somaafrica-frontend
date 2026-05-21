@@ -5,16 +5,15 @@ import { EmailValidator, FormBuilder, FormGroup, ReactiveFormsModule, RequiredVa
 import { ApiHealthService } from '../../services/api/api-health.service';
 import { catchError, of} from 'rxjs';
 import { STATUS_TYPE } from '../../utils/status-type';
-import { CommonModule } from '@angular/common';
+
 import { NotificationService } from '../../services/info/notification.service';
 import { Title } from '@angular/platform-browser';
 
 @Component({
-  selector: 'app-forgot-password',
-  standalone: true,
-  imports: [RouterLink, ReactiveFormsModule, CommonModule],
-  templateUrl: './forgot-password.component.html',
-  styleUrl: './forgot-password.component.css'
+    selector: 'app-forgot-password',
+    imports: [RouterLink, ReactiveFormsModule],
+    templateUrl: './forgot-password.component.html',
+    styleUrl: './forgot-password.component.css'
 })
 export class ForgotPasswordComponent implements OnInit{
   forgotPasswordForm!: FormGroup;
@@ -64,13 +63,14 @@ export class ForgotPasswordComponent implements OnInit{
     }
 
     this.authService.requestPasswordReset(data).subscribe(
-      (response) => {
-        if (response.status != STATUS_TYPE.ERROR){
+      {
+        next: (response) => {
           this.status = STATUS_TYPE.SUCCESS;
           this.notificationService.showNotification('Success', response.detail, 'success');
-        }else{
+        },
+        error: (err) => {
           this.status = STATUS_TYPE.ERROR;
-          this.notificationService.showNotification('Error', response.detail, 'error');
+          this.notificationService.showNotification('Error', err.error.detail, 'error');
         }
       }
     )

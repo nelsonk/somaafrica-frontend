@@ -1,23 +1,26 @@
 <div class="group-selection-container">
-  <h2 class="title">Choose Your Group</h2>
-  <p class="subtitle">Select the group that best represents you.</p>
-  <div class="alert alert-danger" *ngIf="apiNotHealthy">
-    API not healthy, try again later
-  </div>
-  <div class="group-grid">
-    <div
-      *ngFor="let group of groups"
-      class="group-card"
-      (click)="selectGroup(group.name)"
-    >
-      <div class="group-icon">
-        <fa-icon [icon]="group.icon"></fa-icon>
-      </div>
-      <div class="group-overlay">
-        <h3 class="group-name">{{ group.name }}</h3>
-        <p class="group-description">{{ group.description }}</p>
-      </div>
+  <h2 class="title">Choose Your Role</h2>
+  <p class="subtitle">Select the role that best represents you.</p>
+  @if (apiNotHealthy) {
+    <div class="alert alert-danger">
+      API not healthy, try again later
     </div>
+  }
+  <div class="group-grid">
+    @for (role of roles; track role) {
+      <div
+        class="group-card"
+        (click)="selectGroup(role.name)"
+        >
+        <div class="group-icon">
+          <fa-icon [icon]="role.icon"></fa-icon>
+        </div>
+        <div class="group-overlay">
+          <h3 class="group-name">{{ role.name }}</h3>
+          <p class="group-description">{{ role.description }}</p>
+        </div>
+      </div>
+    }
   </div>
 </div>
 

@@ -1,0 +1,125 @@
+<div class="details-wrapper">
+
+  <!-- Header Strip -->
+  <div class="hero-strip d-flex align-items-center justify-content-between p-3">
+    <!-- LEFT SIDE -->
+    <div class="d-flex align-items-center">
+      <div class="profile-img-container me-3">
+
+        <!-- IMAGE -->
+        @if (image) {
+          <img
+            [src]="image"
+            class="profile-img"
+            (error)="imageError = true"
+            [hidden]="imageError" />
+        } @else {
+          <div class="profile-img-fallback">
+            {{ mainSummary.charAt(0) || '?' }}
+          </div>
+        }
+
+        <!-- FALLBACK -->
+
+        <!-- IF IMAGE FAILS -->
+        @if (imageError) {
+          <div class="profile-img-fallback">
+            {{ mainSummary.charAt(0) || '?' }}
+          </div>
+        }
+
+      </div>
+
+      <div>
+        <div class="entity-name">
+          {{ mainSummary }}
+        </div>
+
+        @for (summary of otherSummaries; track summary) {
+          <div class="entity-desc">
+            <span class="summary-key">{{summary[0]}}:</span>
+            <span class="summary-value">{{ summary[1] }}</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- RIGHT SIDE (CLOSE BUTTON) -->
+    <button
+      class="btn btn-link text-white d-flex align-items-center gap-2 p-0 close-btn"
+      (click)="close.emit()">
+      <i class="bi bi-arrow-left"></i>
+      <span>Back</span>
+    </button>
+  </div>
+
+  <!-- Details Card -->
+  <div class="card shadow-sm border-0 rounded-4 mt-4">
+    <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+      <div class="fw-semibold fs-5 text-primary">
+        {{ detailsTitle }}
+      </div>
+
+      <!-- 3 DOT MENU -->
+      <div class="dropdown">
+        <button class="btn btn-light rounded-circle" data-bs-toggle="dropdown">
+          <i class="bi bi-three-dots-vertical"></i>
+        </button>
+
+        <ul class="dropdown-menu dropdown-menu-end shadow">
+          <li>
+            <button class="dropdown-item" (click)="edit.emit()">
+              <i class="bi bi-pencil me-2"></i> Edit
+            </button>
+          </li>
+          <li>
+            <button class="dropdown-item text-danger" (click)="delete.emit()">
+              <i class="bi bi-trash me-2"></i> Delete
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card-body">
+      <div class="details-grid">
+        @for (item of details; track item) {
+          <div class="detail-item">
+            <div class="detail-key">
+              {{ item[0] }}
+            </div>
+            <div class="detail-value">
+              {{ item[1] }}
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- TABS CARD -->
+    @if (tabsData?.length) {
+      <div class="card shadow-sm border-0 rounded-4 mt-4">
+        <div class="card-body">
+          <ul class="nav nav-tabs mb-3">
+            @for (tab of tabsData; track tab; let i = $index) {
+              <li class="nav-item">
+                <button class="nav-link" [class.active]="activeTab === i" (click)="activeTab = i">
+                  {{ tab.title }}
+                </button>
+              </li>
+            }
+          </ul>
+          @for (tab of tabsData; track tab; let i = $index) {
+            <div>
+              @if (activeTab === i) {
+                <app-table [tableData]="tab.tableData">
+                </app-table>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+</div>

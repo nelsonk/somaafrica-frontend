@@ -1,0 +1,177 @@
+/* =========================
+   HERO STRIP
+========================= */
+.hero-strip {
+  background: linear-gradient(135deg, #0d6efd, #3d8bfd);
+  color: white;
+  border-radius: 14px;
+}
+
+/* =========================
+   PROFILE IMAGE SYSTEM
+========================= */
+
+/* Container controls layout (important) */
+.profile-img-container {
+  width: 70px;
+  height: 70px;
+  flex-shrink: 0;
+  position: relative;
+}
+
+/* Larger variant (reuse later) */
+.profile-img-container.lg {
+  width: 100px;
+  height: 100px;
+}
+
+/* Actual image */
+.profile-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 30%;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.85); /* softer white */
+  display: block;
+  transition: transform 0.2s ease;
+
+  /* 👇 THIS is the upgrade */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+/* Add subtle hoover polish, worked with transition in profile-img */
+.profile-img-container:hover .profile-img {
+  transform: scale(1.05);
+}
+
+/* Prevents washed-out images on bright backgrounds */
+.profile-img-container::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+
+  /* subtle overlay to improve contrast */
+  background: radial-gradient(
+    circle,
+    rgba(0,0,0,0) 60%,
+    rgba(0,0,0,0.15) 100%
+  );
+}
+
+/* Fallback (when no image) */
+.profile-img-fallback {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+
+  /* 👇 match your brand instead of black */
+  background: rgba(255, 255, 255, 0.2);
+
+  backdrop-filter: blur(6px); /* subtle glass feel */
+  -webkit-backdrop-filter: blur(6px);
+
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1.125rem;
+
+  border: 2px solid rgba(255, 255, 255, 0.85);
+
+  /* same elevation as image */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+/* Optional: skeleton while loading */
+.profile-img-skeleton {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  animation: pulse 1.2s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+/* =========================
+   SUMMARY TEXT
+========================= */
+
+.entity-name {
+  font-size: 1.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.entity-desc {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+}
+
+.summary-key {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.summary-value {
+  font-weight: 700;
+}
+
+/* =========================
+   DETAILS GRID
+========================= */
+
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem 2rem;
+}
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-key {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: #6c757d;
+  margin-bottom: 3px;
+}
+
+.detail-value {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #212529;
+}
+
+/* =========================
+   BUTTON
+========================= */
+
+.close-btn {
+  background: transparent;
+  border: none;
+  color: white;
+  transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  transform: scale(1.05);
+}

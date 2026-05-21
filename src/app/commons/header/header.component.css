@@ -1,15 +1,168 @@
-.navbar-nav .nav-link:hover {
-    color: #0d6efd !important; /* Replace with your desired hover color */
+/* =========================
+   HEADER
+========================= */
+.header {
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
 }
 
-.navbar-nav .nav-link.active {
-    color: #0d6efd !important; /* Bootstrap primary color */
-    font-weight: bold; /* Highlight active link */
+/* =========================
+   NAVBAR (GLASS + SHRINK)
+========================= */
+.navbar-glass {
+    /* background: rgba(13, 110, 253, 0.75);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px); */
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    /* background: rgba(13, 110, 253, 1); /* stronger */
+    /* backdrop-filter: blur(12px); */
+    transition: all 0.3s ease;
 }
 
-/* styles.css or component-specific CSS */
-.nav-active {
-    /* Custom styles for active nav link */
-    font-weight: bold;
-    color: #0d6efd; /* Bootstrap primary color */
-  }
+.navbar-shrink {
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+
+}
+
+.navbar-glass .nav-link {
+    transition: all 0.3s ease;
+}
+
+.navbar-shrink .nav-link {
+    font-size: 0.9rem;
+}
+
+/* =========================
+   LOGO
+========================= */
+/* .logo-wrapper {
+    background: #ffffff;
+    padding: 4px 10px;
+    border-radius: 10px;
+} */
+
+/* =========================
+   NAV LINKS
+========================= */
+.navbar .nav-link {
+    color:#0d6efd;
+    padding: 8px 14px;
+    border-radius: 8px;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+/* Hover (modern SaaS feel) */
+.navbar .nav-link:hover {
+    background: rgba(255, 255, 255, 0.12);
+    transform: translateY(-1px);
+}
+
+/* Active */
+.nav-active,
+.navbar .nav-link.active {
+    background: rgba(255, 255, 255, 0.2);
+    font-weight: 500;
+}
+
+/* So .nav-indicator positions correctly inside it */
+.navbar-nav {
+    position: relative;
+}
+
+/* =========================
+   ACTIVE INDICATOR
+========================= */
+.nav-indicator {
+    position: absolute;
+    bottom: 0;
+    height: 3px;
+    background: #0d6efd;
+    border-radius: 3px;
+    transition: all 0.25s ease;
+}
+
+/* =========================
+   DROPDOWN (FIXED SYSTEM)
+========================= */
+
+/* Dropdown divider color */
+.dropdown-divider{
+    background-color: #0d6efd;
+    opacity: 0.5;
+}
+
+/* Parent */
+.dropdown {
+    position: relative;
+}
+
+/* Invisible hover buffer (prevents flicker) */
+.dropdown::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    height: 10px;
+}
+
+/* Base dropdown state */
+.dropdown-menu {
+    display: block;              /* always in DOM */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    pointer-events: none;
+
+    margin-top: 6px;
+    border-radius: 12px;
+    border: none;
+    padding: 8px;
+
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+
+    transition: all 0.2s ease;
+}
+
+/* SHOW dropdown (hover OR when inside menu) */
+.dropdown:hover .dropdown-menu,
+.dropdown-menu:hover {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+/* Highlight parent when dropdown active */
+.dropdown:hover > .nav-link {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+/* =========================
+   DROPDOWN ITEMS
+========================= */
+.dropdown-item {
+    border-radius: 8px;
+    transition: all 0.15s ease;
+}
+
+.dropdown-item:hover {
+    background-color: #f1f3f5;
+    color: #0d6efd;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+.navbar .btn {
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.navbar .btn:hover {
+    transform: translateY(-1px);
+}

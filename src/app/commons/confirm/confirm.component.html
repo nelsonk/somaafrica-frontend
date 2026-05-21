@@ -1,4 +1,5 @@
-<div *ngIf="isVisible" class="modal show" tabindex="-1" style="display: block; z-index: 9999;">
+@if (isVisible) {
+  <div class="modal show" tabindex="-1" style="display: block; z-index: 9999;">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
       <div
         class="modal-content p-3"
@@ -12,7 +13,7 @@
           'border-warning text-warning': type === 'warning'
         }"
         style="border-width: 1px; border-radius: 8px;"
-      >
+        >
         <!-- Header -->
         <div class="modal-header border-bottom-0">
           <div class="d-flex align-items-center">
@@ -35,19 +36,17 @@
             (click)="onCancel()"
           ></button>
         </div>
-
         <!-- Body -->
         <div class="modal-body">
           <p>{{ message }}</p>
         </div>
-
         <!-- Footer -->
         <div class="modal-footer border-top-0">
           <button
             type="button"
             class="btn btn-outline-secondary btn-sm"
             (click)="onCancel()"
-          >
+            >
             Cancel
           </button>
           <button
@@ -60,10 +59,11 @@
               'btn-warning': type === 'warning'
             }"
             (click)="onConfirm()"
-          >
+            >
             Confirm
           </button>
         </div>
       </div>
     </div>
   </div>
+}

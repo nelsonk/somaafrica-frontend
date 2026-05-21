@@ -1,15 +1,115 @@
+.soma-bg {
+  background: #0d6efd;
+}
+
+.login-card {
+  background: transparent;
+  border: none;
+}
+
+.layout-wrapper {
+  height: 96vh;
+  gap: 0.5rem;
+}
+
+.right-page {
+  overflow-y: auto;
+}
+
+.left-page a {
+    color: white;
+}
+
+.left-page h6 {
+    color: white;
+}
+
+.center-stack {
+  max-width: 420px;
+  width: 100%;
+}
+
+/* Premium button style */
+.action-btn {
+  width: 100%;
+  padding: 10px 16px;
+  border-radius: 999px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+/* Secondary action */
+.btn-outline-light.action-btn {
+  border: 1px solid rgba(255,255,255,0.6);
+  color: white;
+}
+
+/* FIX HOVER STATE */
+.btn-outline-light.action-btn:hover {
+  background: white;
+  color: #0d6efd; /* switch to primary */
+  border-color: white;
+}
+
+/* Hover polish */
+.action-btn:hover {
+  transform: translateY(-1px);
+}
+
+.card {
+  position: relative;
+  z-index: 2;
+}
+
 .alert {
     padding: 0.5rem; /* Reduce padding */
     font-size: 0.9rem; /* Reduce font size */
     margin-bottom: 0.5rem; /* Adjust margin to make space smaller between alerts */
 }
 
-button.btn-outline-secondary:hover fa-icon {
+/* On larger screens, you can scale everything together */
+@media (min-width: 1200px) {
+  html {
+    font-size: 18px; /* Everything using rem grows proportionally */
+  }
+}
+
+/* 📱 MOBILE RESPONSIVE */
+@media (max-width: 992px) {
+  .layout-wrapper {
+    flex-direction: column;
+    height: auto;
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .page {
+    width: 100%;
+    height: auto;
+  }
+
+  .left-page {
+    order: 1 !important;
+    border-radius: 1rem;
+  }
+
+  .right-page {
+    order: 2 !important;
+    padding: 0;
+  }
+
+  .card {
+    max-width: 100%;
+  }
+}
+
+/* button.btn-outline-secondary:hover fa-icon {
     opacity: 1;
 }
 
 button.btn-outline-secondary fa-icon {
     transition: opacity 0.2s ease-in-out;
     opacity: 0.8;
-}
+} */
 

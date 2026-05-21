@@ -5,18 +5,17 @@ import { NotificationService } from '../../services/info/notification.service';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { STATUS_TYPE } from '../../utils/status-type';
 import { ApiHealthService } from '../../services/api/api-health.service';
-import { CommonModule } from '@angular/common';
+
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { checkPasswordMatch } from '../../utils/password-match';
 
 @Component({
-  selector: 'app-reset-password',
-  standalone: true,
-  imports: [CommonModule, FontAwesomeModule, ReactiveFormsModule, RouterLink],
-  templateUrl: './reset-password.component.html',
-  styleUrl: './reset-password.component.css'
+    selector: 'app-reset-password',
+    imports: [FontAwesomeModule, ReactiveFormsModule, RouterLink],
+    templateUrl: './reset-password.component.html',
+    styleUrl: './reset-password.component.css'
 })
 export class ResetPasswordComponent implements OnInit{
   faEye = faEye;
@@ -81,13 +80,14 @@ export class ResetPasswordComponent implements OnInit{
     }
 
     this.authService.resetPassword(this.guid, this.token, data).subscribe(
-      (response) => {
-        if (response.status !== STATUS_TYPE.ERROR) {
+      {
+        next: () => {
           this.status = STATUS_TYPE.SUCCESS
           this.notificationService.showNotification("Success", "Password reset successfully", "success");
-        }else{
-          this.status = STATUS_TYPE.ERROR
-          this.notificationService.showNotification("Error", response.detail, "error");
+        },
+        error: (err) => {
+          this.status = STATUS_TYPE.ERROR;
+          this.notificationService.showNotification("Error", err.error.detail, "error");
         }
       }
     )

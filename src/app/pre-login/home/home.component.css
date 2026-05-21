@@ -1,0 +1,8 @@
+.container-fluid{
+    padding-top: 80px;
+}
+
+.list-group-item:hover{
+    background-color: #f1f3f5;
+    color: #0d6efd;
+}

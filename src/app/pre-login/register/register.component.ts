@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { Title } from '@angular/platform-browser';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule} from '@angular/forms';
 import { FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
@@ -13,14 +13,14 @@ import { SessionStorageService } from '../../services/storage/session-storage.se
 import { ConfirmationService } from '../../services/info/confirmation.service';
 import { NotificationService } from '../../services/info/notification.service';
 import { checkPasswordMatch } from '../../utils/password-match';
+import { NavigationService } from '../../services/navigation/navigation.service';
 
 @Component({
-  selector: 'app-register',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, FontAwesomeModule],
-  providers: [ApiHealthService],
-  templateUrl: './register.component.html',
-  styleUrls: ['./register.component.css']
+    selector: 'app-register',
+    imports: [ReactiveFormsModule, RouterLink, FontAwesomeModule],
+    providers: [ApiHealthService],
+    templateUrl: './register.component.html',
+    styleUrls: ['./register.component.css']
 })
 export class RegisterComponent implements OnInit{
   registerForm!: FormGroup;
@@ -45,13 +45,12 @@ export class RegisterComponent implements OnInit{
     private healthService: ApiHealthService,
     private authService: AuthService,
     private sessionStorage: SessionStorageService,
-    private confirmationService: ConfirmationService,
-    private notificationService: NotificationService
+    private confirmationService: ConfirmationService
   ) {
     title.setTitle("SomaAfrica - Register");
 
     if (this.sessionStorage.getItem("isAuthenticated")){
-      this.authService.navigateToPage("user/profile", "register");
+      this.authService.navigateToPage("user/profile");
     }
   }
 
@@ -88,10 +87,6 @@ export class RegisterComponent implements OnInit{
 
   }
 
-  navigateToPage(page: string){
-    this.router.navigate([`/${page}`], {queryParams: {source: "register"}});
-  }
-
   onSubmit(){
     this.status = STATUS_TYPE.LOADING;
     let data = {
@@ -103,51 +98,48 @@ export class RegisterComponent implements OnInit{
 
     this.authService.register(data)
     .subscribe(
-      (response) => {
-        if (response.status === STATUS_TYPE.ERROR) {
-          this.status = STATUS_TYPE.ERROR;
-          this.errorMessage = response.detail;
-          this.notificationService.showNotification('Error', this.errorMessage, 'error');
-          return;
-        }
+      {
+        next: () => {
+          this.status = STATUS_TYPE.SUCCESS;
+          let login = false;
 
-        this.status = STATUS_TYPE.SUCCESS;
-        let login = false;
-
-        this.confirmationService.confirm(
-          'Login',
-          'Registered, would you like to be logged in?',
-          'success',
-          () => {
-            login = true;
-          },
-          () => {})
-
-
-        if(login){
-          let loginData = {
-            username: data.username? data.username : data.email,
-            password: data.password1
-          }
-
-          this.authService.login(loginData)
-          .subscribe(
-            (response) => {
-              if (response.status === STATUS_TYPE.ERROR) {
-                this.status = STATUS_TYPE.ERROR;
-                this.errorMessage = response.detail;
-                return;
+          this.confirmationService.confirm(
+            'Login',
+            'Registered, would you like to be logged in?',
+            'success',
+            () => {
+              login = true;
+              let loginData = {
+                username: data.username? data.username : data.email,
+                password: data.password1
               }
 
-              this.status = STATUS_TYPE.SUCCESS;
-              this.authService.navigateToPage("user/profile", "register");
-            }
-          );
-        }else{
-          this.sessionStorage.clearEntireSession();
-          this.authService.navigateToPage("/", "register");
-        }
+              this.authService.login(loginData)
+              .subscribe(
+                {
+                  next: () => {
+                    this.status = STATUS_TYPE.SUCCESS;
+                    this.authService.navigateToPage("profile");
+                  },
+                  error: (err) => {
+                    this.status = STATUS_TYPE.ERROR;
+                    this.errorMessage = err.error.detail;
+                  }
+                }
+              );
 
+            },
+            () => {
+              this.sessionStorage.clearEntireSession();
+              this.authService.navigateToPage("/");
+            }
+          )
+
+        },
+        error: (err) => {
+          this.status = STATUS_TYPE.ERROR;
+          this.errorMessage = err.error.detail;
+        }
       }
     );
   }

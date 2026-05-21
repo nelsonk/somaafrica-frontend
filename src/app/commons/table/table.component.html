@@ -1,0 +1,110 @@
+<div class="table-container bg-white shadow rounded-4">
+  <div class="input-group  flex-grow-1 mb-3">
+    <span class="input-group-text bg-transparent border-0">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" class="text-secondary" fill="currentColor" viewBox="0 0 512 512">
+        <path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"></path>
+      </svg>
+    </span>
+    <input type="search"
+      class="form-control form-control-sm border-0 rounded-pill shadow-sm"
+      placeholder="Search table..."
+      [(ngModel)]="searchText"
+      (input)="onSearch()" />
+  </div>
+  @if (tableData.caption) {
+    <div class="fs-5 fw-semibold text-primary ms-3 mb-3">
+      {{ tableData.caption }}
+    </div>
+  }
+
+  <div class="table-responsive rounded-4">
+    <table class="table align-middle table-borderless mb-0">
+      <thead class="bg-light text-secondary border-bottom">
+        <tr>
+          @for (header of visibleHeaders; track header) {
+            <th
+              (click)="onSort(header)"
+              [style.text-align]="header.align || 'left'"
+              [ngClass]="{ 'sortable': header.sortable }"
+              class="py-3 px-3 text-nowrap text-uppercase small fw-bold"
+              style="cursor: pointer;">
+              <div class="d-flex align-items-center justify-content-between">
+                <span>{{ header.label }}</span>
+                @if (header.sortable) {
+                  <i
+                    class="bi"
+                [ngClass]="{
+                  'bi-caret-up-fill text-primary': sortKey === header.key && sortAsc,
+                  'bi-caret-down-fill text-primary': sortKey === header.key && !sortAsc,
+                  'bi-caret-down': sortKey !== header.key
+                }">
+                  </i>
+                }
+              </div>
+            </th>
+          }
+          @if (tableData.actions?.length) {
+            <th class="py-3 px-3 text-center text-uppercase small fw-bold">
+              Actions
+            </th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of paginatedRows; track row) {
+          <tr
+            class="bg-white border-bottom table-row-hover"
+            [class.selected-row]="row === selectedRow"
+            (click)="onRowClick(row)">
+            @for (header of visibleHeaders; track header) {
+              <td
+                class="px-3 py-2 text-nowrap"
+                [style.text-align]="header.align || 'left'">
+                {{ row[header.key] }}
+              </td>
+            }
+            @if (tableData.actions?.length) {
+              <td class="text-center px-3 py-2">
+                <div class="btn-group btn-group-sm">
+                  @for (action of tableData.actions; track action) {
+                    <button
+                      type="button"
+                      class="btn rounded-pill"
+                      [ngClass]="action.class || 'btn-outline-secondary'"
+                      [attr.title]="action.tooltip || action.label"
+                      (click)="onActionClick(action.label, row); $event.stopPropagation()">
+                      @if (action.icon) {
+                        <i class="{{ action.icon }} me-1"></i>
+                      }
+                      {{ action.label }}
+                    </button>
+                  }
+                </div>
+              </td>
+            }
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  @if (totalPages > 1) {
+    <nav class="mt-4">
+      <ul class="pagination justify-content-center">
+        <li class="page-item" [class.disabled]="currentPage === 1">
+          <button class="page-link shadow-sm" (click)="changePage(currentPage - 1)">«</button>
+        </li>
+        @for (page of [].constructor(totalPages); track page; let i = $index) {
+          <li class="page-item"
+            [class.active]="i + 1 === currentPage">
+            <button class="page-link shadow-sm" (click)="changePage(i + 1)">{{ i + 1 }}</button>
+          </li>
+        }
+        <li class="page-item" [class.disabled]="currentPage === totalPages">
+          <button class="page-link shadow-sm" (click)="changePage(currentPage + 1)">»</button>
+        </li>
+      </ul>
+    </nav>
+  }
+</div>

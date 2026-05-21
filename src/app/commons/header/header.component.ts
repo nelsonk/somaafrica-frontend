@@ -1,47 +1,71 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { ActivatedRoute, Router, NavigationStart, RouterLink, RouterLinkActive } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { AuthService } from '../../services/auth/auth-service.service';
+
+import { NavigationService } from '../../services/navigation/navigation.service';
 
 @Component({
-  selector: 'app-header',
-  standalone: true,
-  imports: [RouterLink, RouterLinkActive],
-  templateUrl: './header.component.html',
-  styleUrls: ['./header.component.css']
+    selector: 'app-header',
+    imports: [RouterLink, RouterLinkActive],
+    templateUrl: './header.component.html',
+    styleUrls: ['./header.component.css']
 })
 export class HeaderComponent implements OnInit {
   currentSource!: string;
   previousUrl!: string; // Store the immediate previous URL
+  authenticated!: boolean
 
-  constructor(private route: ActivatedRoute, private router: Router) {}
+  isScrolled = false;
+
+  indicatorLeft = 0;
+  indicatorWidth = 0;
+
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    public authService: AuthService,
+    private navInterceptor: NavigationService
+  ) {}
+
+  // NAVBAR SHRINK
+  @HostListener('window:scroll')
+  onScroll() {
+    this.isScrolled = window.scrollY > 20;
+  }
+
+  // MOVE INDICATOR ON HOVER
+  moveIndicator(event: MouseEvent) {
+    const el = event.currentTarget as HTMLElement;
+    const targetEl = el.closest('.nav-link, .btn') as HTMLElement;
+
+    if (!targetEl) return;
+
+    const parent = targetEl.closest('.navbar-nav') as HTMLElement;
+
+    const parentRect = parent.getBoundingClientRect();
+    const rect = targetEl.getBoundingClientRect();
+
+    this.indicatorLeft = rect.left - parentRect.left;
+    this.indicatorWidth = rect.width;
+  }
+
+  // LOCK INDICATOR ON CLICK
+  setActive(event: MouseEvent) {
+    this.moveIndicator(event);
+  }
 
   ngOnInit() {
-    // Initialize previous URL to the current URL at app startup
-    this.previousUrl = this.router.url.split('?')[0];
-
-    // Listen to NavigationStart events for every route change
-    this.router.events.pipe(
-      filter(event => event instanceof NavigationStart) // Filter NavigationStart events
-    ).subscribe((event: NavigationStart) => {
-      // Set the previous URL before navigation
-      this.previousUrl = event.url.split('?')[0]; // Update the previous URL for next navigation
-      this.updateSource(); // Update the current source based on previous URL
+    this.authService.isAuthenticated$.subscribe(auth => {
+      this.authenticated = auth;
     });
   }
 
-  updateSource() {
-    // Update the current source to the last visited URL (previous URL)
-    this.currentSource = this.previousUrl || 'defaultSource';
-    // console.log("Updated Source: ", this.currentSource);
+  logout(){
+    this.authService.logout();
   }
 
-  getUpdatedQueryParams(): any {
-    // Force the source to be updated immediately before generating query params
-    this.updateSource(); // Ensure source is updated before query params are set
-
-    const params = { ...this.route.snapshot.queryParams }; // Copy current query params
-    // Set source as the current cleaned-up previous URL
-    params['source'] = this.currentSource;
-    return params;
+  profile(){
+    this.authService.navigateToPage("profile", "/");
   }
 }

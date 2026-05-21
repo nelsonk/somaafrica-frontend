@@ -1,21 +1,13 @@
 import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '../services/auth/auth-service.service';
 import { inject } from '@angular/core';
+import { SessionStorageService } from '../services/storage/session-storage.service';
 
 
 export const authGuardGuard: CanActivateFn = (route, state) => {
-  const authService = inject(AuthService);
-  const router = inject(Router);
-  let authenticated:boolean = false
+  const sessionStorage = inject(SessionStorageService);
 
-  authService.isAuthenticated$.subscribe(auth => {
-    authenticated = auth;
-  });
+  let isAuthenticated = sessionStorage.getItem("isAuthenticated");
 
-  if (!authenticated) {
-    router.navigate(['/login']);
-  }
-
-  return authenticated;
-
+  return isAuthenticated
 };

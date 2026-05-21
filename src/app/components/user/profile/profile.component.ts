@@ -1,28 +1,32 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
-import { CommonModule, NgForOf } from '@angular/common';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { ReusableCardComponent } from '../../../commons/reusable-card/reusable-card.component';
-import { ReactiveFormsModule, FormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ElementRef, ViewChild, Renderer2 } from '@angular/core';
-import { AuthService } from '../../../services/auth/auth-service.service';
-import { Person } from '../../../models/person.interface';
-import { User } from '../../../models/user.interface';
-import { SessionStorageService } from '../../../services/storage/session-storage.service';
-import { STATUS_TYPE } from '../../../utils/status-type';
-import { ApiHealthService } from '../../../services/api/api-health.service';
-import { faEye, faEyeSlash, faUser } from '@fortawesome/free-solid-svg-icons';
-import { forkJoin } from 'rxjs';
-import { NotificationService } from '../../../services/info/notification.service';
-import { ConfirmationService } from '../../../services/info/confirmation.service';
+import { Component, OnInit, ElementRef, ViewChild, Renderer2, Input} from '@angular/core';
+
 import { Title } from '@angular/platform-browser';
+import { ReactiveFormsModule, FormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router, RouterLink, NavigationEnd, ActivatedRoute } from '@angular/router';
+import { filter, forkJoin } from 'rxjs';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faEye, faEyeSlash, faUser } from '@fortawesome/free-solid-svg-icons';
+import { ReusableCardComponent } from '../../../commons/reusable-card/reusable-card.component';
+import { ApiHealthService } from '../../../services/api/api-health.service';
+import { AuthService } from '../../../services/auth/auth-service.service';
+import { ConfirmationService } from '../../../services/info/confirmation.service';
+import { NotificationService } from '../../../services/info/notification.service';
+import { SessionStorageService } from '../../../services/storage/session-storage.service';
+import { CardData, DEFAULT_CARD_DATA } from '../../../models/card.interface';
+import { Person, DEFAULT_PERSON } from '../../../models/person.interface';
+import { SidebarLink, SIDEBAR_LINKS } from '../../../models/sidebar.interface';
+import { User, DEFAULT_USER } from '../../../models/user.interface';
+import { STATUS_TYPE } from '../../../utils/status-type';
+import { NavigationService } from '../../../services/navigation/navigation.service';
+
+declare var bootstrap: any;
 
 
 @Component({
-  selector: 'app-profile',
-  standalone: true,
-  imports: [ReusableCardComponent, CommonModule, FontAwesomeModule, ReactiveFormsModule, FormsModule, NgForOf],
-  templateUrl: './profile.component.html',
-  styleUrl: './profile.component.css'
+    selector: 'app-profile',
+    imports: [FontAwesomeModule, ReactiveFormsModule, FormsModule, RouterLink],
+    templateUrl: './profile.component.html',
+    styleUrl: './profile.component.css'
 })
 export class ProfileComponent implements OnInit{
   apiNotHealthy:boolean = true;
@@ -44,45 +48,21 @@ export class ProfileComponent implements OnInit{
   faUser = faUser;
   STATUS_TYPE = STATUS_TYPE;
   status: STATUS_TYPE = STATUS_TYPE.NOT_LOADING;
-  activeLink: number | null = 0;
+  activeLink: number | null = null;
+  activeSubIndices: { [key: number]: number } = {};
+  currentSource!: string;
+  previousUrl!: string; // Store the immediate previous URL
+  note: string = "";
 
-  person: Person = {
-    account_status: '',
-    address: [],
-    created_at: '',
-    created_by: '',
-    date_of_birth: '',
-    first_name: '',
-    gender: '',
-    guid: '',
-    last_name: '',
-    phone: [],
-    updated_at: '',
-    updated_by: '',
-    user: {
-      username: 'None',
-      email: 'None',
-      guid: '',
-      is_active: false,
-      is_superuser: false,
-      last_login: '',
-  },
-  };
+  person: Person = { ...DEFAULT_PERSON };
 
   phoneNumbers = "";
   addresses = "";
 
-  user: User = {
-    username: 'None',
-    email: 'None',
-    guid: '',
-    is_active: false,
-    is_superuser: false,
-    last_login: '',
-  }
+  user: User = { ...DEFAULT_USER };
 
   password = {
-    current: '',
+    password: '',
     password1: '',
     password2: ''
   }
@@ -91,73 +71,9 @@ export class ProfileComponent implements OnInit{
 
   @ViewChild('collapseAboutMe') collapseAboutMe!: ElementRef;
 
-  links = [
-    {
-      id: 'dashboard',
-      label: 'Dashboard',
-      dataToggle: 'collapse',
-      href: '#dashboardlist',
-      controls: 'dashboardlist',
-      subItems: ['All', 'Performance', 'Payments'],
-      subItemsHref: ['#', '#', '#'],
-    },
-    {
-      id: 'student',
-      label: 'Students',
-      dataToggle: 'collapse',
-      href: '#studentlist',
-      controls: 'studentlist',
-      subItems: ['All', 'Performance', 'Payments'],
-      subItemsHref: ['#', '#', '#'],
-    },
-    {
-      id: 'school',
-      label: 'Schools',
-      dataToggle: 'collapse',
-      href: '#schoollist',
-      controls: 'schoollist',
-      subItems: ['All', 'Performance', 'Payments'],
-      subItemsHref: ['#', '#', '#'],
-    },
-    {
-      id: 'teacher',
-      label: 'Teachers',
-      dataToggle: 'collapse',
-      href: '#teacherlist',
-      controls: 'teacherlist',
-      subItems: ['All', 'Performance', 'Payments'],
-      subItemsHref: ['#', '#', '#'],
-    },
-    {
-      id: 'agent',
-      label: 'SomaAfrica Agents',
-      dataToggle: 'collapse',
-      href: '#agentlist',
-      controls: 'agentlist',
-      subItems: ['All', 'Performance', 'Payments'],
-      subItemsHref: ['#', '#', '#'],
-    },
-    {
-      id: 'admin',
-      label: 'SomaAfrica Admins',
-      dataToggle: 'collapse',
-      href: '#adminlist',
-      controls: 'adminlist',
-      subItems: ['All', 'Performance', 'Payments'],
-      subItemsHref: ['#', '#', '#'],
-    },
-  ];
+  links:SidebarLink[] = SIDEBAR_LINKS;
 
-  cardData = {
-    title: 'Recommended just for you!',
-    description: '',
-    items: [
-      { image: 'img/logo.png', title: 'Coaching & Quizzes', desc: 'Looking for coaching or Quizzes, we have a teacher near you & the best prepared Quizzes', link: '/register' },
-      { image: 'img/logo.png', title: 'Online Admissions', desc: 'Applying into any school has never been easier & you even get to track progress till admission', link: '/login' },
-      { image: 'img/logo.png', title: 'Learning Materials', desc: 'Explore thousands of written and video materials from the best schools and teachers', link: '#' },
-      { image: 'img/logo.png', title: 'Learning Materials', desc: 'Explore thousands of written and video materials from the best schools and teachers', link: '/' }
-    ]
-  };
+  cardData: CardData = { ...DEFAULT_CARD_DATA };
 
 
   constructor(
@@ -169,9 +85,13 @@ export class ProfileComponent implements OnInit{
     private fb: FormBuilder,
     private renderer: Renderer2,
     private el: ElementRef,
-    title: Title
+    private router: Router,
+    private route: ActivatedRoute,
+    title: Title,
+    private navInterceptor: NavigationService
   ) {
     title.setTitle("SomaAfrica - Profile");
+    this.note = "Earn 45% for 2 years as a SomaAfrica agent for each school you sign, learn more.";
 
     try {
       this.user = this.sessionStorage.getItem("User");
@@ -181,6 +101,16 @@ export class ProfileComponent implements OnInit{
   }
 
   ngOnInit(): void {
+    // Update active link on navigation
+    this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe((event: NavigationEnd) => {
+        this.highlightActiveLink(event.urlAfterRedirects);
+      });
+
+    // Handle initial load
+    this.highlightActiveLink(this.router.url);
+
     this.passwordForm = this.fb.group({
       current: ['', [Validators.minLength(8), Validators.required]],
       password1: ['', [Validators.minLength(8), Validators.required]],
@@ -188,7 +118,7 @@ export class ProfileComponent implements OnInit{
     });
 
     this.passwordForm.valueChanges.subscribe(()=> {
-      this.password.current = this.passwordForm.get("current")?.value;
+      this.password.password = this.passwordForm.get("current")?.value;
       this.password.password1 = this.passwordForm.get("password1")?.value;
       this.password.password2 = this.passwordForm.get("password2")?.value;
       this.displayAlerts();
@@ -202,12 +132,10 @@ export class ProfileComponent implements OnInit{
           this.status = STATUS_TYPE.SUCCESS;
 
           if(!this.fetchedFromApi){
-            if(this.getPerson()){
-              this.fetchedFromApi = true;
-            }
+            this.getPerson()
           }
         }else{
-          if (this.person.guid){
+          if (this.person?.guid){
             return;
           }
 
@@ -246,8 +174,66 @@ export class ProfileComponent implements OnInit{
     return passwordsMatch;
   }
 
+  highlightActiveLink(currentUrl: string): void {
+    const path = currentUrl.split('?')[0];
+    let longestMatchLength = -1;
+    let bestLinkIndex: number | null = null;
+    let bestSubIndex: number | null = null;
+
+    this.links.forEach((link, linkIndex) => {
+      // Match main link
+      if (
+        path === link.href ||
+        path.startsWith(link.href + '/') ||
+        path === link.href + '/'
+      ) {
+        if (link.href.length > longestMatchLength) {
+          longestMatchLength = link.href.length;
+          bestLinkIndex = linkIndex;
+          bestSubIndex = null;
+        }
+      }
+
+      // Match sub-items
+      link.subItemsHref.forEach((subHref, subIndex) => {
+        if (
+          path === subHref ||
+          path.startsWith(subHref + '/') ||
+          path === subHref + '/'
+        ) {
+          if (subHref.length >= longestMatchLength) {
+            longestMatchLength = subHref.length;
+            bestLinkIndex = linkIndex;
+            bestSubIndex = subIndex;
+          }
+        }
+      });
+    });
+
+    // Set active parent and subitem
+    this.activeLink = bestLinkIndex;
+    this.activeSubIndices = {};
+
+    if (bestLinkIndex !== null && bestSubIndex !== null) {
+      this.activeSubIndices[bestLinkIndex] = bestSubIndex;
+    }
+  }
+
   setActiveLink(index: number): void {
-    this.activeLink = this.activeLink === index ? null : index;
+    if (this.activeLink === index) {
+      this.activeLink = null;
+      delete this.activeSubIndices[index];
+    } else {
+      this.activeLink = index;
+    }
+  }
+
+  setActiveSubLink(linkIndex: number, subLinkIndex: number): void {
+    if (this.activeSubIndices[linkIndex] === subLinkIndex) {
+      delete this.activeSubIndices[linkIndex];
+    } else {
+      this.activeSubIndices[linkIndex] = subLinkIndex;
+    }
   }
 
   openAccordion(): void {
@@ -268,22 +254,35 @@ export class ProfileComponent implements OnInit{
     }
   }
 
-  openModal(modalId: string) {
-    const modal = this.el.nativeElement.querySelector(`#${modalId}`);
-    if (modal) {
-        this.renderer.removeAttribute(modal, 'aria-hidden');
-        this.renderer.removeAttribute(modal, 'inert');
+  openModal(modalId: string, panelId?: string) {
+    const modalElement = document.getElementById(modalId);
+
+    if (modalElement) {
+      const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+
+      modal.show();
+
+      if (panelId) {
+        setTimeout(() => {
+          const panelElement = document.getElementById(panelId);
+
+          if (panelElement) {
+            bootstrap.Collapse.getOrCreateInstance(panelElement).show();
+          }
+        }, 300);
+      }
     }
   }
 
   closeModal(modalId: string) {
-    const modal = this.el.nativeElement.querySelector(`#${modalId}`);
-    if (modal) {
-        this.renderer.setAttribute(modal, 'aria-hidden', 'true');
-        this.renderer.setAttribute(modal, 'inert', '');
+    const modalElement = document.getElementById(modalId);
+
+    if (modalElement) {
+      const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+
+      modal.hide();
     }
   }
-
 
   logout(){
     this.auth.logout();
@@ -321,8 +320,8 @@ export class ProfileComponent implements OnInit{
     this.password = Object.assign(filter, this.password);
 
     this.auth.changePassword(this.user.guid, this.password).subscribe(
-      (response) => {
-        if (response.status != STATUS_TYPE.ERROR){
+      {
+        next: () => {
           this.status = STATUS_TYPE.SUCCESS;
           this.errorMessage = "";
           this.notificationService.showNotification(
@@ -330,13 +329,10 @@ export class ProfileComponent implements OnInit{
             "Password updated successfully",
             'success'
           );
-        }else{
+        },
+        error: (err) => {
           this.status = STATUS_TYPE.ERROR;
-          this.errorMessage = response.detail;
-
-          if(this.errorMessage == "Invalid password"){
-            this.errorMessage = "Current password incorrect";
-          }
+          this.errorMessage = err.error.detail;
 
           this.notificationService.showNotification(
             'Error',
@@ -354,15 +350,16 @@ export class ProfileComponent implements OnInit{
     }
 
     this.auth.addUserToPerson(person_guid, data).subscribe(
-      (response) => {
-        if (response.status != STATUS_TYPE.ERROR){
+      {
+        next: () => {
           this.status = STATUS_TYPE.SUCCESS;
           this.userError = "";
           this.notificationService.showNotification('Success', "Person created successfully", 'success');
           this.getPerson();
-        }else{
+        },
+        error: (err) => {
           this.status = STATUS_TYPE.ERROR;
-          this.userError = response.detail;
+          this.userError = err.error.detail;
           this.notificationService.showNotification('Error', this.userError, 'error');
         }
       }
@@ -370,16 +367,18 @@ export class ProfileComponent implements OnInit{
   }
 
   saveUser(){
+    console.log("Save user: ", this.user)
     if (this.user){
       this.auth.updateUser(this.user.guid, this.user).subscribe(
-        (response) => {
-          if (response.status != STATUS_TYPE.ERROR){
+        {
+          next: () => {
             this.status = STATUS_TYPE.SUCCESS;
             this.userError = "";
             this.notificationService.showNotification('Success', 'User saved successfully', 'success');
-          }else{
+          },
+          error: (err) => {
             this.status = STATUS_TYPE.ERROR;
-            this.userError = response.detail;
+            this.userError = err.error.detail;
             this.notificationService.showNotification('Error', this.userError, 'error');
           }
         }
@@ -387,40 +386,52 @@ export class ProfileComponent implements OnInit{
     }
   }
 
-  getPerson(): boolean{
+  getPerson(){
     let returnValue: boolean = false;
     this.auth.getPerson().subscribe(
-      (response) => {
-        if (response.status != STATUS_TYPE.ERROR){
+      {
+        next: (response) => {
           this.status = STATUS_TYPE.SUCCESS;
-          this.personError = "";
-          this.person = response[0];
-          returnValue = true;
-        }else{
+
+          if (response.length === 0){
+            this.personError = "No person details found";
+            this.fetchedFromApi = true;
+            this.openModal('profileModal', 'collapseAccount');
+            this.notificationService.showNotification(
+              'Info',
+              'No person found, please fill in details below to create person',
+              'info'
+            );
+          }else{
+            this.personError = "";
+            this.person = response[0];
+            this.fetchedFromApi = true;
+          }
+        },
+        error: (err) => {
           this.status = STATUS_TYPE.ERROR;
-          this.personError = response.error;
+          this.personError = err.error.detail;
           this.notificationService.showNotification('Error', this.personError, 'error');
-          returnValue = false;
         }
       }
     );
 
-    return returnValue;
   }
 
   savePerson(){
     // Create a new object without `user`, `phone`, and `address`
     const { user, phone, address, ...personCopy } = this.person;
 
-    this.auth.updatePerson(this.person.guid, personCopy).subscribe(
-      (response) => {
-        if (response.status != STATUS_TYPE.ERROR){
+    this.auth.updatePerson(this.person.guid ?? '', personCopy).subscribe(
+      {
+        next: () => {
           this.status = STATUS_TYPE.SUCCESS;
           this.personError = "";
           this.notificationService.showNotification('Success', 'Person saved successfully', 'success');
-        }else{
+        },
+        error: (err) => {
           this.status = STATUS_TYPE.ERROR;
-          this.personError = response.detail;
+          this.personError = err.error.detail;
           this.notificationService.showNotification('Error', this.personError, 'error');
         }
       }
@@ -436,14 +447,15 @@ export class ProfileComponent implements OnInit{
     const { user, phone, address, ...personCopy } = this.person;
 
     this.auth.createPerson(personCopy).subscribe(
-      (response) => {
-        if (response.status != STATUS_TYPE.ERROR) {
+      {
+        next: (response) => {
           this.status = STATUS_TYPE.SUCCESS;
           this.personError = "";
           this.addUser(response.guid);
-        }else{
+        },
+        error: (err) => {
           this.status = STATUS_TYPE.ERROR;
-          this.personError = response.detail;
+          this.personError = err.error.detail;
           this.notificationService.showNotification('Error', this.personError, 'error');
         }
       }
@@ -472,15 +484,15 @@ export class ProfileComponent implements OnInit{
     if(phone.length > 0){
       for (let i=0; i < phone.length; i++){
         if (!phone[i].number && phone[i].guid){
-          apiCalls.push(this.auth.removePhone(this.person.guid, phone[i]));
+          apiCalls.push(this.auth.removePhone(this.person.guid ?? '', phone[i]));
           continue;
         }
 
         if(phone[i].guid){
           phone[i].updated_by = this.user.guid;
-          apiCalls.push(this.auth.updatePhone(phone[i].guid, phone[i]));
+          apiCalls.push(this.auth.updatePhone(phone[i].guid ?? '', phone[i]));
         }else{
-          apiCalls.push(this.auth.addPhone(this.person.guid, phone[i]));
+          apiCalls.push(this.auth.addPhone(this.person.guid ?? '', phone[i]));
         }
       }
 
@@ -551,15 +563,15 @@ export class ProfileComponent implements OnInit{
     if(address.length > 0){
       for (let i=0; i < address.length; i++){
         if (!address[i].address && address[i].guid){
-          apiCalls.push(this.auth.removeAddress(this.person.guid, address[i]));
+          apiCalls.push(this.auth.removeAddress(this.person.guid ?? '', address[i]));
           continue;
         }
 
         if(address[i].guid){
           address[i].updated_by = this.user.guid;
-          apiCalls.push(this.auth.updateAddress(address[i].guid, address[i]));
+          apiCalls.push(this.auth.updateAddress(address[i].guid ?? '', address[i]));
         }else{
-          apiCalls.push(this.auth.addAddress(this.person.guid, address[i]));
+          apiCalls.push(this.auth.addAddress(this.person.guid ?? '', address[i]));
         }
       }
 
@@ -594,9 +606,13 @@ export class ProfileComponent implements OnInit{
             }
           }
 
-          this.notificationService.showNotification('Error', this.addressError, 'error');
+          this.notificationService.showNotification(
+            'Error', this.addressError, 'error'
+          );
         }else{
-          this.notificationService.showNotification('Success', 'Address/es added/modified successfully', 'success');
+          this.notificationService.showNotification(
+            'Success', 'Address/es added/modified successfully', 'success'
+          );
 
           // reset new addresses only if all successfully added
           this.addresses = "";
