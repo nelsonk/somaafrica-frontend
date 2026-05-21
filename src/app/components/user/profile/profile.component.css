@@ -62,16 +62,6 @@
   margin-top: 0.2rem;
 }
 
-/* .nav-pills .nav-link {
-    border-radius: 4px;
-    transition: all 0.3s;
-}
-
-.nav-pills .nav-link.active {
-    background-color: #0d6efd;
-    color: #fff;
-} */
-
 /* Dropdown SVG Styling */
 #profileTrigger {
     cursor: pointer;
@@ -100,15 +90,6 @@
     background-color: #f8f9fa; /* Light hover background */
 }
 
-
-
-/* body {
-    background: url('https://images.unsplash.com/photo-1420496368970-d83b063b5b48?fit=crop&fm=jpg&h=700&q=80&w=1225') no-repeat center center;
-    background-size: 1400px 700px;
-    background-position: 30%;
-    background-attachment: fixed;
-  } */
-
 .text {
   font-family: raleway;
   font-size: 40px;
@@ -130,14 +111,13 @@
 .image {
   text-align: center;
   width: 200px;
-  /* Container's dimensions */
-
   height: 200px;
   -webkit-border-radius: 75%;
   -moz-border-radius: 75%;
   border-radius: 75%;
   box-shadow: 0 0 0 1px #eee;
-  background: url("https://images.unsplash.com/reserve/ysPfhVSzSP2m629CW0mw_selfPortrait.jpg?fit=crop&fm=jpg&h=700&q=80&w=1225") center center no-repeat;
+  background-position: center center;
+  background-repeat: no-repeat;
   background-size: cover;
   margin: auto;
   margin-top: 20px;
@@ -149,6 +129,21 @@
   display: inline-block;
   vertical-align: middle;
   height: 150px;
+}
+
+.image-small {
+  text-align: center;
+  width: 70px;
+  height: 70px;
+  -webkit-border-radius: 75%;
+  -moz-border-radius: 75%;
+  border-radius: 75%;
+  box-shadow: 0 0 0 1px #eee;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  margin: auto;
+  align-content: center;
 }
 
 .image:hover {

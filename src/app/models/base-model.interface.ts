@@ -23,7 +23,7 @@ export const DEFAULT_USERTRACKER_MODEL: UserTrackerModel = {
 };
 
 export const DEFAULT_BASE_MODEL: BaseModel = {
-    guid: 'ghhjsjjssiuiieiosjkdhbhdsbjsjnbjnsbjsjbhhsuhsjbshjhjshjb',
+    guid: '',
     ...DEFAULT_TIMESTAMP_MODEL,
     ...DEFAULT_USERTRACKER_MODEL
 };

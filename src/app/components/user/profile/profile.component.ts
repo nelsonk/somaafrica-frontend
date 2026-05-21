@@ -1,12 +1,11 @@
 import { Component, OnInit, ElementRef, ViewChild, Renderer2, Input} from '@angular/core';
-
+import { NgOptimizedImage } from '@angular/common';
 import { Title } from '@angular/platform-browser';
 import { ReactiveFormsModule, FormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterLink, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { filter, forkJoin } from 'rxjs';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faEye, faEyeSlash, faUser } from '@fortawesome/free-solid-svg-icons';
-import { ReusableCardComponent } from '../../../commons/reusable-card/reusable-card.component';
 import { ApiHealthService } from '../../../services/api/api-health.service';
 import { AuthService } from '../../../services/auth/auth-service.service';
 import { ConfirmationService } from '../../../services/info/confirmation.service';
@@ -24,7 +23,7 @@ declare var bootstrap: any;
 
 @Component({
     selector: 'app-profile',
-    imports: [FontAwesomeModule, ReactiveFormsModule, FormsModule, RouterLink],
+    imports: [FontAwesomeModule, ReactiveFormsModule, FormsModule, RouterLink, NgOptimizedImage],
     templateUrl: './profile.component.html',
     styleUrl: './profile.component.css'
 })
@@ -55,6 +54,8 @@ export class ProfileComponent implements OnInit{
   note: string = "";
 
   person: Person = { ...DEFAULT_PERSON };
+  selectedFile: File | null = null;
+  preview: string | ArrayBuffer | null = null;
 
   phoneNumbers = "";
   addresses = "";
@@ -158,6 +159,32 @@ export class ProfileComponent implements OnInit{
   //   this.notificationService.register(this.notification);
   // }
 
+  // Read and preview attached photo
+  onFileSelected(event: Event): void {
+
+    const input = event.target as HTMLInputElement;
+
+    if (!input.files?.length) return;
+
+    this.selectedFile = input.files[0];
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      this.preview = reader.result;
+    };
+
+    reader.readAsDataURL(this.selectedFile);
+  }
+
+  // Display person photo
+  getPhotoUrl(): string {
+    if (this.person.photo) {
+      return this.person.photo;
+    }
+    return 'https://images.unsplash.com/reserve/ysPfhVSzSP2m629CW0mw_selfPortrait.jpg?fit=crop&fm=jpg&h=700&q=80&w=1225';
+  }
+
   displayAlerts(){
     let password1 = this.passwordForm.get("password1");
     let password2 = this.passwordForm.get("password2");
@@ -233,24 +260,6 @@ export class ProfileComponent implements OnInit{
       delete this.activeSubIndices[linkIndex];
     } else {
       this.activeSubIndices[linkIndex] = subLinkIndex;
-    }
-  }
-
-  openAccordion(): void {
-    const accordionElement = document.getElementById('collapseAboutMe');
-
-    if (accordionElement) {
-      accordionElement.classList.add('show');
-
-      // Listen for Bootstrap's shown.bs.collapse event
-      accordionElement.addEventListener('shown.bs.collapse', () => {
-        this.collapseAboutMe.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      });
-
-      // If the collapse is already open, trigger scroll directly
-      if (accordionElement.classList.contains('show')) {
-        this.collapseAboutMe.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
     }
   }
 
@@ -332,7 +341,7 @@ export class ProfileComponent implements OnInit{
         },
         error: (err) => {
           this.status = STATUS_TYPE.ERROR;
-          this.errorMessage = err.error.detail;
+          this.errorMessage = JSON.stringify(err.error);
 
           this.notificationService.showNotification(
             'Error',
@@ -355,11 +364,10 @@ export class ProfileComponent implements OnInit{
           this.status = STATUS_TYPE.SUCCESS;
           this.userError = "";
           this.notificationService.showNotification('Success', "Person created successfully", 'success');
-          this.getPerson();
         },
         error: (err) => {
           this.status = STATUS_TYPE.ERROR;
-          this.userError = err.error.detail;
+          this.userError = JSON.stringify(err.error);
           this.notificationService.showNotification('Error', this.userError, 'error');
         }
       }
@@ -367,7 +375,6 @@ export class ProfileComponent implements OnInit{
   }
 
   saveUser(){
-    console.log("Save user: ", this.user)
     if (this.user){
       this.auth.updateUser(this.user.guid, this.user).subscribe(
         {
@@ -375,10 +382,12 @@ export class ProfileComponent implements OnInit{
             this.status = STATUS_TYPE.SUCCESS;
             this.userError = "";
             this.notificationService.showNotification('Success', 'User saved successfully', 'success');
+
+            this.auth.getUser(this.user.guid, true).subscribe();
           },
           error: (err) => {
             this.status = STATUS_TYPE.ERROR;
-            this.userError = err.error.detail;
+            this.userError = JSON.stringify(err.error);
             this.notificationService.showNotification('Error', this.userError, 'error');
           }
         }
@@ -386,8 +395,24 @@ export class ProfileComponent implements OnInit{
     }
   }
 
+  personFormData(person:any){
+    const formData = new FormData();
+
+    Object.entries(person).forEach(([key, value]) => {
+      if (value !== null && value !== undefined) {
+        formData.append(key, value as string);
+      }
+    });
+
+    // ADD THE FILE HERE
+    if (this.selectedFile) {
+      formData.append('photo', this.selectedFile);
+    }
+
+    return formData;
+  }
+
   getPerson(){
-    let returnValue: boolean = false;
     this.auth.getPerson().subscribe(
       {
         next: (response) => {
@@ -399,18 +424,39 @@ export class ProfileComponent implements OnInit{
             this.openModal('profileModal', 'collapseAccount');
             this.notificationService.showNotification(
               'Info',
-              'No person found, please fill in details below to create person',
+              'No person found, please fill in the details below to create person',
               'info'
             );
           }else{
             this.personError = "";
             this.person = response[0];
             this.fetchedFromApi = true;
+
+            if (this.person.phone.length === 0 || this.person.address.length === 0) {
+              this.openModal('profileModal', 'collapseContact');
+              this.notificationService.showNotification(
+                'Info',
+                'Some contact info missing, please fill in the details below to add contact',
+                'info'
+              );
+            }else if (!this.person.user.email){
+              this.openModal('profileModal', 'collapseAboutMe');
+              this.notificationService.showNotification(
+                'Info',
+                'Please provide email address, this is used in reseting password incase forgotten',
+                'info'
+              );
+            }else{
+              if(this.person.account_status === "Incomplete"){
+                this.person.account_status = "Complete";
+                this.savePerson();
+              }
+            }
           }
         },
         error: (err) => {
           this.status = STATUS_TYPE.ERROR;
-          this.personError = err.error.detail;
+          this.personError = JSON.stringify(err.error);
           this.notificationService.showNotification('Error', this.personError, 'error');
         }
       }
@@ -420,19 +466,29 @@ export class ProfileComponent implements OnInit{
 
   savePerson(){
     // Create a new object without `user`, `phone`, and `address`
-    const { user, phone, address, ...personCopy } = this.person;
+    const { user, phone, address, photo, ...personCopy } = this.person;
 
-    this.auth.updatePerson(this.person.guid ?? '', personCopy).subscribe(
+    this.auth.updatePerson(this.person.guid ?? '', this.personFormData(personCopy)).subscribe(
       {
         next: () => {
           this.status = STATUS_TYPE.SUCCESS;
           this.personError = "";
+
           this.notificationService.showNotification('Success', 'Person saved successfully', 'success');
+
+          if (Object.keys(user).length === 0) {
+            this.addUser(this.user.guid);
+          }
+
+          this.getPerson();
         },
         error: (err) => {
           this.status = STATUS_TYPE.ERROR;
-          this.personError = err.error.detail;
+          this.personError = JSON.stringify(err.error);
+
           this.notificationService.showNotification('Error', this.personError, 'error');
+
+          this.getPerson();
         }
       }
     );
@@ -446,20 +502,27 @@ export class ProfileComponent implements OnInit{
     // Create a new object without `user`, `phone`, and `address`
     const { user, phone, address, ...personCopy } = this.person;
 
-    this.auth.createPerson(personCopy).subscribe(
+    this.auth.createPerson(this.personFormData(personCopy)).subscribe(
       {
         next: (response) => {
           this.status = STATUS_TYPE.SUCCESS;
           this.personError = "";
+
           this.addUser(response.guid);
+
+          this.getPerson();
         },
         error: (err) => {
           this.status = STATUS_TYPE.ERROR;
-          this.personError = err.error.detail;
+          this.personError = JSON.stringify(err.error);
+
           this.notificationService.showNotification('Error', this.personError, 'error');
+
+          this.getPerson();
         }
       }
     );
+
   }
 
   savePhone(){
@@ -468,7 +531,7 @@ export class ProfileComponent implements OnInit{
     .split(';')
     .map(number => number.trim())
     .filter(number => number); // Remove empty strings
-    let phone = this.person.phone;
+    const phone = [ ...this.person.phone];
     const apiCalls = [];
 
     if (phoneNumbersArray.length > 0 && this.person.guid){
@@ -497,47 +560,28 @@ export class ProfileComponent implements OnInit{
       }
 
       // Combine all API calls and handle responses
-      forkJoin(apiCalls).subscribe((responses) => {
-        let forkErrors: any[] = [];
-
-        responses.forEach((response, index) => {
-          if (response.status !== STATUS_TYPE.ERROR) {
+      forkJoin(apiCalls).subscribe(
+        {
+          next: () => {
             this.status = STATUS_TYPE.SUCCESS;
             this.phoneError = "";
-          } else {
-            forkErrors.push(response);
+
+            this.notificationService.showNotification('Success', 'Phone/s added/modified successfully', 'success');
+
+            // Reset new numbers only if all successfully added.
+            this.phoneNumbers = "";
+
+            // Refresh data after all operations are complete
+            this.getPerson();
+          },
+          error: (errs) => {
+            this.status = STATUS_TYPE.ERROR;
+            this.phoneError = JSON.stringify(errs.error);
+
+            this.notificationService.showNotification('Error', this.phoneError, 'error');
           }
-        });
-
-        if (forkErrors.length > 0) {
-          this.status = STATUS_TYPE.ERROR;
-          this.phoneError = "";
-
-          for (const error of forkErrors) {
-            if (typeof error === "object" && error !== null) {
-              // Iterate through key-value pairs if error is an object
-              for (const [key, value] of Object.entries(error)) {
-                this.phoneError += `${key}: ${value}\n`;
-              }
-
-              this.phoneError += "\n";
-            } else if (typeof error === "string" && error.trim() !== "") {
-              // If error is a string, add it directly
-              this.phoneError += `${error}\n`;
-            }
-          }
-
-          this.notificationService.showNotification('Error', this.phoneError, 'error');
-        }else{
-          this.notificationService.showNotification('Success', 'Phone/s added/modified successfully', 'success');
-
-          // Reset new numbers only if all successfully added.
-          this.phoneNumbers = "";
         }
-
-        // Refresh data after all operations are complete
-        this.getPerson();
-      });
+      );
     }
   }
 
@@ -547,7 +591,7 @@ export class ProfileComponent implements OnInit{
     .split(';')
     .map(address => address.trim())
     .filter(address => address); // Remove empty strings
-    let address = this.person.address;
+    const address = [ ...this.person.address];
     const apiCalls = [];
 
     if (AddressesArray.length > 0 && this.person.guid){
@@ -576,51 +620,28 @@ export class ProfileComponent implements OnInit{
       }
 
       // Combine all API calls and handle responses
-      forkJoin(apiCalls).subscribe((responses) => {
-        let forkErrors: any[] = [];
-
-        responses.forEach((response, index) => {
-          if (response.status !== STATUS_TYPE.ERROR) {
+      forkJoin(apiCalls).subscribe(
+        {
+          next: () => {
             this.status = STATUS_TYPE.SUCCESS;
             this.addressError = "";
-          } else {
-            forkErrors.push(response);
+
+            this.notificationService.showNotification('Success', 'Address/es added/modified successfully', 'success');
+
+            // Reset new numbers only if all successfully added.
+            this.addresses = "";
+
+            // Refresh data after all operations are complete
+            this.getPerson();
+          },
+          error: (errs) => {
+            this.status = STATUS_TYPE.ERROR;
+            this.addressError = JSON.stringify(errs.error);
+
+            this.notificationService.showNotification('Error', this.addressError, 'error');
           }
-        });
-
-        if (forkErrors.length > 0) {
-          this.status = STATUS_TYPE.ERROR;
-          this.addressError = "";
-
-          for (const error of forkErrors) {
-            if (typeof error === "object" && error !== null) {
-              // Iterate through key-value pairs if error is an object
-              for (const [key, value] of Object.entries(error)) {
-                this.addressError += `${key}: ${value}\n`;
-              }
-
-              this.addressError += "\n";
-            } else if (typeof error === "string" && error.trim() !== "") {
-              // If error is a string, add it directly
-              this.addressError += `${error}\n`;
-            }
-          }
-
-          this.notificationService.showNotification(
-            'Error', this.addressError, 'error'
-          );
-        }else{
-          this.notificationService.showNotification(
-            'Success', 'Address/es added/modified successfully', 'success'
-          );
-
-          // reset new addresses only if all successfully added
-          this.addresses = "";
         }
-
-        // Refresh data after all operations are complete
-        this.getPerson();
-      });
+      );
     }
   }
 
