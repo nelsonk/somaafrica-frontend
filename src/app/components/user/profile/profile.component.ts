@@ -141,11 +141,11 @@ export class ProfileComponent implements OnInit{
           }
 
           try {
-            const person_local = this.sessionStorage.getItem("Person");
+            const personLocal = this.sessionStorage.getItem("Person");
 
-            if(person_local){
+            if(personLocal){
               // Only assign if not empty to avoid overriding with empty
-              this.person = person_local;
+              this.person = personLocal;
             }
           } catch (error) {
             console.log("Error getting person from session storage: ", error)

@@ -88,4 +88,30 @@ This checks if user has a group/role else redirect them to Roles page to choose 
 # TrackSource Directive
 Not currently used, we use NavigationService instead.
 
+# File / Image upload
+Use formData to send file to API
 
+# ng-select
+This is good for selection fields allowing either single selection or multiple
+
+Install:
+npm install --save @ng-select/ng-select
+
+Import in ts:
+import { NgSelectComponent } from '@ng-select/ng-select';
+imports: [NgSelectComponent]
+
+Use in html:
+@case ('multi-select') {
+    <ng-select
+        [items]="summary.options"
+        bindLabel="label"
+        [multiple]="true"
+        [(ngModel)]="summary.value">
+    </ng-select>
+}
+
+ng-select css in styles.css
+
+# soma-input
+Use this class to style any input in any component, css in styles.css

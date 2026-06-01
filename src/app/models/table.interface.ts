@@ -55,3 +55,11 @@ export const SAMPLE_TABLE_DATA: TableData = {
     }
   ]
 };
+
+export const ACTION_EDIT: TableAction[] = [
+  {
+      label: 'Edit',
+      icon: 'bi bi-pencil',
+      class: 'btn-outline-primary'
+    }
+  ]

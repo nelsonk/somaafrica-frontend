@@ -1,4 +1,5 @@
 import { BaseModel, DEFAULT_BASE_MODEL } from "./base-model.interface";
+import { setDetail } from "../utils/details-helper";
 import { Person, DEFAULT_PERSON } from "./person.interface";
 import {
     EducationLevel,
@@ -12,15 +13,15 @@ import {
 
 export interface Teacher extends BaseModel{
     person: string;
-    person_details: Person;
+    person_details?: Person;
     education_levels: EducationLevel[];
     curriculums: Curriculum[];
     subjects: Subject[];
     summary: string;
-    description: string;
-    start_teaching_date: string;
+    description?: string;
+    years_of_experience?: string;
     qualifications: string;
-    rating: string;
+    rating?: string;
 }
 
 export const DEFAULT_TEACHER: Teacher = {
@@ -32,7 +33,8 @@ export const DEFAULT_TEACHER: Teacher = {
     subjects: [ { ...DEFAULT_SUBJECT } ],
     summary: '',
     description: '',
-    start_teaching_date: '',
+    years_of_experience: '',
     qualifications: '',
     rating: ''
 };
+

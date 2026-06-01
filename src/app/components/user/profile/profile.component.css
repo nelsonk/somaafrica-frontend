@@ -110,8 +110,8 @@
 
 .image {
   text-align: center;
-  width: 200px;
-  height: 200px;
+  width: 12.5rem;
+  height: 12.5rem;
   -webkit-border-radius: 75%;
   -moz-border-radius: 75%;
   border-radius: 75%;
@@ -120,8 +120,8 @@
   background-repeat: no-repeat;
   background-size: cover;
   margin: auto;
-  margin-top: 20px;
-  margin-bottom: -30px;
+  margin-top: 1.25rem;
+  margin-bottom: -1.875rem;
   align-content: center;
 }
 
@@ -133,8 +133,8 @@
 
 .image-small {
   text-align: center;
-  width: 70px;
-  height: 70px;
+  width: 4.375rem;
+  height: 4.375rem;
   -webkit-border-radius: 75%;
   -moz-border-radius: 75%;
   border-radius: 75%;

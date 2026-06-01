@@ -20,7 +20,7 @@ export class ConfirmationService {
     message: string,
     type: 'success' | 'info' | 'error' | 'warning',
     onConfirm: () => void,
-    onCancel: () => void): void
+    onCancel?: () => void): void
   {
     this.modalSubject.next({title, message, type, onConfirm, onCancel});
   }
