@@ -3,44 +3,223 @@
   <!-- Header Strip -->
   <div class="hero-strip d-flex align-items-center justify-content-between p-3">
     <!-- LEFT SIDE -->
-    <div class="d-flex align-items-center">
-      <div class="profile-img-container me-3">
-
-        <!-- IMAGE -->
-        @if (image) {
+    <div class="d-flex align-items-center w-75">
+      <!-- IMAGE -->
+      @if (image) {
+        <div class="image-global me-3">
           <img
-            [src]="image"
+            [src]="image || 'img/logo.png'"
             class="profile-img"
             (error)="imageError = true"
-            [hidden]="imageError" />
-        } @else {
-          <div class="profile-img-fallback">
-            {{ mainSummary.charAt(0) || '?' }}
+            [hidden]="imageError"
+          />
+          <div class="trick">
           </div>
-        }
-
-        <!-- FALLBACK -->
-
-        <!-- IF IMAGE FAILS -->
-        @if (imageError) {
-          <div class="profile-img-fallback">
-            {{ mainSummary.charAt(0) || '?' }}
-          </div>
-        }
-
-      </div>
-
-      <div>
-        <div class="entity-name">
-          {{ mainSummary }}
         </div>
+      }
 
-        @for (summary of otherSummaries; track summary) {
-          <div class="entity-desc">
-            <span class="summary-key">{{summary[0]}}:</span>
-            <span class="summary-value">{{ summary[1] }}</span>
+      <div class="flex-grow-1 min-w-0">
+        @if (mainSummary) {
+          <div class="entity-name">
+            {{ mainSummary.value }}
           </div>
         }
+
+        <form [formGroup]="form">
+          @for (summary of otherSummaries; track summary) {
+            <!-- VIEW MODE -->
+            @if (!isEdit()) {
+              <div class="entity-desc">
+                <div class="summary-key">{{summary.label}}:</div>
+                <div class="summary-value formatted-text">
+
+                  @switch (summary.type) {
+
+                    @case ('boolean') {
+                      {{ summary.value ? 'Yes' : 'No' }}
+                    }
+
+                    @case ('multi-select') {
+                      {{ formatMultiSelect(summary.value) }}
+                    }
+
+                    @case ('single-select') {
+                      {{ summary.value?.label }}
+                    }
+
+                    @case ('object') {
+                      Nested Object
+                    }
+
+                    @default {
+                      {{ summary.value }}
+                    }
+
+                  }
+                </div>
+              </div>
+            }
+
+            <!-- EDIT MODE -->
+            @if (isEdit() && !summary.readonly) {
+              <div class="entity-desc">
+                <div class="summary-key">{{summary.label}}:</div>
+                <div class="summary-value formatted-text">
+
+                    @switch (summary.type) {
+
+                      @case ('number')
+                      @case ('email')
+                      @case ('text')
+                      @case ('date')
+                      @default {
+                        <input
+                          [type]="summary.type ? summary.type : 'text'"
+                          class="form-control soma-input"
+                          [formControlName]="summary.key"
+                          [placeholder]="summary?.placeholder"
+                          [maxlength]="summary.maxlength"
+                          [readOnly]="summary.readonly"
+                        />
+
+                        @if (isInvalid(summary.key)) {
+
+                          <div class="text-danger small">
+
+                            @for (
+                              error of getErrors(summary);
+                              track error
+                            ) {
+                              <div>{{ error }}</div>
+                            }
+
+                          </div>
+
+                        }
+                      }
+
+                      @case ('textarea') {
+                        <textarea
+                          class="form-control soma-input"
+                          [formControlName]="summary.key"
+                          [placeholder]="summary?.placeholder"
+                          [maxlength]="summary.maxlength"
+                          [readOnly]="summary.readonly"
+                          style="field-sizing: content;"
+                        ></textarea>
+
+                        @if (isInvalid(summary.key)) {
+
+                          <div class="text-danger small">
+
+                            @for (
+                              error of getErrors(summary);
+                              track error
+                            ) {
+                              <div>{{ error }}</div>
+                            }
+
+                          </div>
+
+                        }
+                      }
+
+                      @case ('boolean') {
+                        <input
+                          type="checkbox"
+                          [formControlName]="summary.key"
+                          [readOnly]="summary.readonly"
+                        />
+                      }
+
+                      @case ('multi-select')
+                      @case ('single-select') {
+                        <ng-select
+                          class="modern-select"
+                          [items]="summary.options"
+                          bindLabel="label"
+                          bufferAmount="10"
+                          [fixedPlaceholder]="false"
+                          [popover]="true"
+                          [virtualScroll]="true"
+                          [readonly]="summary.readonly"
+                          [multiple]="summary.type === 'multi-select'"
+                          [formControlName]="summary.key"
+                          [placeholder]="summary?.placeholder || 'Click to select'"
+                        >
+
+                          <ng-template ng-header-tmp>
+                            <div class="select-all-wrapper">
+                              <button type="button" (click)="toggleSelectAll(summary)">
+                                {{ isAllSelected(summary) ? 'Deselect All' : 'Select All' }}
+                              </button>
+                            </div>
+                          </ng-template>
+
+                          <ng-template ng-label-tmp let-item="item">
+                            <div class="modern-select-label-item">
+
+                              <div class="modern-select-avatar">
+                                {{ item.label?.charAt(0) }}
+                              </div>
+
+                              <span>
+                                {{ item.label }}
+                              </span>
+
+                            </div>
+                          </ng-template>
+
+                          <ng-template ng-option-tmp let-item="item">
+
+                            <div class="modern-select-option">
+
+                              <div class="modern-select-avatar">
+                                {{ item.label?.charAt(0) }}
+                              </div>
+
+                              <div class="modern-select-option-content">
+
+                                <div class="modern-select-option-title">
+                                  {{ item.label }}
+                                </div>
+
+                                @if(item.description){
+                                  <div class="modern-select-option-description">
+                                    {{ item.description }}
+                                  </div>
+                                }
+
+                              </div>
+
+                            </div>
+
+                          </ng-template>
+
+                        </ng-select>
+
+                        @if (isInvalid(summary.key)) {
+
+                          <div class="text-danger small">
+
+                            @for (
+                              error of getErrors(summary);
+                              track error
+                            ) {
+                              <div>{{ error }}</div>
+                            }
+
+                          </div>
+
+                        }
+                      }
+
+                    }
+                </div>
+              </div>
+            }
+          }
+        </form>
       </div>
     </div>
 
@@ -67,48 +246,277 @@
         </button>
 
         <ul class="dropdown-menu dropdown-menu-end shadow">
-          <li>
-            <button class="dropdown-item" (click)="edit.emit()">
-              <i class="bi bi-pencil me-2"></i> Edit
-            </button>
-          </li>
-          <li>
-            <button class="dropdown-item text-danger" (click)="delete.emit()">
-              <i class="bi bi-trash me-2"></i> Delete
-            </button>
-          </li>
+          @if (editable){
+            <li>
+              <button class="dropdown-item" (click)="onEdit()">
+                <i class="bi bi-pencil me-2"></i> Edit
+              </button>
+            </li>
+          }
+
+          @if (deletable){
+            <li>
+              <button class="dropdown-item text-danger" (click)="onDelete()">
+                <i class="bi bi-trash me-2"></i> Delete
+              </button>
+            </li>
+          }
         </ul>
       </div>
     </div>
 
     <div class="card-body">
-      <div class="details-grid">
-        @for (item of details; track item) {
-          <div class="detail-item">
-            <div class="detail-key">
-              {{ item[0] }}
-            </div>
-            <div class="detail-value">
-              {{ item[1] }}
-            </div>
-          </div>
-        }
-      </div>
+      <form [formGroup]="form">
+        <div [class]="isEdit() ? 'details-grid' : 'details-grid-view'">
+          @for (detail of details; track detail.key) {
+            <!-- VIEW MODE -->
+            @if (!isEdit()) {
+              <div
+                class="detail-item"
+                [class.full-width]="detail.type === 'textarea' || detail.fullwidth"
+              >
+
+                <div class="detail-key">
+                  {{ detail.label }}:
+                </div>
+
+                <div class="detail-value formatted-text">
+
+                  @switch (detail.type) {
+
+                    @case ('boolean') {
+                      {{ detail.value ? 'Yes' : 'No' }}
+                    }
+
+                    @case ('multi-select') {
+                      {{ formatMultiSelect(detail.value) }}
+                    }
+
+                    @case ('single-select') {
+                      {{ detail.value?.label }}
+                    }
+
+                    @default {
+                      {{ detail.value }}
+                    }
+
+                  }
+                </div>
+              </div>
+            }
+
+            <!-- EDIT MODE -->
+            @if (isEdit() && !detail.readonly) {
+              <div
+                class="detail-item"
+                [class.full-width]="detail.type === 'textarea' || detail.fullwidth"
+              >
+                <div class="detail-key">
+                  {{ detail.label }}:
+                </div>
+
+                <div class="detail-value">
+
+                    @switch (detail.type) {
+
+                      @case ('number')
+                      @case ('email')
+                      @case ('text')
+                      @case ('date')
+                      @default {
+                        <input
+                          [type]="detail.type ? detail.type : 'text'"
+                          class="form-control soma-input"
+                          [formControlName]="detail.key"
+                          [placeholder]="detail?.placeholder"
+                          [maxlength]="detail.maxlength"
+                          [readOnly]="detail.readonly"
+                        />
+
+                        @if (isInvalid(detail.key)) {
+
+                          <div class="text-danger small">
+
+                            @for (
+                              error of getErrors(detail);
+                              track error
+                            ) {
+                              <div>{{ error }}</div>
+                            }
+
+                          </div>
+
+                        }
+                      }
+
+                      @case ('textarea') {
+                        <textarea
+                          class="form-control soma-input"
+                          [formControlName]="detail.key"
+                          [placeholder]="detail?.placeholder"
+                          [maxlength]="detail.maxlength"
+                          [readOnly]="detail.readonly"
+                          style="field-sizing: content;"
+                        ></textarea>
+
+                        @if (isInvalid(detail.key)) {
+
+                          <div class="text-danger small">
+
+                            @for (
+                              error of getErrors(detail);
+                              track error
+                            ) {
+                              <div>{{ error }}</div>
+                            }
+
+                          </div>
+
+                        }
+                      }
+
+                      @case ('boolean') {
+                        <input
+                          type="checkbox"
+                          [formControlName]="detail.key"
+                          [readOnly]="detail.readonly"
+                        />
+                      }
+
+                      @case ('multi-select')
+                      @case ('single-select') {
+                        <ng-select
+                          class="modern-select"
+                          [items]="detail.options"
+                          bindLabel="label"
+                          bufferAmount="10"
+                          [fixedPlaceholder]="false"
+                          [popover]="true"
+                          [virtualScroll]="true"
+                          [readonly]="detail.readonly"
+                          [multiple]="detail.type === 'multi-select'"
+                          [formControlName]="detail.key"
+                          [placeholder]="detail?.placeholder || 'Click to select'"
+                        >
+
+                          <ng-template ng-header-tmp>
+                            <div class="select-all-wrapper">
+                              <button type="button" (click)="toggleSelectAll(detail)">
+                                {{ isAllSelected(detail) ? 'Deselect All' : 'Select All' }}
+                              </button>
+                            </div>
+                          </ng-template>
+
+                          <ng-template ng-label-tmp let-item="item">
+                            <div class="modern-select-label-item">
+
+                              <div class="modern-select-avatar">
+                                {{ item.label?.charAt(0) }}
+                              </div>
+
+                              <span>
+                                {{ item.label }}
+                              </span>
+
+                            </div>
+                          </ng-template>
+
+                          <ng-template ng-option-tmp let-item="item">
+
+                            <div class="modern-select-option">
+
+                              <div class="modern-select-avatar">
+                                {{ item.label?.charAt(0) }}
+                              </div>
+
+                              <div class="modern-select-option-content">
+
+                                <div class="modern-select-option-title">
+                                  {{ item.label }}
+                                </div>
+
+                                @if(item.description){
+                                  <div class="modern-select-option-description">
+                                    {{ item.description }}
+                                  </div>
+                                }
+
+                              </div>
+
+                            </div>
+
+                          </ng-template>
+
+                        </ng-select>
+
+                        @if (isInvalid(detail.key)) {
+
+                          <div class="text-danger small">
+
+                            @for (
+                              error of getErrors(detail);
+                              track error
+                            ) {
+                              <div>{{ error }}</div>
+                            }
+
+                          </div>
+
+                        }
+                      }
+
+                    }
+                </div>
+
+              </div>
+
+            }
+
+          }
+        </div>
+      </form>
+
+      @if (isEdit()) {
+        <div class="d-flex justify-content-center mt-3">
+          <button
+            class="btn btn-outline-primary action-btn px-5"
+            (click)="onSave()"
+            [disabled]="form.invalid"
+          >
+            Submit
+          </button>
+        </div>
+      }
+
+      @if (deletable && !isEdit()) {
+        <div class="d-flex justify-content-center mt-3">
+          <button class="btn btn-outline-danger action-btn px-5" (click)="onDelete()">
+            Delete
+          </button>
+        </div>
+      }
+
     </div>
 
     <!-- TABS CARD -->
     @if (tabsData?.length) {
       <div class="card shadow-sm border-0 rounded-4 mt-4">
         <div class="card-body">
+
           <ul class="nav nav-tabs mb-3">
             @for (tab of tabsData; track tab; let i = $index) {
               <li class="nav-item">
-                <button class="nav-link" [class.active]="activeTab === i" (click)="activeTab = i">
+                <button
+                  class="nav-link"
+                  [class.active]="activeTab === i"
+                  (click)="activeTab = i"
+                >
                   {{ tab.title }}
                 </button>
               </li>
             }
           </ul>
+
           @for (tab of tabsData; track tab; let i = $index) {
             <div>
               @if (activeTab === i) {
@@ -117,9 +525,9 @@
               }
             </div>
           }
+
         </div>
       </div>
     }
   </div>
-
 </div>

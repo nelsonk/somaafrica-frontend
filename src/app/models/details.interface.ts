@@ -1,13 +1,49 @@
 import { TableData, SAMPLE_TABLE_DATA } from "./table.interface";
 
-export interface Summary {
-    image?: string;
-    summary: Record<string, string | number | boolean>;
+
+export type FieldType =
+  | 'text'
+  | 'textarea'
+  | 'number'
+  | 'boolean'
+  | 'date'
+  | 'email'
+  | 'single-select'
+  | 'multi-select'
+  | 'object'
+  | 'file'
+  | 'readonly';
+
+export interface SelectOption {
+  label: string;
+  value: any;
+  raw?: any;
+}
+
+export interface DetailField {
+  key: string;
+  label: string;
+  type: FieldType;
+  value: any;
+  options?: SelectOption[];
+  children?: DetailField[];
+  readonly?: boolean | null;
+  required?: boolean;
+  hidden?: boolean;
+  disabled?: boolean;
+  placeholder?: string;
+  maxlength?: number;
+  fullwidth?: boolean;
 }
 
 export interface Detail {
-    title: string;
-    details: Record<string, string | number | boolean>;
+  title: string;
+  details: DetailField[];
+}
+
+export interface Summary {
+    image?: string;
+    summary: DetailField[];
 }
 
 export interface TabData {
@@ -16,19 +52,22 @@ export interface TabData {
 }
 
 export interface DetailsData {
-    summary: Summary;
-    detail: Detail;
+    editable?: boolean;
+    deletable?: boolean;
+    callback?: string;
+    summary?: Summary;
+    detail?: Detail;
     tabData?: TabData[];
 }
 
 export const DEFAULT_SUMMARY: Summary = {
     image: '',
-    summary: {}
+    summary: []
 };
 
 export const DEFAULT_DETAIL: Detail = {
     title: '',
-    details: {}
+    details: []
 };
 
 export const DEFAULT_TAB_DATA: TabData = {
@@ -40,3 +79,9 @@ export const DEFAULT_DETAILS_DATA: DetailsData = {
     summary: { ...DEFAULT_SUMMARY },
     detail: { ...DEFAULT_DETAIL }
 };
+
+export interface DetailSaveData {
+    callback?: string;
+    summary: any;
+    detail: any;
+}

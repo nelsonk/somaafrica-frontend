@@ -13,16 +13,16 @@
 
 /* Container controls layout (important) */
 .profile-img-container {
-  width: 70px;
-  height: 70px;
+  width: 140px;
+  height: 140px;
   flex-shrink: 0;
   position: relative;
 }
 
 /* Larger variant (reuse later) */
 .profile-img-container.lg {
-  width: 100px;
-  height: 100px;
+  width: 200px;
+  height: 200px;
 }
 
 /* Actual image */
@@ -112,9 +112,10 @@
 }
 
 .entity-desc {
-  display: flex;
+  display: grid;
+  grid-template-columns: 7rem minmax(0, 1fr); /* fixed label column */
   gap: 0.5rem;
-  align-items: baseline;
+  align-items: center;
 }
 
 .summary-key {
@@ -125,6 +126,7 @@
 
 .summary-value {
   font-weight: 700;
+  margin-top: 0.25rem;
 }
 
 /* =========================
@@ -133,7 +135,13 @@
 
 .details-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(25rem, 1fr));
+  gap: 1rem 2rem;
+}
+
+.details-grid-view {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
   gap: 1rem 2rem;
 }
 
@@ -157,7 +165,11 @@
 .detail-value {
   font-size: 0.95rem;
   font-weight: 600;
-  color: #212529;
+  /* color: #212529; */
+}
+
+.full-width {
+  grid-column: 1 / -1;
 }
 
 /* =========================

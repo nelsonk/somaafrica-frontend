@@ -160,6 +160,18 @@ export class AuthService {
     );
   }
 
+  getPersons(){
+    const url = `${environment.BASE_URL}/persons/person`;
+
+    return this.api.get<any>(url).pipe(
+      tap({
+        next: (response) => {
+          this.sessionStorage.setItem("Persons", response);
+        }
+      })
+    );
+  }
+
   updatePerson(person_guid: string, data: {}){
     const url = `${environment.BASE_URL}/persons/person/${person_guid}`;
 

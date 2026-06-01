@@ -4,7 +4,7 @@
     <!-- Sidebar Header -->
     <div class="d-flex align-items-center justify-content-center py-4 border-bottom">
       <a class="navbar-brand logo-wrapper" [routerLink]="['/']">
-        <img ngSrc="img/logo.png" alt="SomaAfrica" width="200" height="100" priority style="height: auto;">
+        <img ngSrc="img/logo.png" alt="SomaAfrica" width="200" height="54" priority style="height: auto;">
       </a>
     </div>
 
@@ -267,12 +267,13 @@
                           <div class="panel-body">
                             <form>
                               <div class="mb-3">
-                                <label class="form-label">Photo</label>
+                                <label class="form-label">Photo:</label>
 
                                 <input
                                   type="file"
                                   class="form-control"
                                   accept="image/*"
+                                  [title]="person.photo ?? 'None'"
                                   (change)="onFileSelected($event)">
                               </div>
 
