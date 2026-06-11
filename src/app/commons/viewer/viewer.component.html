@@ -1,0 +1,79 @@
+<!-- viewer.component.html -->
+<div class="viewer-container" [class.dark]="darkMode">
+
+  <!-- TOP TOOLBAR -->
+  <div class="toolbar">
+
+    <button (click)="prevPage()">◀</button>
+
+    <span>
+      Page {{pageNumber}} / {{totalPages}}
+    </span>
+
+    <button (click)="nextPage()">▶</button>
+
+    <div class="divider"></div>
+
+    <button (click)="zoomOut()">-</button>
+
+    <span>{{ (zoom * 100) | number:'1.0-0' }}%</span>
+
+    <button (click)="zoomIn()">+</button>
+
+    <div class="divider"></div>
+
+    <input
+      type="number"
+      min="1"
+      [max]="totalPages"
+      (change)="goToPage($event.target.valueAsNumber)"
+      placeholder="Go to page"
+    />
+
+    <div class="divider"></div>
+
+    <button (click)="toggleDarkMode()">🌙</button>
+
+    <button (click)="fullscreen()">⛶</button>
+
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="content">
+
+    <!-- SIDEBAR (THUMBNAILS PLACEHOLDER) -->
+    <app-thumbnail-sidebar
+        (pageSelect)="goToPage($event)"
+    >
+    </app-thumbnail-sidebar>
+
+    <!-- PDF VIEW -->
+    <div class="pdf-area">
+
+        <div class="canvas-wrapper">
+
+            <canvas #canvas></canvas>
+
+            <canvas
+                #annotationCanvas
+                class="annotation-layer"
+                (mousedown)="startDraw($event)"
+                (mouseup)="stopDraw()"
+                (mousemove)="draw($event)">
+            </canvas>
+
+            <div
+                #textLayer
+                class="textLayer">
+            </div>
+
+            <div class="watermark">
+                CONFIDENTIAL
+            </div>
+
+        </div>
+
+    </div>
+
+  </div>
+</div>

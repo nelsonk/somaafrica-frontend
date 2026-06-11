@@ -9,12 +9,13 @@ import {
 
 import { DetailsData, DetailSaveData } from '../../models/details.interface';
 import { TableComponent } from '../table/table.component';
+import { ViewerComponent } from '../viewer/viewer.component';
 import { NgSelectModule } from '@ng-select/ng-select';
 
 
 @Component({
     selector: 'app-details-page',
-    imports: [TableComponent, ReactiveFormsModule, NgSelectModule],
+    imports: [TableComponent, ViewerComponent, ReactiveFormsModule, NgSelectModule],
     templateUrl: './details-page.component.html',
     styleUrl: './details-page.component.css'
 })
@@ -33,6 +34,7 @@ export class DetailsPageComponent implements OnInit{
   details: any = [];
   tabsData: any = [];
   detailsTitle? = '';
+  document? = '';
   editable?: boolean = true;
   deletable?: boolean = false;
   callback?: string;
@@ -44,6 +46,7 @@ export class DetailsPageComponent implements OnInit{
     this.editable = this.detailsData?.editable;
     this.deletable = this.detailsData?.deletable;
     this.callback = this.detailsData?.callback;
+    this.document = this.detailsData?.detail?.document;
     this.detailsTitle = this.detailsData?.detail?.title;
     this.details = this.detailsData?.detail?.details || [];
     this.tabsData = this.detailsData?.tabData;
@@ -53,12 +56,31 @@ export class DetailsPageComponent implements OnInit{
     this.mainSummary = summaries[0];
 
     if(this.action && this.action === 'Edit'){
+      // this.otherSummaries = [];
+      // this.details = [...summaries, ...this.details];
+
       this.otherSummaries = summaries;
     }else{
       this.otherSummaries = summaries.slice(1);
     }
 
     this.buildForm();
+  }
+
+  // Read file
+  onFileSelected(event: Event, detailKey: any): void {
+
+    const input = event.target as HTMLInputElement;
+
+    if (!input.files?.length) return;
+
+    const file = input.files[0];
+
+    this.details.map((detail:any) => {
+      if(detail.key == detailKey){
+        detail.value = file;
+      }
+    });
   }
 
   buildForm(): void {
@@ -203,13 +225,15 @@ export class DetailsPageComponent implements OnInit{
   onEdit(){
     this.action = 'Edit';
     this.otherSummaries = this.detailsData?.summary?.summary || [];
+    // this.details = [...this.otherSummaries, ...this.details];
+    // this.otherSummaries = [];
 
     this.buildForm();
   }
 
   onDelete(){
     this.otherSummaries = this.detailsData?.summary?.summary || [];
-    
+
     this.delete.emit({
       'callback': this.callback,
       'summary': this.otherSummaries,

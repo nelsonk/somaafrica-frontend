@@ -66,11 +66,19 @@ export class ForgotPasswordComponent implements OnInit{
       {
         next: (response) => {
           this.status = STATUS_TYPE.SUCCESS;
-          this.notificationService.showNotification('Success', response.detail, 'success');
+          this.notificationService.showNotification(
+            'Success',
+            response.detail,
+            'success'
+          );
         },
         error: (err) => {
           this.status = STATUS_TYPE.ERROR;
-          this.notificationService.showNotification('Error', JSON.stringify(err.error), 'error');
+          this.notificationService.showNotification(
+            'Error',
+            JSON.stringify(err.error),
+            'error'
+          );
         }
       }
     )

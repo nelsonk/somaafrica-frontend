@@ -363,12 +363,20 @@ export class ProfileComponent implements OnInit{
         next: () => {
           this.status = STATUS_TYPE.SUCCESS;
           this.userError = "";
-          this.notificationService.showNotification('Success', "Person created successfully", 'success');
+          this.notificationService.showNotification(
+            'Success',
+            'Person created successfully',
+            'success'
+          );
         },
         error: (err) => {
           this.status = STATUS_TYPE.ERROR;
           this.userError = JSON.stringify(err.error);
-          this.notificationService.showNotification('Error', this.userError, 'error');
+          this.notificationService.showNotification(
+            'Error',
+            this.userError,
+            'error'
+          );
         }
       }
     );
@@ -381,14 +389,22 @@ export class ProfileComponent implements OnInit{
           next: () => {
             this.status = STATUS_TYPE.SUCCESS;
             this.userError = "";
-            this.notificationService.showNotification('Success', 'User saved successfully', 'success');
+            this.notificationService.showNotification(
+              'Success',
+              'User saved successfully',
+              'success'
+            );
 
             this.auth.getUser(this.user.guid, true).subscribe();
           },
           error: (err) => {
             this.status = STATUS_TYPE.ERROR;
             this.userError = JSON.stringify(err.error);
-            this.notificationService.showNotification('Error', this.userError, 'error');
+            this.notificationService.showNotification(
+              'Error',
+              this.userError,
+              'error'
+            );
           }
         }
       );
@@ -457,7 +473,11 @@ export class ProfileComponent implements OnInit{
         error: (err) => {
           this.status = STATUS_TYPE.ERROR;
           this.personError = JSON.stringify(err.error);
-          this.notificationService.showNotification('Error', this.personError, 'error');
+          this.notificationService.showNotification(
+            'Error',
+            this.personError,
+            'error'
+          );
         }
       }
     );
@@ -474,7 +494,11 @@ export class ProfileComponent implements OnInit{
           this.status = STATUS_TYPE.SUCCESS;
           this.personError = "";
 
-          this.notificationService.showNotification('Success', 'Person saved successfully', 'success');
+          this.notificationService.showNotification(
+            'Success',
+            'Person saved successfully',
+            'success'
+          );
 
           if (Object.keys(user).length === 0) {
             this.addUser(this.user.guid);
@@ -486,7 +510,11 @@ export class ProfileComponent implements OnInit{
           this.status = STATUS_TYPE.ERROR;
           this.personError = JSON.stringify(err.error);
 
-          this.notificationService.showNotification('Error', this.personError, 'error');
+          this.notificationService.showNotification(
+            'Error',
+            this.personError,
+            'error'
+          );
 
           this.getPerson();
         }
@@ -516,7 +544,11 @@ export class ProfileComponent implements OnInit{
           this.status = STATUS_TYPE.ERROR;
           this.personError = JSON.stringify(err.error);
 
-          this.notificationService.showNotification('Error', this.personError, 'error');
+          this.notificationService.showNotification(
+            'Error',
+            this.personError,
+            'error'
+          );
 
           this.getPerson();
         }

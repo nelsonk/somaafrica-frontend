@@ -349,6 +349,33 @@
                         }
                       }
 
+                      @case ('file') {
+                        <input
+                          type="file"
+                          class="form-control soma-input"
+                          [formControlName]="detail.key"
+                          [placeholder]="detail?.placeholder"
+                          [maxlength]="detail.maxlength"
+                          [readOnly]="detail.readonly"
+                          (change)="onFileSelected($event, detail.key)"
+                        />
+
+                        @if (isInvalid(detail.key)) {
+
+                          <div class="text-danger small">
+
+                            @for (
+                              error of getErrors(detail);
+                              track error
+                            ) {
+                              <div>{{ error }}</div>
+                            }
+
+                          </div>
+
+                        }
+                      }
+
                       @case ('textarea') {
                         <textarea
                           class="form-control soma-input"
@@ -476,12 +503,20 @@
         </div>
       </form>
 
+      @if (document) {
+        <div>
+          <app-viewer
+            [fileUrl]="document"
+          >
+          </app-viewer>
+        </div>
+      }
+
       @if (isEdit()) {
         <div class="d-flex justify-content-center mt-3">
           <button
             class="btn btn-outline-primary action-btn px-5"
             (click)="onSave()"
-            [disabled]="form.invalid"
           >
             Submit
           </button>

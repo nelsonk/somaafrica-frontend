@@ -1,0 +1,32 @@
+<!-- Main Content -->
+<div class="d-flex align-items-start gap-3 mt-4 mx-2">
+  <!-- add min-width: 0 in adtion to the flex to allow dynamic shrinking and growing-->
+  @if (materialsTable && !materialData) {
+    <div [style.flex]="materialData ? '0 0 30%' : '1'" style="min-width: 0;">
+      <div class="d-md-flex justify-content-md-end">
+        <button class="btn btn-outline-primary action-btn" type="submit" (click)="createMaterial()">
+          Create Learning Material
+        </button>
+      </div>
+      <app-table
+        [tableData]="materialsTable"
+        (rowClicked)="onRowClick($event)"
+        (actionClicked)="onActionClick($event)"
+        [compact]="!!materialData"
+      ></app-table>
+    </div>
+  }
+
+  @if (materialData) {
+    <div style="flex: 1 1 auto; min-width: 0;">
+      <app-details-page
+        [detailsData]="materialData"
+        [action]="action"
+        (close)="onCloseDetail()"
+        (save)="onSaveDetails($event)"
+        (delete)="onDelete($event)"
+      ></app-details-page>
+    </div>
+  }
+</div>
+

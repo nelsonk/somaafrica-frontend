@@ -1,0 +1,30 @@
+<div class="thumbs">
+
+  <div
+    class="thumb"
+    *ngFor="
+      let thumb
+      of thumbnails;
+      let i = index
+    "
+    [attr.data-page]="i + 1"
+    #thumbItem
+    (click)="selectPage(i)"
+  >
+
+    <img
+      *ngIf="thumb"
+      [src]="thumb"
+    />
+
+    <div
+      *ngIf="!thumb"
+      class="thumb-placeholder">
+
+      Page {{ i + 1 }}
+
+    </div>
+
+  </div>
+
+</div>
