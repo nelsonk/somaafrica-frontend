@@ -36,6 +36,12 @@ export class ViewerComponent implements AfterViewInit {
   @ViewChild(ThumbnailSidebarComponent)
   thumbs!: ThumbnailSidebarComponent;
 
+  @ViewChild('scrollContainer', { static: false })
+  scrollContainer!: ElementRef<HTMLDivElement>;
+
+  @ViewChild('viewerContainer', { static: false })
+  viewerContainer!: ElementRef<HTMLElement>;
+
   isDrawing = false;
   annotationCtx!: CanvasRenderingContext2D;
   pageCache = new Map<number, any>();
@@ -49,9 +55,11 @@ export class ViewerComponent implements AfterViewInit {
   renderedPages = new Set<number>();
   observer!: IntersectionObserver;
   private pageObserver!: IntersectionObserver;
+  isFullscreen = false;
   totalPages = 0;
   zoom = 1.2;
   darkMode = false;
+  pdfDocument: any;
 
   constructor(
     private pdf: PdfService,
@@ -72,11 +80,33 @@ export class ViewerComponent implements AfterViewInit {
       this.auth.getHeaders()
     );
 
+    this.pdfDocument = doc;
+
     this.totalPages = doc.numPages;
 
     this.pages = Array.from(
       { length: this.totalPages },
       (_, i) => i + 1
+    );
+
+    // 🔥 IMPORTANT: precompute viewport heights for ALL pages
+    const firstPage = await this.pdf.getPage(1);
+    const baseViewport = firstPage.getViewport({ scale: this.zoom });
+
+    await Promise.all(
+      this.pages.map(async (pageNum) => {
+        const page = await this.pdf.getPage(pageNum);
+        const viewport = page.getViewport({ scale: this.zoom });
+
+        const el = document.querySelector(
+          `.page[data-page="${pageNum}"]`
+        ) as HTMLElement;
+
+        if (el) {
+          el.style.height = `${viewport.height}px`;
+          el.style.minHeight = `${viewport.height}px`;
+        }
+      })
     );
 
     this.setupObserver();
@@ -86,6 +116,8 @@ export class ViewerComponent implements AfterViewInit {
   }
 
   setupObserver() {
+    this.observer?.disconnect();
+
     this.observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
@@ -122,6 +154,10 @@ export class ViewerComponent implements AfterViewInit {
       `.page[data-page="${pageNumber}"]`
     ) as HTMLElement;
 
+    // ✅ FIX: lock layout BEFORE rendering starts
+    // pageEl.style.height = `${viewport.height}px`;
+    // pageEl.style.minHeight = `${viewport.height}px`;
+
     const canvas = pageEl.querySelector(
       '.pdf-canvas'
     ) as HTMLCanvasElement;
@@ -157,26 +193,51 @@ export class ViewerComponent implements AfterViewInit {
     this.renderedPages.add(pageNumber);
   }
 
-  setupPageObserver() {
-    const options = {
-      root: document.querySelector('.pdf-scroll'),
-      threshold: 0.6 // page must be mostly visible
-    };
+  setupPageObserver(): void {
+    const container = this.scrollContainer.nativeElement;
 
-    this.pageObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
+    if (this.pageObserver) {
+      this.pageObserver.disconnect();
+    }
 
-        const page = Number(
-          (entry.target as HTMLElement).dataset['page']
-        );
+    this.pageObserver = new IntersectionObserver(
+      (entries) => {
+        let bestEntry: IntersectionObserverEntry | null = null;
 
-        this.pageNumber = page;
+        for (const entry of entries) {
+          if (!entry.isIntersecting) {
+            continue;
+          }
+
+          if (
+            !bestEntry ||
+            entry.intersectionRatio > bestEntry.intersectionRatio
+          ) {
+            bestEntry = entry;
+          }
+        }
+
+        if (bestEntry) {
+          const page = Number(
+            (bestEntry.target as HTMLElement).dataset['page']
+          );
+
+          if (this.pageNumber !== page) {
+            this.pageNumber = page;
+            this.onPageChange(page);
+          }
+        }
+      },
+      {
+        root: container,
+        threshold: [0.25, 0.5, 0.75, 1]
+      }
+    );
+
+    setTimeout(() => {
+      document.querySelectorAll('.page').forEach((el) => {
+        this.pageObserver.observe(el);
       });
-    }, options);
-
-    document.querySelectorAll('.page').forEach(el => {
-      this.pageObserver.observe(el);
     });
   }
 
@@ -192,50 +253,20 @@ export class ViewerComponent implements AfterViewInit {
     (annotation as any)._ctx = ctx;
   }
 
-  async nextPage() {
-    const next = Math.min(this.totalPages, this.pageNumber + 1);
-    this.scrollToPage(next);
+  nextPage(): void {
+    this.goToPage(
+      Math.min(this.totalPages, this.pageNumber + 1)
+    );
   }
 
-  async prevPage() {
-    const prev = Math.max(1, this.pageNumber - 1);
-    this.scrollToPage(prev);
+  prevPage(): void {
+    this.goToPage(
+      Math.max(1, this.pageNumber - 1)
+    );
   }
 
-  scrollToPage(page: number) {
-    const el = document.querySelector(`.page[data-page="${page}"]`) as HTMLElement;
-
-    if (!el) return;
-
-    const container = document.querySelector('.pdf-scroll')!;
-
-    container.scrollTo({
-      top: el.offsetTop - 20,
-      behavior: 'smooth'
-    });
-  }
-
-  @HostListener('window:scroll', [])
-  onScroll() {
-    const pages = document.querySelectorAll('.page');
-
-    let closestPage = this.pageNumber;
-    let minDistance = Infinity;
-
-    pages.forEach((el) => {
-      const rect = el.getBoundingClientRect();
-
-      const distance = Math.abs(rect.top);
-
-      const page = Number(el.getAttribute('data-page'));
-
-      if (distance < minDistance) {
-        minDistance = distance;
-        closestPage = page;
-      }
-    });
-
-    this.pageNumber = closestPage;
+  scrollToPage(page: number): void {
+    this.goToPage(page);
   }
 
   @HostListener('keydown', ['$event'])
@@ -255,12 +286,19 @@ export class ViewerComponent implements AfterViewInit {
   }
 
   resetRender() {
+
+    this.observer?.disconnect();
+
     this.renderedPages.clear();
 
     document.querySelectorAll('.page').forEach((el) => {
-      (el.querySelector('.pdf-canvas') as HTMLCanvasElement)
-        .getContext('2d')
-        ?.clearRect(0, 0, 10000, 10000);
+
+      const canvas = el.querySelector(
+        '.pdf-canvas'
+      ) as HTMLCanvasElement;
+
+      canvas.width = 0;
+      canvas.height = 0;
     });
 
     this.setupObserver();
@@ -271,24 +309,54 @@ export class ViewerComponent implements AfterViewInit {
     this.resetRender();
   }
 
-  goToPage(page: number) {
-    const el = document.querySelector(
-      `.page[data-page="${page}"]`
-    );
+  async goToPage(page: number): Promise<void> {
 
-    el?.scrollIntoView({ behavior: 'smooth' });
+    if (!page || page < 1 || page > this.totalPages) {
+      return;
+    }
+
+    const container = this.scrollContainer.nativeElement;
+
+    const pageEl = container.querySelector(
+      `.page[data-page="${page}"]`
+    ) as HTMLElement | null;
+
+    if (!pageEl) return;
+
+    container.scrollTo({
+      top: pageEl.offsetTop,
+      behavior: 'smooth'
+    });
+
+    this.pageNumber = page;
   }
 
   toggleDarkMode() {
     this.darkMode = !this.darkMode;
   }
 
-  fullscreen() {
-    const el = document.documentElement;
+  async fullscreen() {
+    const el = this.viewerContainer?.nativeElement;
 
-    if (el.requestFullscreen) {
-      el.requestFullscreen();
+    if (!el) return;
+
+    // EXIT fullscreen
+    if (document.fullscreenElement) {
+      await document.exitFullscreen();
+      this.isFullscreen = false;
+      return;
     }
+
+    // ENTER fullscreen (ONLY viewer)
+    if (el.requestFullscreen) {
+      await el.requestFullscreen();
+      this.isFullscreen = true;
+    }
+  }
+
+  @HostListener('document:fullscreenchange')
+  onFullscreenChange() {
+    this.isFullscreen = !!document.fullscreenElement;
   }
 
   async preloadNearbyPages(currentPage: number) {
@@ -381,5 +449,11 @@ export class ViewerComponent implements AfterViewInit {
     this.isDrawing = false;
 
     // save annotation here
+  }
+
+  onPageChange(page: number): void {
+    this.thumbs.currentPage = page;
+
+    this.thumbs.scrollActiveIntoView(page);
   }
 }

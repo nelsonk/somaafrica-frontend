@@ -1,30 +1,26 @@
 <div class="thumbs">
 
-  <div
-    class="thumb"
-    *ngFor="
-      let thumb
-      of thumbnails;
-      let i = index
-    "
-    [attr.data-page]="i + 1"
-    #thumbItem
-    (click)="selectPage(i)"
-  >
-
-    <img
-      *ngIf="thumb"
-      [src]="thumb"
-    />
+  @for (thumb of thumbnails; track $index; let i = $index) {
 
     <div
-      *ngIf="!thumb"
-      class="thumb-placeholder">
+      class="thumb"
+      [attr.data-page]="i + 1"
+      (click)="selectPage(i + 1)"
+      [class.active]="currentPage === i + 1"
+    >
 
-      Page {{ i + 1 }}
+      @if (thumb) {
+        <img [src]="thumb" />
+      }
+
+      @if (!thumb) {
+        <div class="placeholder">
+          Page {{ i + 1 }}
+        </div>
+      }
 
     </div>
 
-  </div>
+  }
 
 </div>

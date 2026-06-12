@@ -6,6 +6,16 @@
   font-family: system-ui;
 }
 
+.viewer-container:fullscreen {
+  width: 100vw;
+  height: 100vh;
+  background: #F4ECD8;
+}
+
+.viewer-container:fullscreen .content {
+  height: calc(100vh - 50px);
+}
+
 /* DARK MODE */
 .viewer-container.dark {
   background: #0f172a;

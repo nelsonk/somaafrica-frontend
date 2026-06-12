@@ -1,5 +1,5 @@
 <!-- viewer.component.html -->
-<div class="viewer-container" [class.dark]="darkMode">
+<div class="viewer-container" #viewerContainer [class.dark]="darkMode">
 
   <!-- TOP TOOLBAR -->
   <div class="toolbar">
@@ -34,7 +34,9 @@
 
     <button (click)="toggleDarkMode()">🌙</button>
 
-    <button (click)="fullscreen()">⛶</button>
+    <button (click)="fullscreen()">
+      {{ isFullscreen ? '✕' : '⛶' }}
+    </button>
 
   </div>
 
@@ -43,7 +45,8 @@
 
     <!-- SIDEBAR (THUMBNAILS PLACEHOLDER) -->
     <app-thumbnail-sidebar
-        (pageSelect)="goToPage($event)"
+      [pdf]="pdfDocument"
+      (pageSelect)="goToPage($event)"
     >
     </app-thumbnail-sidebar>
 

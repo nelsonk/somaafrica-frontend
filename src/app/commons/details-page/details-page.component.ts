@@ -11,11 +11,12 @@ import { DetailsData, DetailSaveData } from '../../models/details.interface';
 import { TableComponent } from '../table/table.component';
 import { ViewerComponent } from '../viewer/viewer.component';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { CommonModule } from '@angular/common';
 
 
 @Component({
     selector: 'app-details-page',
-    imports: [TableComponent, ViewerComponent, ReactiveFormsModule, NgSelectModule],
+    imports: [TableComponent, ViewerComponent, ReactiveFormsModule, NgSelectModule, CommonModule],
     templateUrl: './details-page.component.html',
     styleUrl: './details-page.component.css'
 })

@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
-import * as pdfjsLib from 'pdfjs-dist';
 
 @Injectable({ providedIn: 'root' })
 export class ThumbnailService {
 
-  async renderThumbnail(page: any, scale = 0.2) {
+  async renderThumbnail(page: any, scale = 0.3) {
 
     const viewport = page.getViewport({ scale });
 
@@ -16,9 +15,10 @@ export class ThumbnailService {
 
     await page.render({
       canvasContext: ctx,
-      viewport
+      viewport,
+      intent: 'display'
     }).promise;
 
-    return canvas.toDataURL();
+    return canvas.toDataURL('image/png');
   }
 }
