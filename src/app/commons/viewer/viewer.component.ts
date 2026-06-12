@@ -4,9 +4,10 @@ import {
   ElementRef,
   ViewChild,
   AfterViewInit,
-  Input
+  Input,
+  HostListener
 } from '@angular/core';
-import { DecimalPipe } from '@angular/common';
+import { CommonModule, DecimalPipe } from '@angular/common';
 
 import { PdfService } from '../../services/viewer/pdf.service';
 import { AuthHeaderService } from '../../services/viewer/auth-header.service';
@@ -16,7 +17,7 @@ import { ThumbnailSidebarComponent } from '../thumbnail-sidebar/thumbnail-sideba
 
 @Component({
   selector: 'app-viewer',
-  imports: [DecimalPipe, ThumbnailSidebarComponent],
+  imports: [DecimalPipe, ThumbnailSidebarComponent, CommonModule],
   templateUrl: './viewer.component.html',
   styleUrls: ['./viewer.component.css']
 })
@@ -42,7 +43,12 @@ export class ViewerComponent implements AfterViewInit {
   renderOrder: string[] = [];
   readonly CACHE_RADIUS = 2;
   readonly MAX_RENDER_CACHE = 10;
-  pageNumber = 1;
+  pages: number[] = [];
+  pageNumber: number = 1;
+  pageCanvases = new Map<number, HTMLCanvasElement>();
+  renderedPages = new Set<number>();
+  observer!: IntersectionObserver;
+  private pageObserver!: IntersectionObserver;
   totalPages = 0;
   zoom = 1.2;
   darkMode = false;
@@ -54,6 +60,10 @@ export class ViewerComponent implements AfterViewInit {
 
   async ngAfterViewInit() {
     await this.loadDocument();
+
+    setTimeout(() => {
+      this.setupPageObserver();
+    });
   }
 
   async loadDocument() {
@@ -62,104 +72,211 @@ export class ViewerComponent implements AfterViewInit {
       this.auth.getHeaders()
     );
 
-    this.thumbs.pdf = doc;
-
-    await this.thumbs.generate();
-
     this.totalPages = doc.numPages;
 
-    await this.preloadNearbyPages(1);
-    await this.renderPage();
+    this.pages = Array.from(
+      { length: this.totalPages },
+      (_, i) => i + 1
+    );
+
+    this.setupObserver();
+
+    this.thumbs.pdf = doc;
+    await this.thumbs.generate();
   }
 
-  async renderPage() {
-    const cachedCanvas = this.renderCache.get(this.cacheKey(this.pageNumber));
+  setupObserver() {
+    this.observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const page = Number(
+            (entry.target as HTMLElement).dataset['page']
+          );
 
-    if (cachedCanvas) {
+          if (entry.isIntersecting) {
+            this.renderPage(page);
+          }
+        }
+      },
+      {
+        root: document.querySelector('.pdf-scroll'),
+        rootMargin: '300px', // preload before visible
+        threshold: 0.1
+      }
+    );
 
-      const canvas = this.canvas.nativeElement;
+    setTimeout(() => {
+      document.querySelectorAll('.page').forEach((el) => {
+        this.observer.observe(el);
+      });
+    });
+  }
 
-      canvas.width = cachedCanvas.width;
-      canvas.height = cachedCanvas.height;
+  async renderPage(pageNumber: number) {
+    if (this.renderedPages.has(pageNumber)) return;
 
-      const ctx = canvas.getContext('2d')!;
+    const page = await this.pdf.getPage(pageNumber);
+    const viewport = page.getViewport({ scale: this.zoom });
 
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(cachedCanvas, 0, 0);
+    const pageEl = document.querySelector(
+      `.page[data-page="${pageNumber}"]`
+    ) as HTMLElement;
 
-      return;
-    }
+    const canvas = pageEl.querySelector(
+      '.pdf-canvas'
+    ) as HTMLCanvasElement;
 
-    let page = this.pageCache.get(this.pageNumber);
-
-    if (!page) {
-      page = await this.pdf.getPage(this.pageNumber);
-
-      this.pageCache.set(this.pageNumber, page);
-    }
-
-    const viewport = page.getViewport({scale: this.zoom});
-    const canvas = this.canvas.nativeElement;
     const ctx = canvas.getContext('2d')!;
 
     canvas.width = viewport.width;
     canvas.height = viewport.height;
 
-    await page.render({canvasContext: ctx, viewport}).promise;
+    await page.render({
+      canvasContext: ctx,
+      viewport
+    }).promise;
 
-    this.storeRenderedPage(this.pageNumber, canvas);
-
+    // TEXT LAYER (optional but correct now)
     const textContent = await page.getTextContent();
-    const container = this.textLayer.nativeElement;
 
-    container.innerHTML = '';
-    container.style.width = `${viewport.width}px`;
-    container.style.height = `${viewport.height}px`;
+    const textLayer = pageEl.querySelector('.textLayer') as HTMLElement;
+    textLayer.innerHTML = '';
+    textLayer.style.width = `${viewport.width}px`;
+    textLayer.style.height = `${viewport.height}px`;
 
-    // 3. Create a new TextLayer instance
-    const textLayer = new pdfjsLib.TextLayer({
+    const tl = new pdfjsLib.TextLayer({
       textContentSource: textContent,
-      container,
+      container: textLayer,
       viewport
     });
 
-    // 4. Render the layer
-    await textLayer.render();
+    await tl.render();
 
-    this.initAnnotationLayer();
+    this.initAnnotationLayerForPage(pageEl, canvas);
+
+    this.renderedPages.add(pageNumber);
+  }
+
+  setupPageObserver() {
+    const options = {
+      root: document.querySelector('.pdf-scroll'),
+      threshold: 0.6 // page must be mostly visible
+    };
+
+    this.pageObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+
+        const page = Number(
+          (entry.target as HTMLElement).dataset['page']
+        );
+
+        this.pageNumber = page;
+      });
+    }, options);
+
+    document.querySelectorAll('.page').forEach(el => {
+      this.pageObserver.observe(el);
+    });
+  }
+
+  initAnnotationLayerForPage(pageEl: HTMLElement, canvas: HTMLCanvasElement) {
+    const annotation = pageEl.querySelector(
+      '.annotation-layer'
+    ) as HTMLCanvasElement;
+
+    annotation.width = canvas.width;
+    annotation.height = canvas.height;
+
+    const ctx = annotation.getContext('2d')!;
+    (annotation as any)._ctx = ctx;
   }
 
   async nextPage() {
-    if (this.pageNumber < this.totalPages) {
-      await this.goToPage(this.pageNumber + 1);
-    }
+    const next = Math.min(this.totalPages, this.pageNumber + 1);
+    this.scrollToPage(next);
   }
 
   async prevPage() {
-    if (this.pageNumber > 1) {
-      await this.goToPage(this.pageNumber - 1);
+    const prev = Math.max(1, this.pageNumber - 1);
+    this.scrollToPage(prev);
+  }
+
+  scrollToPage(page: number) {
+    const el = document.querySelector(`.page[data-page="${page}"]`) as HTMLElement;
+
+    if (!el) return;
+
+    const container = document.querySelector('.pdf-scroll')!;
+
+    container.scrollTo({
+      top: el.offsetTop - 20,
+      behavior: 'smooth'
+    });
+  }
+
+  @HostListener('window:scroll', [])
+  onScroll() {
+    const pages = document.querySelectorAll('.page');
+
+    let closestPage = this.pageNumber;
+    let minDistance = Infinity;
+
+    pages.forEach((el) => {
+      const rect = el.getBoundingClientRect();
+
+      const distance = Math.abs(rect.top);
+
+      const page = Number(el.getAttribute('data-page'));
+
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestPage = page;
+      }
+    });
+
+    this.pageNumber = closestPage;
+  }
+
+  @HostListener('keydown', ['$event'])
+  handleKeys(event: KeyboardEvent) {
+    if (event.key === 'ArrowDown') {
+      this.nextPage();
+    }
+
+    if (event.key === 'ArrowUp') {
+      this.prevPage();
     }
   }
 
-  zoomIn() {
+  async zoomIn() {
     this.zoom += 0.2;
-    this.renderPage();
+    this.resetRender();
+  }
+
+  resetRender() {
+    this.renderedPages.clear();
+
+    document.querySelectorAll('.page').forEach((el) => {
+      (el.querySelector('.pdf-canvas') as HTMLCanvasElement)
+        .getContext('2d')
+        ?.clearRect(0, 0, 10000, 10000);
+    });
+
+    this.setupObserver();
   }
 
   zoomOut() {
     this.zoom = Math.max(0.6, this.zoom - 0.2);
-    this.renderPage();
+    this.resetRender();
   }
 
-  async goToPage(page: number) {
-    if (page < 1 || page > this.totalPages) {
-      return;
-    }
+  goToPage(page: number) {
+    const el = document.querySelector(
+      `.page[data-page="${page}"]`
+    );
 
-    this.pageNumber = page;
-
-    await this.preloadNearbyPages(page);
-    await this.renderPage();
+    el?.scrollIntoView({ behavior: 'smooth' });
   }
 
   toggleDarkMode() {

@@ -52,19 +52,18 @@
 
         <div class="canvas-wrapper">
 
-            <canvas #canvas></canvas>
-
-            <canvas
-                #annotationCanvas
-                class="annotation-layer"
-                (mousedown)="startDraw($event)"
-                (mouseup)="stopDraw()"
-                (mousemove)="draw($event)">
-            </canvas>
-
-            <div
-                #textLayer
-                class="textLayer">
+            <div class="pdf-scroll" #scrollContainer>
+              <div class="pages">
+                <div
+                  class="page"
+                  *ngFor="let page of pages"
+                  [attr.data-page]="page"
+                >
+                  <canvas class="pdf-canvas"></canvas>
+                  <canvas class="annotation-layer"></canvas>
+                  <div class="textLayer"></div>
+                </div>
+              </div>
             </div>
 
             <div class="watermark">

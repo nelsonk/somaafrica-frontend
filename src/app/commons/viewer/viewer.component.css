@@ -152,3 +152,36 @@ canvas {
 /* .textLayer {
   display: none;
 } */
+
+.pdf-scroll {
+  height: 100vh;
+  overflow-y: auto;
+  background: #f5f7fb;
+}
+
+.pages {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+}
+
+.page {
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+.pdf-canvas {
+  display: block;
+  background: white;
+}
+
+.annotation-layer,
+.textLayer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
