@@ -32,6 +32,35 @@
 
     <div class="divider"></div>
 
+    <div class="search-box">
+
+      <input
+        type="text"
+        placeholder="Search document..."
+        [(ngModel)]="searchTerm"
+        (keydown.enter)="handleSearchEnter()"
+      />
+
+      <button
+        (click)="searchDocument()"
+      >
+        🔍
+      </button>
+
+      <button
+        (click)="prevSearchResult()"
+      >
+        ↑
+      </button>
+
+      <button
+        (click)="nextSearchResult()"
+      >
+        ↓
+      </button>
+
+    </div>
+
     <button (click)="toggleDarkMode()">🌙</button>
 
     <button (click)="fullscreen()">
@@ -49,6 +78,56 @@
       (pageSelect)="goToPage($event)"
     >
     </app-thumbnail-sidebar>
+
+    @if (showSearchSidebar) {
+      <div
+        class="search-sidebar"
+      >
+
+        <div class="search-header">
+
+          Search Results
+
+          <button
+            (click)="showSearchSidebar = false"
+          >
+            ✕
+          </button>
+
+        </div>
+
+        <div class="search-results">
+
+          @for (result of searchResults; track $index; let i = $index) {
+            <div
+              class="search-result"
+              [class.active]="
+                i === currentSearchIndex
+              "
+              (click)="goToSearchResult(result)"
+            >
+
+              <div class="page-label">
+                Match {{ i + 1 }}
+                •
+                Page {{ result.page }}
+              </div>
+
+              <div class="snippet">
+                {{ result.snippet }}
+              </div>
+
+              <div class="count">
+                Match {{ i + 1 }}
+              </div>
+
+            </div>
+          }
+
+        </div>
+
+      </div>
+    }
 
     <!-- PDF VIEW -->
     <div class="pdf-area">

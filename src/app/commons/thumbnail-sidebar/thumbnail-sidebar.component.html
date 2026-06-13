@@ -11,6 +11,9 @@
 
       @if (thumb) {
         <img [src]="thumb" />
+        <div class="page-number">
+          {{ i + 1 }}
+        </div>
       }
 
       @if (!thumb) {

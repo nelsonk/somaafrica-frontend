@@ -9,7 +9,7 @@
 .viewer-container:fullscreen {
   width: 100vw;
   height: 100vh;
-  background: #F4ECD8;
+  background: #e7f1ff;
 }
 
 .viewer-container:fullscreen .content {
@@ -194,4 +194,92 @@ canvas {
   left: 0;
   width: 100%;
   height: 100%;
+}
+
+/* Search CSS */
+.search-sidebar {
+  width: 320px;
+  min-width: 320px;
+
+  display: flex;
+  flex-direction: column;
+
+  background: white;
+
+  border-right: 1px solid #ddd;
+}
+
+.search-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 12px;
+
+  border-bottom: 1px solid #eee;
+
+  font-weight: 600;
+}
+
+.search-results {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.search-result {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+
+  cursor: pointer;
+}
+
+.search-result:hover {
+  background: #f3f4f6;
+}
+
+.search-result.active {
+  background: #dbeafe;
+}
+
+.page-label {
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.snippet {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.4;
+}
+
+.count {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #2563eb;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.search-box input {
+  width: 220px;
+}
+
+.pdf-search-hit {
+  background: #ffeb3b;
+  color: black;
+  border-radius: 2px;
+}
+
+.pdf-search-hit.active {
+  background: orange;
+}
+
+.active-search-hit {
+  background: orange !important;
+  color: black;
+  border-radius: 2px;
 }

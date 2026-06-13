@@ -13,11 +13,18 @@ import { PdfService } from '../../services/viewer/pdf.service';
 import { AuthHeaderService } from '../../services/viewer/auth-header.service';
 import * as pdfjsLib from 'pdfjs-dist';
 import { ThumbnailSidebarComponent } from '../thumbnail-sidebar/thumbnail-sidebar.component';
+import { FormsModule } from '@angular/forms';
+import { normalizePdfText } from '../../utils/normalize-pdf-text';
 
 
 @Component({
   selector: 'app-viewer',
-  imports: [DecimalPipe, ThumbnailSidebarComponent, CommonModule],
+  imports: [
+    DecimalPipe,
+    ThumbnailSidebarComponent,
+    CommonModule,
+    FormsModule
+  ],
   templateUrl: './viewer.component.html',
   styleUrls: ['./viewer.component.css']
 })
@@ -60,6 +67,23 @@ export class ViewerComponent implements AfterViewInit {
   zoom = 1.2;
   darkMode = false;
   pdfDocument: any;
+  searchTerm = '';
+  searchMatches = new Map<number, string[]>();
+  currentSearchIndex = -1;
+  isSearching = false;
+  pageTextCache = new Map<number, string>();
+  pageTextItemsCache = new Map<number, any[]>();
+  showSearchSidebar = false;
+  isBuildingIndex = false;
+
+  searchResults: {
+    page: number;
+    snippet: string;
+
+    // 🔥 exact positioning
+    itemIndex: number;
+    transform: number[];
+  }[] = [];
 
   constructor(
     private pdf: PdfService,
@@ -83,6 +107,7 @@ export class ViewerComponent implements AfterViewInit {
     this.pdfDocument = doc;
 
     this.totalPages = doc.numPages;
+    this.buildSearchIndex();
 
     this.pages = Array.from(
       { length: this.totalPages },
@@ -187,6 +212,10 @@ export class ViewerComponent implements AfterViewInit {
     });
 
     await tl.render();
+
+    if (this.searchTerm) {
+      this.highlightVisiblePages();
+    }
 
     this.initAnnotationLayerForPage(pageEl, canvas);
 
@@ -455,5 +484,224 @@ export class ViewerComponent implements AfterViewInit {
     this.thumbs.currentPage = page;
 
     this.thumbs.scrollActiveIntoView(page);
+  }
+
+  totalMatches(): number {
+    return this.searchResults.length;
+  }
+
+  nextSearchResult() {
+
+    if (!this.searchResults.length) {
+      return;
+    }
+
+    this.currentSearchIndex++;
+
+    if (
+      this.currentSearchIndex >=
+      this.searchResults.length
+    ) {
+      this.currentSearchIndex = 0;
+    }
+
+    const result =
+      this.searchResults[
+        this.currentSearchIndex
+      ];
+
+    this.goToSearchResult(result);
+  }
+
+  prevSearchResult() {
+
+    if (!this.searchResults.length) {
+      return;
+    }
+
+    this.currentSearchIndex--;
+
+    if (this.currentSearchIndex < 0) {
+      this.currentSearchIndex =
+        this.searchResults.length - 1;
+    }
+
+    const result =
+      this.searchResults[
+        this.currentSearchIndex
+      ];
+
+    this.goToSearchResult(result);
+  }
+
+  highlightVisiblePages() {
+
+    if (!this.searchTerm) {
+      return;
+    }
+
+    const escaped =
+      this.searchTerm.replace(
+        /[.*+?^${}()|[\]\\]/g,
+        '\\$&'
+      );
+
+    const regex =
+      new RegExp(`(${escaped})`, 'gi');
+
+    document
+      .querySelectorAll('.textLayer span')
+      .forEach((node) => {
+
+        const el = node as HTMLElement;
+
+        const text =
+          el.textContent || '';
+
+        if (!regex.test(text)) {
+          return;
+        }
+
+        el.innerHTML = text.replace(
+          regex,
+          `<mark class="pdf-search-hit">$1</mark>`
+        );
+      });
+  }
+
+  async buildSearchIndex() {
+
+    if (this.pageTextCache.size === this.totalPages) {
+      return;
+    }
+
+    this.isBuildingIndex = true;
+
+    for (let pageNumber = 1; pageNumber <= this.totalPages; pageNumber++) {
+
+      if (this.pageTextCache.has(pageNumber)) {
+        continue;
+      }
+
+      const page = await this.pdf.getPage(pageNumber);
+
+      const textContent = await page.getTextContent();
+
+      // store raw items (IMPORTANT)
+      this.pageTextItemsCache.set(pageNumber, textContent.items);
+
+      const text = textContent.items
+        .map((item: any) => item.str)
+        .join(' ')
+        .normalize('NFKC')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+      this.pageTextCache.set(pageNumber, text);
+    }
+
+    this.isBuildingIndex = false;
+  }
+
+  async searchDocument() {
+
+    const term =
+      this.searchTerm.trim().toLowerCase();
+
+    if (!term) return;
+
+    await this.buildSearchIndex();
+
+    this.searchResults = [];
+
+    for (const [pageNumber, items] of this.pageTextItemsCache.entries()) {
+
+      let fullText = '';
+
+      items.forEach((item: any) => {
+        fullText += item.str + ' ';
+      });
+
+      const lower = fullText.toLowerCase();
+
+      let pos = 0;
+
+      items.forEach((item: any, index: number) => {
+
+        const text = item.str || '';
+        const lowerItem = text.toLowerCase();
+
+        const matchIndex = lowerItem.indexOf(term);
+
+        if (matchIndex !== -1) {
+
+          const snippet =
+            '...' + text + '...';
+
+          this.searchResults.push({
+            page: pageNumber,
+            snippet,
+            itemIndex: index,
+            transform: item.transform // 🔥 KEY LINE
+          });
+        }
+
+        pos++;
+      });
+    }
+
+    this.currentSearchIndex = -1;
+
+    this.showSearchSidebar = true;
+
+    if (this.searchResults.length) {
+      this.nextSearchResult();
+    }
+  }
+
+  goToSearchResult(result: any) {
+
+    this.goToPage(result.page);
+
+    setTimeout(() => {
+
+      const pageEl =
+        document.querySelector(
+          `.page[data-page="${result.page}"]`
+        ) as HTMLElement;
+
+      if (!pageEl) return;
+
+      const spans =
+        pageEl.querySelectorAll('.textLayer span');
+
+      const target = spans[result.itemIndex] as HTMLElement;
+
+      if (target) {
+
+        target.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center'
+        });
+
+        // highlight active word
+        target.classList.add('active-search-hit');
+      }
+
+    }, 300);
+  }
+
+  handleSearchEnter() {
+
+    if (!this.searchTerm.trim()) {
+      return;
+    }
+
+    if (!this.searchResults.length) {
+      this.searchDocument();
+      return;
+    }
+
+    this.nextSearchResult();
   }
 }
