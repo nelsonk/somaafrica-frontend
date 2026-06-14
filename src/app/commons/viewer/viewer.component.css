@@ -228,11 +228,34 @@ canvas {
 }
 
 .pdf-search-hit.active {
-  background: blue;
+  background: orange;
 }
 
 .active-search-hit {
-  background: red !important;
-  color: blue;
+  background: orange !important;
+  color: black;
   border-radius: 0.125rem;
 }
+
+/* Remove bluish paints on toggle of fullscreen, prevSearch, nextSearch; added by chrome */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+*:focus {
+  outline: none;
+}
+
+*:focus-visible {
+  outline: none;
+}
+
+button,
+input,
+.search-result,
+.page {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* End of remove buish paints */

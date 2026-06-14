@@ -310,12 +310,10 @@ export class ViewerComponent implements AfterViewInit {
   handleKeys(event: KeyboardEvent) {
     if (event.key === 'ArrowDown') {
       this.nextPage();
-      this.resetRender();
     }
 
     if (event.key === 'ArrowUp') {
       this.prevPage();
-      this.resetRender();
     }
   }
 
@@ -446,20 +444,6 @@ export class ViewerComponent implements AfterViewInit {
   @HostListener('document:fullscreenchange')
   onFullscreenChange() {
     this.isFullscreen = !!document.fullscreenElement;
-
-    setTimeout(() => {
-      // 3. FORCE LAYOUT REPAINT (fix GPU ghosting)
-      const container = this.scrollContainer?.nativeElement;
-
-      if (container) {
-        const scroll = container.scrollTop;
-        container.scrollTop = scroll + 1;
-        container.scrollTop = scroll;
-      }
-
-      this.resetRender();
-
-    }, 100);
   }
 
   async preloadNearbyPages(currentPage: number) {
@@ -571,7 +555,6 @@ export class ViewerComponent implements AfterViewInit {
       (this.currentSearchIndex + 1) % this.searchResults.length;
 
     this.goToSearchResult(this.searchResults[this.currentSearchIndex]);
-    this.resetRender();
   }
 
   prevSearchResult() {
@@ -582,7 +565,6 @@ export class ViewerComponent implements AfterViewInit {
       % this.searchResults.length;
 
     this.goToSearchResult(this.searchResults[this.currentSearchIndex]);
-    this.resetRender();
   }
 
   jumpToFirstMatch() {
