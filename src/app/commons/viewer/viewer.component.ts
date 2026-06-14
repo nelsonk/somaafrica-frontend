@@ -73,17 +73,22 @@ export class ViewerComponent implements AfterViewInit {
   isSearching = false;
   pageTextCache = new Map<number, string>();
   pageTextItemsCache = new Map<number, any[]>();
+  pageItemsCache = new Map<number, any[]>();
   showSearchSidebar = false;
   isBuildingIndex = false;
+  private lastSearchedTerm: string = '';
 
   searchResults: {
     page: number;
-    snippet: string;
-
-    // 🔥 exact positioning
     itemIndex: number;
+    text: string;
+    snippet: string;   // ✅ ADD THIS BACK
     transform: number[];
+    width: number;
+    height: number;
   }[] = [];
+
+  totalMatchCount = 0;
 
   constructor(
     private pdf: PdfService,
@@ -214,7 +219,10 @@ export class ViewerComponent implements AfterViewInit {
     await tl.render();
 
     if (this.searchTerm) {
-      this.highlightVisiblePages();
+      console.log('Search term in renderPage: ', this.searchTerm)
+      setTimeout(() => {
+        this.highlightVisiblePages();
+      }, 0);
     }
 
     this.initAnnotationLayerForPage(pageEl, canvas);
@@ -302,10 +310,12 @@ export class ViewerComponent implements AfterViewInit {
   handleKeys(event: KeyboardEvent) {
     if (event.key === 'ArrowDown') {
       this.nextPage();
+      this.resetRender();
     }
 
     if (event.key === 'ArrowUp') {
       this.prevPage();
+      this.resetRender();
     }
   }
 
@@ -314,28 +324,78 @@ export class ViewerComponent implements AfterViewInit {
     this.resetRender();
   }
 
+  zoomOut() {
+    this.zoom = Math.max(0.6, this.zoom - 0.2);
+    this.resetRender();
+  }
+
   resetRender() {
 
     this.observer?.disconnect();
+    this.pageObserver?.disconnect();
 
     this.renderedPages.clear();
 
     document.querySelectorAll('.page').forEach((el) => {
 
-      const canvas = el.querySelector(
-        '.pdf-canvas'
-      ) as HTMLCanvasElement;
+      const canvas =
+        el.querySelector(
+          '.pdf-canvas'
+        ) as HTMLCanvasElement;
 
-      canvas.width = 0;
-      canvas.height = 0;
+      const annotation =
+        el.querySelector(
+          '.annotation-layer'
+        ) as HTMLCanvasElement;
+
+      const textLayer =
+        el.querySelector(
+          '.textLayer'
+        ) as HTMLElement;
+
+      if (canvas) {
+
+        const ctx =
+          canvas.getContext('2d');
+
+        ctx?.clearRect(
+          0,
+          0,
+          canvas.width,
+          canvas.height
+        );
+
+        canvas.width = 0;
+        canvas.height = 0;
+      }
+
+      if (annotation) {
+
+        const ctx =
+          annotation.getContext('2d');
+
+        ctx?.clearRect(
+          0,
+          0,
+          annotation.width,
+          annotation.height
+        );
+
+        annotation.width = 0;
+        annotation.height = 0;
+      }
+
+      if (textLayer) {
+        textLayer.replaceChildren();
+      }
     });
 
-    this.setupObserver();
-  }
+    requestAnimationFrame(() => {
 
-  zoomOut() {
-    this.zoom = Math.max(0.6, this.zoom - 0.2);
-    this.resetRender();
+      this.setupObserver();
+      this.setupPageObserver();
+
+    });
   }
 
   async goToPage(page: number): Promise<void> {
@@ -386,6 +446,20 @@ export class ViewerComponent implements AfterViewInit {
   @HostListener('document:fullscreenchange')
   onFullscreenChange() {
     this.isFullscreen = !!document.fullscreenElement;
+
+    setTimeout(() => {
+      // 3. FORCE LAYOUT REPAINT (fix GPU ghosting)
+      const container = this.scrollContainer?.nativeElement;
+
+      if (container) {
+        const scroll = container.scrollTop;
+        container.scrollTop = scroll + 1;
+        container.scrollTop = scroll;
+      }
+
+      this.resetRender();
+
+    }, 100);
   }
 
   async preloadNearbyPages(currentPage: number) {
@@ -491,87 +565,147 @@ export class ViewerComponent implements AfterViewInit {
   }
 
   nextSearchResult() {
+    if (!this.searchResults.length) return;
 
-    if (!this.searchResults.length) {
-      return;
-    }
+    this.currentSearchIndex =
+      (this.currentSearchIndex + 1) % this.searchResults.length;
 
-    this.currentSearchIndex++;
-
-    if (
-      this.currentSearchIndex >=
-      this.searchResults.length
-    ) {
-      this.currentSearchIndex = 0;
-    }
-
-    const result =
-      this.searchResults[
-        this.currentSearchIndex
-      ];
-
-    this.goToSearchResult(result);
+    this.goToSearchResult(this.searchResults[this.currentSearchIndex]);
+    this.resetRender();
   }
 
   prevSearchResult() {
+    if (!this.searchResults.length) return;
 
-    if (!this.searchResults.length) {
+    this.currentSearchIndex =
+      (this.currentSearchIndex - 1 + this.searchResults.length)
+      % this.searchResults.length;
+
+    this.goToSearchResult(this.searchResults[this.currentSearchIndex]);
+    this.resetRender();
+  }
+
+  jumpToFirstMatch() {
+
+    if (!this.searchResults.length) return;
+
+    requestAnimationFrame(() => {
+
+      setTimeout(() => {
+
+        this.currentSearchIndex = 0;
+
+        const result =
+          this.searchResults[0];
+
+        this.goToMatch(result);
+
+      }, 50);
+
+    });
+  }
+
+  async goToMatch(match: any) {
+
+    await this.goToPage(match.page);
+
+    const waitForSpan = () =>
+      new Promise<HTMLElement | null>((resolve) => {
+
+        let attempts = 0;
+
+        const timer = setInterval(() => {
+
+          const pageEl =
+            document.querySelector(
+              `.page[data-page="${match.page}"]`
+            ) as HTMLElement;
+
+          if (!pageEl) {
+            return;
+          }
+
+          const spans =
+            pageEl.querySelectorAll(
+              '.textLayer span'
+            );
+
+          const target =
+            spans[match.itemIndex] as HTMLElement;
+
+          this.highlightVisiblePages();
+
+          console.log('goToMatch: ', {match, spans, target})
+
+          if (target) {
+
+            clearInterval(timer);
+
+            resolve(target);
+
+            target.classList.add(
+              'active-search-hit'
+            );
+
+            console.log('target inside goToMatch: ', target)
+
+            return;
+          }
+
+          if (++attempts > 30) {
+
+            clearInterval(timer);
+
+            resolve(null);
+          }
+
+        }, 100);
+      });
+
+    const target = await waitForSpan();
+
+    if (!target) {
       return;
     }
 
-    this.currentSearchIndex--;
+    target.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center'
+    });
 
-    if (this.currentSearchIndex < 0) {
-      this.currentSearchIndex =
-        this.searchResults.length - 1;
-    }
-
-    const result =
-      this.searchResults[
-        this.currentSearchIndex
-      ];
-
-    this.goToSearchResult(result);
+    this.scrollActiveSearchIntoView();
   }
 
   highlightVisiblePages() {
 
-    if (!this.searchTerm) {
-      return;
-    }
+    if (!this.searchTerm) return;
+
+    const term = this.searchTerm.trim();
+    if (!term) return;
 
     const escaped =
-      this.searchTerm.replace(
-        /[.*+?^${}()|[\]\\]/g,
-        '\\$&'
+      term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+    const regex = new RegExp(`(${escaped})`, 'gi');
+
+    document.querySelectorAll('.textLayer span').forEach((node) => {
+
+      const el = node as HTMLElement;
+
+      const text = el.textContent || '';
+
+      if (!regex.test(text)) return;
+
+      el.innerHTML = text.replace(
+        regex,
+        `<mark class="pdf-search-hit">$1</mark>`
       );
-
-    const regex =
-      new RegExp(`(${escaped})`, 'gi');
-
-    document
-      .querySelectorAll('.textLayer span')
-      .forEach((node) => {
-
-        const el = node as HTMLElement;
-
-        const text =
-          el.textContent || '';
-
-        if (!regex.test(text)) {
-          return;
-        }
-
-        el.innerHTML = text.replace(
-          regex,
-          `<mark class="pdf-search-hit">$1</mark>`
-        );
-      });
+    });
   }
 
   async buildSearchIndex() {
 
-    if (this.pageTextCache.size === this.totalPages) {
+    if (this.pageItemsCache.size === this.totalPages) {
       return;
     }
 
@@ -579,7 +713,7 @@ export class ViewerComponent implements AfterViewInit {
 
     for (let pageNumber = 1; pageNumber <= this.totalPages; pageNumber++) {
 
-      if (this.pageTextCache.has(pageNumber)) {
+      if (this.pageItemsCache.has(pageNumber)) {
         continue;
       }
 
@@ -587,76 +721,64 @@ export class ViewerComponent implements AfterViewInit {
 
       const textContent = await page.getTextContent();
 
-      // store raw items (IMPORTANT)
-      this.pageTextItemsCache.set(pageNumber, textContent.items);
-
-      const text = textContent.items
-        .map((item: any) => item.str)
-        .join(' ')
-        .normalize('NFKC')
-        .replace(/\s+/g, ' ')
-        .trim();
-
-      this.pageTextCache.set(pageNumber, text);
+      this.pageItemsCache.set(pageNumber, textContent.items);
     }
 
     this.isBuildingIndex = false;
   }
 
   async searchDocument() {
+    this.clearAllSearchHighlights();
 
-    const term =
-      this.searchTerm.trim().toLowerCase();
+    this.searchResults = [];
+    this.currentSearchIndex = -1;
+    this.totalMatchCount = 0;
+
+    const term = normalizePdfText(this.searchTerm || '')
+      .toLowerCase()
+      .trim();
 
     if (!term) return;
 
     await this.buildSearchIndex();
 
-    this.searchResults = [];
+    const results: any[] = [];
 
-    for (const [pageNumber, items] of this.pageTextItemsCache.entries()) {
+    for (const [pageNumber, items] of this.pageItemsCache.entries()) {
 
-      let fullText = '';
-
-      items.forEach((item: any) => {
-        fullText += item.str + ' ';
-      });
-
-      const lower = fullText.toLowerCase();
-
-      let pos = 0;
+      const pageResults: any[] = [];
 
       items.forEach((item: any, index: number) => {
 
-        const text = item.str || '';
-        const lowerItem = text.toLowerCase();
+        const text = normalizePdfText(item.str || '').toLowerCase();
 
-        const matchIndex = lowerItem.indexOf(term);
+        if (!text.includes(term)) return;
 
-        if (matchIndex !== -1) {
+        const snippet =
+          '...' +
+          item.str.substring(0, 80) +
+          '...';
 
-          const snippet =
-            '...' + text + '...';
-
-          this.searchResults.push({
-            page: pageNumber,
-            snippet,
-            itemIndex: index,
-            transform: item.transform // 🔥 KEY LINE
-          });
-        }
-
-        pos++;
+        pageResults.push({
+          page: pageNumber,
+          itemIndex: index,
+          text: item.str,
+          snippet
+        });
       });
+
+      results.push(...pageResults);
     }
 
-    this.currentSearchIndex = -1;
-
+    this.searchResults = results;
+    this.totalMatchCount = results.length;
     this.showSearchSidebar = true;
 
     if (this.searchResults.length) {
-      this.nextSearchResult();
+      this.jumpToFirstMatch();
     }
+
+    this.lastSearchedTerm = this.searchTerm;
   }
 
   goToSearchResult(result: any) {
@@ -672,36 +794,116 @@ export class ViewerComponent implements AfterViewInit {
 
       if (!pageEl) return;
 
+      // remove previous active highlight
+      document.querySelectorAll('.active-search-hit')
+        .forEach(el => el.classList.remove('active-search-hit'));
+
       const spans =
         pageEl.querySelectorAll('.textLayer span');
 
       const target = spans[result.itemIndex] as HTMLElement;
 
       if (target) {
+        target.classList.add('active-search-hit');
+        console.log({target})
 
         target.scrollIntoView({
           behavior: 'smooth',
           block: 'center'
         });
-
-        // highlight active word
-        target.classList.add('active-search-hit');
       }
 
-    }, 300);
+    }, 200);
+
+    this.scrollActiveSearchIntoView();
   }
 
-  handleSearchEnter() {
+  handleSearchEnter(event?: Event) {
 
-    if (!this.searchTerm.trim()) {
-      return;
-    }
+    const keyboardEvent = event as KeyboardEvent | undefined;
 
-    if (!this.searchResults.length) {
+    const term = (this.searchTerm || '').trim();
+    if (!term) return;
+
+    const normalized =
+      normalizePdfText(term).toLowerCase();
+
+    const last =
+      normalizePdfText(this.lastSearchedTerm || '').toLowerCase();
+
+    // NEW SEARCH
+    if (normalized !== last) {
       this.searchDocument();
+      this.lastSearchedTerm = term;
       return;
     }
 
-    this.nextSearchResult();
+    if (!this.searchResults.length) return;
+
+    // NEXT / PREV navigation
+    if (keyboardEvent?.shiftKey) {
+      this.prevSearchResult();
+    } else {
+      this.nextSearchResult();
+    }
+  }
+
+  scrollActiveSearchIntoView() {
+
+    requestAnimationFrame(() => {
+
+      const container =
+        document.querySelector('.search-results') as HTMLElement;
+
+      const active =
+        document.querySelector('.search-result.active') as HTMLElement;
+
+      if (!container || !active) return;
+
+      const containerRect = container.getBoundingClientRect();
+      const activeRect = active.getBoundingClientRect();
+
+      const offset =
+        activeRect.top - containerRect.top + container.scrollTop;
+
+      container.scrollTo({
+        top: offset - container.clientHeight / 2,
+        behavior: 'smooth'
+      });
+    });
+  }
+
+  onSearchInputChange() {
+
+    // clear stale results immediately when user edits query
+    // this.searchResults = [];
+    // this.currentSearchIndex = -1;
+    // this.totalMatchCount = 0;
+    // this.lastSearchedTerm = ''
+
+    // remove highlights immediately
+    this.clearAllSearchHighlights();
+
+    this.showSearchSidebar = false;
+  }
+
+  clearAllSearchHighlights() {
+
+    // remove ALL marks
+    document.querySelectorAll('.pdf-search-hit').forEach(el => {
+      const parent = el.parentNode;
+      if (parent) {
+        parent.replaceChild(
+          document.createTextNode(el.textContent || ''),
+          el
+        );
+        parent.normalize();
+      }
+    });
+
+    // remove active highlight
+    document.querySelectorAll('.active-search-hit')
+      .forEach(el => el.classList.remove('active-search-hit'));
+
   }
 }

@@ -36,28 +36,19 @@
 
       <input
         type="text"
-        placeholder="Search document..."
         [(ngModel)]="searchTerm"
-        (keydown.enter)="handleSearchEnter()"
+        (input)="onSearchInputChange()"
+        (keydown.enter)="handleSearchEnter($event)"
+        placeholder="Search document..."
       />
 
-      <button
-        (click)="searchDocument()"
-      >
-        🔍
-      </button>
+      <span class="match-counter">
+        {{ currentSearchIndex + 1 || 0 }} / {{ totalMatchCount }}
+      </span>
 
-      <button
-        (click)="prevSearchResult()"
-      >
-        ↑
-      </button>
-
-      <button
-        (click)="nextSearchResult()"
-      >
-        ↓
-      </button>
+      <button (click)="handleSearchEnter($event)">🔍</button>
+      <button (click)="prevSearchResult()">↑</button>
+      <button (click)="nextSearchResult()">↓</button>
 
     </div>
 
@@ -89,7 +80,7 @@
           Search Results
 
           <button
-            (click)="showSearchSidebar = false"
+            (click)="onSearchInputChange()"
           >
             ✕
           </button>
@@ -136,15 +127,16 @@
 
             <div class="pdf-scroll" #scrollContainer>
               <div class="pages">
-                <div
-                  class="page"
-                  *ngFor="let page of pages"
-                  [attr.data-page]="page"
-                >
-                  <canvas class="pdf-canvas"></canvas>
-                  <canvas class="annotation-layer"></canvas>
-                  <div class="textLayer"></div>
-                </div>
+                @for (page of pages; track $index) {
+                  <div
+                    class="page"
+                    [attr.data-page]="page"
+                  >
+                    <canvas class="pdf-canvas"></canvas>
+                    <canvas class="annotation-layer"></canvas>
+                    <div class="textLayer"></div>
+                  </div>
+                }
               </div>
             </div>
 
