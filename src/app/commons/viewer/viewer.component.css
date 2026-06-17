@@ -62,20 +62,22 @@
   display: flex;
   flex: 1;
   overflow: hidden;
+  min-width: 0;
 }
 
 .sidebar {
-  width: 12.5rem;
+  width: 11rem;
   background: #fff;
   border-right: 0.0625rem solid #eee;
   padding: 0.625rem;
 }
 
 .pdf-area {
-  flex: 1;
+  flex: 1 1 auto;
+  min-width: 0;
   overflow: auto;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   padding: 1.25rem;
 }
 
@@ -134,7 +136,8 @@ canvas {
 
 .pdf-scroll {
   height: 100vh;
-  overflow-y: auto;
+  width: 100%;
+  overflow: auto;
   background: #f5f7fb;
 }
 
@@ -158,12 +161,17 @@ canvas {
 
 /* Search CSS */
 .search-sidebar {
-  width: 20rem;
-  min-width: 20rem;
+  width: 0;
   display: flex;
   flex-direction: column;
   background: white;
   border-right: 0.0625rem solid #ddd;
+  overflow: hidden;
+  transition: width 0.2s;
+}
+
+.search-sidebar.open {
+  width: 15rem;
 }
 
 .search-header {
@@ -229,12 +237,6 @@ canvas {
 
 .pdf-search-hit.active {
   background: orange;
-}
-
-.active-search-hit {
-  background: orange !important;
-  color: black;
-  border-radius: 0.125rem;
 }
 
 /* Remove bluish paints on toggle of fullscreen, prevSearch, nextSearch; added by chrome */

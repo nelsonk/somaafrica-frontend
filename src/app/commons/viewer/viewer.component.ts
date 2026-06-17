@@ -14,7 +14,7 @@ import { AuthHeaderService } from '../../services/viewer/auth-header.service';
 import * as pdfjsLib from 'pdfjs-dist';
 import { ThumbnailSidebarComponent } from '../thumbnail-sidebar/thumbnail-sidebar.component';
 import { FormsModule } from '@angular/forms';
-import { normalizePdfText } from '../../utils/normalize-pdf-text';
+import { normalizePdfText, isReadableText } from '../../utils/normalize-pdf-text';
 
 
 @Component({
@@ -74,6 +74,8 @@ export class ViewerComponent implements AfterViewInit {
   pageTextCache = new Map<number, string>();
   pageTextItemsCache = new Map<number, any[]>();
   pageItemsCache = new Map<number, any[]>();
+  pageSpanCache = new Map<number, HTMLElement[]>();
+  private renderingPages = new Set<number>();
   showSearchSidebar = false;
   isBuildingIndex = false;
   private lastSearchedTerm: string = '';
@@ -175,59 +177,72 @@ export class ViewerComponent implements AfterViewInit {
   }
 
   async renderPage(pageNumber: number) {
-    if (this.renderedPages.has(pageNumber)) return;
-
-    const page = await this.pdf.getPage(pageNumber);
-    const viewport = page.getViewport({ scale: this.zoom });
-
-    const pageEl = document.querySelector(
-      `.page[data-page="${pageNumber}"]`
-    ) as HTMLElement;
-
-    // ✅ FIX: lock layout BEFORE rendering starts
-    // pageEl.style.height = `${viewport.height}px`;
-    // pageEl.style.minHeight = `${viewport.height}px`;
-
-    const canvas = pageEl.querySelector(
-      '.pdf-canvas'
-    ) as HTMLCanvasElement;
-
-    const ctx = canvas.getContext('2d')!;
-
-    canvas.width = viewport.width;
-    canvas.height = viewport.height;
-
-    await page.render({
-      canvasContext: ctx,
-      viewport
-    }).promise;
-
-    // TEXT LAYER (optional but correct now)
-    const textContent = await page.getTextContent();
-
-    const textLayer = pageEl.querySelector('.textLayer') as HTMLElement;
-    textLayer.innerHTML = '';
-    textLayer.style.width = `${viewport.width}px`;
-    textLayer.style.height = `${viewport.height}px`;
-
-    const tl = new pdfjsLib.TextLayer({
-      textContentSource: textContent,
-      container: textLayer,
-      viewport
-    });
-
-    await tl.render();
-
-    if (this.searchTerm) {
-      console.log('Search term in renderPage: ', this.searchTerm)
-      setTimeout(() => {
-        this.highlightVisiblePages();
-      }, 0);
+    if (
+      this.renderedPages.has(pageNumber) ||
+      this.renderingPages.has(pageNumber)
+    ) {
+      return;
     }
 
-    this.initAnnotationLayerForPage(pageEl, canvas);
+    this.renderingPages.add(pageNumber);
 
-    this.renderedPages.add(pageNumber);
+    try {
+
+      const page = await this.pdf.getPage(pageNumber);
+      const viewport = page.getViewport({ scale: this.zoom });
+
+      const pageEl = document.querySelector(
+        `.page[data-page="${pageNumber}"]`
+      ) as HTMLElement;
+
+      const canvas = pageEl.querySelector(
+        '.pdf-canvas'
+      ) as HTMLCanvasElement;
+
+      const ctx = canvas.getContext('2d')!;
+
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+
+      await page.render({canvasContext: ctx, viewport}).promise;
+
+      // TEXT LAYER (optional but correct now)
+      const textContent = await page.getTextContent();
+
+      const textLayer = pageEl.querySelector('.textLayer') as HTMLElement;
+      textLayer.innerHTML = '';
+      textLayer.style.width = `${viewport.width}px`;
+      textLayer.style.height = `${viewport.height}px`;
+
+      const tl = new pdfjsLib.TextLayer({
+        textContentSource: textContent,
+        container: textLayer,
+        viewport
+      });
+
+      await tl.render();
+
+      const spans = Array.from(
+        textLayer.querySelectorAll('span')
+      ) as HTMLElement[];
+
+      this.pageSpanCache.set(pageNumber, spans);
+
+      if (this.searchTerm) {
+        setTimeout(() => {
+          this.highlightVisiblePages();
+        }, 0);
+      }
+
+      this.initAnnotationLayerForPage(pageEl, canvas);
+
+      this.renderedPages.add(pageNumber);
+
+    } finally {
+
+      this.renderingPages.delete(pageNumber);
+
+    }
   }
 
   setupPageObserver(): void {
@@ -302,10 +317,6 @@ export class ViewerComponent implements AfterViewInit {
     );
   }
 
-  scrollToPage(page: number): void {
-    this.goToPage(page);
-  }
-
   @HostListener('keydown', ['$event'])
   handleKeys(event: KeyboardEvent) {
     if (event.key === 'ArrowDown') {
@@ -317,44 +328,42 @@ export class ViewerComponent implements AfterViewInit {
     }
   }
 
+  async onZoomChange(){
+    this.resetRender();
+    await this.loadDocument();
+    this.goToSearchResult(this.searchResults[this.currentSearchIndex]);
+  }
+
   async zoomIn() {
     this.zoom += 0.2;
-    this.resetRender();
+    this.onZoomChange();
   }
 
   zoomOut() {
     this.zoom = Math.max(0.6, this.zoom - 0.2);
-    this.resetRender();
+    this.onZoomChange();
   }
 
   resetRender() {
-
     this.observer?.disconnect();
     this.pageObserver?.disconnect();
-
     this.renderedPages.clear();
 
     document.querySelectorAll('.page').forEach((el) => {
+      const canvas = el.querySelector(
+        '.pdf-canvas'
+      ) as HTMLCanvasElement;
 
-      const canvas =
-        el.querySelector(
-          '.pdf-canvas'
-        ) as HTMLCanvasElement;
+      const annotation = el.querySelector(
+        '.annotation-layer'
+      ) as HTMLCanvasElement;
 
-      const annotation =
-        el.querySelector(
-          '.annotation-layer'
-        ) as HTMLCanvasElement;
-
-      const textLayer =
-        el.querySelector(
-          '.textLayer'
-        ) as HTMLElement;
+      const textLayer = el.querySelector(
+        '.textLayer'
+      ) as HTMLElement;
 
       if (canvas) {
-
-        const ctx =
-          canvas.getContext('2d');
+        const ctx = canvas.getContext('2d');
 
         ctx?.clearRect(
           0,
@@ -368,9 +377,7 @@ export class ViewerComponent implements AfterViewInit {
       }
 
       if (annotation) {
-
-        const ctx =
-          annotation.getContext('2d');
+        const ctx = annotation.getContext('2d');
 
         ctx?.clearRect(
           0,
@@ -389,15 +396,12 @@ export class ViewerComponent implements AfterViewInit {
     });
 
     requestAnimationFrame(() => {
-
       this.setupObserver();
       this.setupPageObserver();
-
     });
   }
 
   async goToPage(page: number): Promise<void> {
-
     if (!page || page < 1 || page > this.totalPages) {
       return;
     }
@@ -532,8 +536,10 @@ export class ViewerComponent implements AfterViewInit {
     this.annotationCtx.stroke();
   }
 
-  stopDraw() {
-    this.isDrawing = false;
+  stopDraw(event: KeyboardEvent) {
+    if (event.key === 'Escape' || event.key === 'Esc') {
+      this.isDrawing = false;
+    }
 
     // save annotation here
   }
@@ -607,17 +613,14 @@ export class ViewerComponent implements AfterViewInit {
             return;
           }
 
-          const spans =
-            pageEl.querySelectorAll(
-              '.textLayer span'
-            );
+          const spans = Array.from(
+            pageEl.querySelectorAll('.textLayer span')
+          ) as HTMLElement[];
 
           const target =
             spans[match.itemIndex] as HTMLElement;
 
           this.highlightVisiblePages();
-
-          console.log('goToMatch: ', {match, spans, target})
 
           if (target) {
 
@@ -625,12 +628,16 @@ export class ViewerComponent implements AfterViewInit {
 
             resolve(target);
 
+            document
+              .querySelectorAll('.active-search-hit')
+              .forEach(el =>
+                el.classList.remove('active-search-hit')
+              );
+
+
             target.classList.add(
               'active-search-hit'
             );
-
-            console.log('target inside goToMatch: ', target)
-
             return;
           }
 
@@ -659,21 +666,17 @@ export class ViewerComponent implements AfterViewInit {
   }
 
   highlightVisiblePages() {
-
     if (!this.searchTerm) return;
 
     const term = this.searchTerm.trim();
+
     if (!term) return;
 
-    const escaped =
-      term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
+    const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const regex = new RegExp(`(${escaped})`, 'gi');
 
     document.querySelectorAll('.textLayer span').forEach((node) => {
-
       const el = node as HTMLElement;
-
       const text = el.textContent || '';
 
       if (!regex.test(text)) return;
@@ -686,27 +689,29 @@ export class ViewerComponent implements AfterViewInit {
   }
 
   async buildSearchIndex() {
+    for (
+      let pageNumber = 1;
+      pageNumber <= this.totalPages;
+      pageNumber++
+    ) {
 
-    if (this.pageItemsCache.size === this.totalPages) {
-      return;
+      if (this.pageSpanCache.has(pageNumber)) continue;
+
+      await this.renderPage(pageNumber);
+
+      const pageEl =
+        document.querySelector(
+          `.page[data-page="${pageNumber}"]`
+        ) as HTMLElement;
+
+      if (!pageEl) continue;
+
+      const spans = Array.from(
+        pageEl.querySelectorAll('.textLayer span')
+      ) as HTMLElement[];
+
+      this.pageSpanCache.set(pageNumber, spans);
     }
-
-    this.isBuildingIndex = true;
-
-    for (let pageNumber = 1; pageNumber <= this.totalPages; pageNumber++) {
-
-      if (this.pageItemsCache.has(pageNumber)) {
-        continue;
-      }
-
-      const page = await this.pdf.getPage(pageNumber);
-
-      const textContent = await page.getTextContent();
-
-      this.pageItemsCache.set(pageNumber, textContent.items);
-    }
-
-    this.isBuildingIndex = false;
   }
 
   async searchDocument() {
@@ -726,30 +731,63 @@ export class ViewerComponent implements AfterViewInit {
 
     const results: any[] = [];
 
-    for (const [pageNumber, items] of this.pageItemsCache.entries()) {
+    for (
+      const [pageNumber, spans]
+      of this.pageSpanCache.entries()
+    ){
+      const pageText = spans.filter(
+        s => isReadableText(s.textContent || '')
+      ).map(s => s.textContent || '')
+      .join(' ');
 
-      const pageResults: any[] = [];
+      const normalizedPageText = normalizePdfText(pageText).toLowerCase();
 
-      items.forEach((item: any, index: number) => {
+      let startIndex = 0;
+      let found_at = 0
 
-        const text = normalizePdfText(item.str || '').toLowerCase();
+      while(true){
+        const found = normalizedPageText.indexOf(term, startIndex);
 
-        if (!text.includes(term)) return;
+        if (found === -1) break;
 
-        const snippet =
-          '...' +
-          item.str.substring(0, 80) +
-          '...';
+        let accumulated = '';
 
-        pageResults.push({
-          page: pageNumber,
-          itemIndex: index,
-          text: item.str,
-          snippet
-        });
-      });
+        for (let i = 0; i < spans.length;i ++) {
+          if(i <= found_at) continue;
 
-      results.push(...pageResults);
+          let accumulated_index = accumulated.length
+          found_at = i
+
+          accumulated += normalizePdfText(
+            spans[i].textContent || ''
+          ).toLowerCase();
+
+          const found_again = accumulated.indexOf(term, accumulated_index);
+
+          if (found_again === -1) continue;
+
+          const snippetStart = Math.max(0, found - 40);
+
+          const snippetEnd = Math.min(
+            normalizedPageText.length,
+            found + term.length + 80
+          );
+
+          const snippet =
+            `...${normalizedPageText.slice(snippetStart, snippetEnd)}...`;
+
+          results.push({
+            page: pageNumber,
+            itemIndex: i,
+            text: term,
+            snippet: snippet
+          });
+
+          break;
+        }
+
+        startIndex = found + term.length;
+      }
     }
 
     this.searchResults = results;
@@ -763,16 +801,15 @@ export class ViewerComponent implements AfterViewInit {
     this.lastSearchedTerm = this.searchTerm;
   }
 
-  goToSearchResult(result: any) {
+  goToSearchResult(result: any, index?: number) {
+    if (index) this.currentSearchIndex = index % this.searchResults.length;
 
     this.goToPage(result.page);
 
     setTimeout(() => {
-
-      const pageEl =
-        document.querySelector(
-          `.page[data-page="${result.page}"]`
-        ) as HTMLElement;
+      const pageEl = document.querySelector(
+        `.page[data-page="${result.page}"]`
+      ) as HTMLElement;
 
       if (!pageEl) return;
 
@@ -780,38 +817,32 @@ export class ViewerComponent implements AfterViewInit {
       document.querySelectorAll('.active-search-hit')
         .forEach(el => el.classList.remove('active-search-hit'));
 
-      const spans =
-        pageEl.querySelectorAll('.textLayer span');
-
+      const spans = pageEl.querySelectorAll('.textLayer span');
       const target = spans[result.itemIndex] as HTMLElement;
 
       if (target) {
         target.classList.add('active-search-hit');
-        console.log({target})
 
         target.scrollIntoView({
           behavior: 'smooth',
           block: 'center'
         });
+
+        this.scrollActiveSearchIntoView();
       }
 
     }, 200);
-
-    this.scrollActiveSearchIntoView();
   }
 
   handleSearchEnter(event?: Event) {
-
     const keyboardEvent = event as KeyboardEvent | undefined;
-
     const term = (this.searchTerm || '').trim();
+
     if (!term) return;
 
-    const normalized =
-      normalizePdfText(term).toLowerCase();
+    const normalized = normalizePdfText(term).toLowerCase();
 
-    const last =
-      normalizePdfText(this.lastSearchedTerm || '').toLowerCase();
+    const last = normalizePdfText(this.lastSearchedTerm || '').toLowerCase();
 
     // NEW SEARCH
     if (normalized !== last) {
@@ -831,9 +862,7 @@ export class ViewerComponent implements AfterViewInit {
   }
 
   scrollActiveSearchIntoView() {
-
     requestAnimationFrame(() => {
-
       const container =
         document.querySelector('.search-results') as HTMLElement;
 
@@ -856,13 +885,6 @@ export class ViewerComponent implements AfterViewInit {
   }
 
   onSearchInputChange() {
-
-    // clear stale results immediately when user edits query
-    // this.searchResults = [];
-    // this.currentSearchIndex = -1;
-    // this.totalMatchCount = 0;
-    // this.lastSearchedTerm = ''
-
     // remove highlights immediately
     this.clearAllSearchHighlights();
 
@@ -870,10 +892,10 @@ export class ViewerComponent implements AfterViewInit {
   }
 
   clearAllSearchHighlights() {
-
     // remove ALL marks
     document.querySelectorAll('.pdf-search-hit').forEach(el => {
       const parent = el.parentNode;
+
       if (parent) {
         parent.replaceChild(
           document.createTextNode(el.textContent || ''),

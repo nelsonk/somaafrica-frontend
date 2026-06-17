@@ -73,6 +73,7 @@
     @if (showSearchSidebar) {
       <div
         class="search-sidebar"
+        [class.open]="showSearchSidebar"
       >
 
         <div class="search-header">
@@ -80,7 +81,7 @@
           Search Results
 
           <button
-            (click)="onSearchInputChange()"
+            (click)="showSearchSidebar = false"
           >
             ✕
           </button>
@@ -95,7 +96,7 @@
               [class.active]="
                 i === currentSearchIndex
               "
-              (click)="goToSearchResult(result)"
+              (click)="goToSearchResult(result, i)"
             >
 
               <div class="page-label">

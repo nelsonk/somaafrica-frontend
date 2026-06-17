@@ -134,3 +134,7 @@ Then you can use classes like this in any component
 install this
 
 `npm install pdfjs-dist`
+
+Annotation service not currently used but could be used to get, delete, create annotations from API
+
+Thumbnail component and service are used to add small previews of document pages on the side and to easily jump to previewed page

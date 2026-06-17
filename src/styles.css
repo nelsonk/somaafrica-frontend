@@ -327,3 +327,9 @@ textarea.soma-input {
 .action-btn:hover {
   transform: translateY(-1px);
 }
+
+/* PDF viewer active search hit highlight */
+.textLayer span.active-search-hit > mark.pdf-search-hit {
+  background: #ff5722 !important;
+  color: white !important;
+}
