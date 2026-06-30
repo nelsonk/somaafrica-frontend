@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { ACTIONS, TableResponse } from '../../models/table.interface';
+import { ACTION_EDIT, TableResponse } from '../../models/table.interface';
 import { CrudService } from '../api/crud.service';
 import { setDetail } from '../../utils/details-helper';
 import { NotificationService } from '../info/notification.service';
@@ -16,6 +16,7 @@ import { Observable, of, map, pipe, catchError, forkJoin } from 'rxjs';
 })
 export class TeacherService {
   teachersUrl = `${environment.BASE_URL}/teachers/teacher`;
+  user: any = null;
 
   constructor(
     private crud: CrudService,
@@ -23,7 +24,9 @@ export class TeacherService {
     private auth: AuthService,
     private sessionStorage: SessionStorageService,
     private detail: DetailService
-  ) { }
+  ) {
+    this.user = sessionStorage.getItem('User');
+  }
 
   setTeachersTable(response: any){
       const HEADERS = [
@@ -43,6 +46,19 @@ export class TeacherService {
       */
       const teacherRows = response.map((resp:any) => {
         const visible = resp.is_visible;
+        const is_super_user = this.user.is_superuser;
+        let actions = [...ACTION_EDIT];
+
+        if(is_super_user){
+          actions = [
+            ...actions,
+            {
+              label: 'Delete',
+              icon: 'bi bi-trash',
+              class: 'btn-outline-danger'
+            }
+          ]
+        }
 
         return {
           guid: resp.guid,
@@ -52,7 +68,7 @@ export class TeacherService {
             .map((e:any) => e.level).join(', '),
           subjects: resp.subjects.map((s:any) => s.name).join(', '),
           rating: resp.rating,
-          actions: [...ACTIONS,
+          actions: [...actions,
             {
               'label': visible ? 'De-Activate' : 'Activate',
               'icon': visible ? 'fa-solid fa-toggle-off' : 'fa-solid fa-toggle-on',
@@ -304,11 +320,7 @@ export class TeacherService {
           })
         ),
         catchError ((er:any) => {
-          this.notify.showNotification(
-            'Error',
-            JSON.stringify(er.error),
-            'error'
-          );
+          this.notify.showError(JSON.stringify(er.error));
 
           return of({
             table: teachersTable,

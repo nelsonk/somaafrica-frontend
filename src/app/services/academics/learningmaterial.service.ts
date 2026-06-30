@@ -3,13 +3,14 @@ import { environment } from '../../../environments/environment';
 import { NotificationService } from '../info/notification.service';
 import { CrudService } from '../api/crud.service';
 import { setDetail } from '../../utils/details-helper';
-import { ACTIONS } from '../../models/table.interface';
+import { ACTION_EDIT, TableAction } from '../../models/table.interface';
 import { TableResponse } from '../../models/table.interface';
 import { DetailService } from '../detail/detail.service';
 import { Observable, pipe, map, of, catchError, forkJoin } from 'rxjs';
 import { MATERIAL_TYPES } from '../../models/learningmaterial.interface';
 import { User } from '../../models/user.interface';
 import { DetailField, DetailSaveData } from '../../models/details.interface';
+import { SessionStorageService } from '../storage/session-storage.service';
 
 @Injectable({
   providedIn: 'root',
@@ -22,12 +23,16 @@ export class LearningMaterialsService {
   educationLeveleUrl = `${environment.BASE_URL}/academics/level`;
   teachersUrl = `${environment.BASE_URL}/teachers/teacher`;
   currenciesUrl = `${environment.BASE_URL}/payments/currency`;
+  user: any = null;
 
   constructor(
     private notify: NotificationService,
     private crud: CrudService,
-    private detail: DetailService
-  ){}
+    private detail: DetailService,
+    private sessionStorage: SessionStorageService
+  ){
+    this.user = this.sessionStorage.getItem("User");
+  }
 
   getMaterials():Observable<TableResponse>{
     let materialsTable: any = '';
@@ -43,11 +48,7 @@ export class LearningMaterialsService {
         })
       ),
       catchError ((er:any) => {
-        this.notify.showNotification(
-          'Error',
-          JSON.stringify(er.error),
-          'error'
-        );
+        this.notify.showError(JSON.stringify(er.error));
 
         return of({
           table: materialsTable,
@@ -75,6 +76,43 @@ export class LearningMaterialsService {
     */
     const materialRows = response.map((resp:any) => {
       const visible = resp.is_visible;
+      const quiz = resp.quiz?.guid;
+      const is_super_user = this.user.is_superuser;
+
+      let actions = [...ACTION_EDIT];
+
+      if(resp.type === 'quiz') {
+        if(quiz){
+          actions = [
+            {
+              label: 'Quiz',
+              icon: 'bi bi-eye',
+              class: 'btn-outline-success'
+            },
+            ...actions
+          ]
+        }else{
+          actions = [
+            {
+              label: 'Quiz',
+              icon: 'bi bi-plus-lg',
+              class: 'btn-outline-success'
+            },
+            ...actions
+          ]
+        }
+      }
+
+      if(is_super_user){
+        actions = [
+          ...actions,
+          {
+            label: 'Delete',
+            icon: 'bi bi-trash',
+            class: 'btn-outline-danger'
+          }
+        ]
+      }
 
       return {
         guid: resp.guid,
@@ -83,7 +121,8 @@ export class LearningMaterialsService {
         price: resp.price,
         currency: resp.currency.currency,
         classes: resp.classes.map((s:any) => s.name).join(', '),
-        actions: [...ACTIONS,
+        actions: [
+          ...actions,
           {
             'label': visible ? 'De-Activate' : 'Activate',
             'icon': visible ? 'fa-solid fa-toggle-off' : 'fa-solid fa-toggle-on',
@@ -215,7 +254,8 @@ export class LearningMaterialsService {
               label: "File Name",
               value: material?.document?.file,
               type: 'file',
-              required: false
+              required: false,
+              hidden: material.type === 'reading' ? false : true
             }),
             setDetail({
               key: 'created_at',

@@ -21,7 +21,7 @@
     <table class="table align-middle table-borderless mb-0">
       <thead class="bg-light text-secondary border-bottom">
         <tr>
-          @for (header of visibleHeaders; track header.label) {
+          @for (header of visibleHeaders; track header.key) {
             <th
               (click)="onSort(header)"
               [style.text-align]="header.align || 'left'"
@@ -49,12 +49,12 @@
         </tr>
       </thead>
       <tbody>
-        @for (row of paginatedRows; track row) {
+        @for (row of paginatedRows; track row['guid']) {
           <tr
             class="bg-white border-bottom table-row-hover"
             [class.selected-row]="row === selectedRow"
             (click)="onRowClick(row)">
-            @for (header of visibleHeaders; track header) {
+            @for (header of visibleHeaders; track header.key) {
               <td
                 class="px-3 py-2 text-nowrap"
                 [style.text-align]="header.align || 'left'">

@@ -208,3 +208,7 @@
   margin-right: auto;
   margin-top: 0;
 }
+
+.hidden-space {
+  display: none !important;
+}

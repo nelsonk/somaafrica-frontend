@@ -138,8 +138,11 @@ export class AuthService {
     return this.api.patch<BaseResponse>(url, data, {bypass: true});
   }
 
-  navigateToPage(target?: string, source?:string){
-    this.router.navigate([`/${target}`], {queryParams: {source: source}});
+  navigateToPage(target?: string, source?:string, guid?: string){
+    this.router.navigate(
+      [`/${target}`],
+      {queryParams: {source: source, guid: guid}}
+    );
   }
 
   createPerson(data: {}){

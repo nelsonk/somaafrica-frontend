@@ -84,8 +84,6 @@ export class ThumbnailSidebarComponent implements AfterViewInit {
 
     const page = await this.pdf.getPage(pageNumber);
 
-    console.log('Rendering thumb', pageNumber);
-
     const image = await this.thumbService.renderThumbnail(page, 0.35);
 
     this.thumbnails[pageNumber - 1] = image;

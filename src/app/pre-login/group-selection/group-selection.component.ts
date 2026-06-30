@@ -80,11 +80,7 @@ export class GroupSelectionComponent implements OnInit{
         },
         error: (err) => {
           this.status = STATUS_TYPE.ERROR;
-          this.notificationService.showNotification(
-            'Error',
-            JSON.stringify(err.error),
-            'error'
-          );
+          this.notificationService.showError(JSON.stringify(err.error));
         }
       }
     );

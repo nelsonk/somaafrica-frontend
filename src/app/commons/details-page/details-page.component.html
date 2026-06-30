@@ -271,236 +271,239 @@
       <form [formGroup]="form">
         <div [class]="isEdit() ? 'details-grid' : 'details-grid-view'">
           @for (detail of details; track detail.key) {
-            <!-- VIEW MODE -->
-            @if (!isEdit()) {
-              <div
-                class="detail-item"
-                [class.full-width]="detail.type === 'textarea' || detail.fullwidth"
-              >
 
-                <div class="detail-key">
-                  {{ detail.label }}:
-                </div>
+            @if (!detail.hidden) {
+              <!-- VIEW MODE -->
+              @if (!isEdit()) {
+                <div
+                  class="detail-item"
+                  [class.full-width]="detail.type === 'textarea' || detail.fullwidth"
+                >
 
-                <div class="detail-value formatted-text">
+                  <div class="detail-key">
+                    {{ detail.label }}:
+                  </div>
 
-                  @switch (detail.type) {
-
-                    @case ('boolean') {
-                      {{ detail.value ? 'Yes' : 'No' }}
-                    }
-
-                    @case ('multi-select') {
-                      {{ formatMultiSelect(detail.value) }}
-                    }
-
-                    @case ('single-select') {
-                      {{ detail.value?.label }}
-                    }
-
-                    @default {
-                      {{ detail.value }}
-                    }
-
-                  }
-                </div>
-              </div>
-            }
-
-            <!-- EDIT MODE -->
-            @if (isEdit() && !detail.readonly) {
-              <div
-                class="detail-item"
-                [class.full-width]="detail.type === 'textarea' || detail.fullwidth"
-              >
-                <div class="detail-key">
-                  {{ detail.label }}:
-                </div>
-
-                <div class="detail-value">
+                  <div class="detail-value formatted-text">
 
                     @switch (detail.type) {
 
-                      @case ('number')
-                      @case ('email')
-                      @case ('text')
-                      @case ('date')
-                      @default {
-                        <input
-                          [type]="detail.type ? detail.type : 'text'"
-                          class="form-control soma-input"
-                          [formControlName]="detail.key"
-                          [placeholder]="detail?.placeholder"
-                          [maxlength]="detail.maxlength"
-                          [readOnly]="detail.readonly"
-                        />
-
-                        @if (isInvalid(detail.key)) {
-
-                          <div class="text-danger small">
-
-                            @for (
-                              error of getErrors(detail);
-                              track error
-                            ) {
-                              <div>{{ error }}</div>
-                            }
-
-                          </div>
-
-                        }
-                      }
-
-                      @case ('file') {
-                        <input
-                          type="file"
-                          class="form-control soma-input"
-                          [formControlName]="detail.key"
-                          [placeholder]="detail?.placeholder"
-                          [maxlength]="detail.maxlength"
-                          [readOnly]="detail.readonly"
-                          (change)="onFileSelected($event, detail.key)"
-                        />
-
-                        @if (isInvalid(detail.key)) {
-
-                          <div class="text-danger small">
-
-                            @for (
-                              error of getErrors(detail);
-                              track error
-                            ) {
-                              <div>{{ error }}</div>
-                            }
-
-                          </div>
-
-                        }
-                      }
-
-                      @case ('textarea') {
-                        <textarea
-                          class="form-control soma-input"
-                          [formControlName]="detail.key"
-                          [placeholder]="detail?.placeholder"
-                          [maxlength]="detail.maxlength"
-                          [readOnly]="detail.readonly"
-                          style="field-sizing: content;"
-                        ></textarea>
-
-                        @if (isInvalid(detail.key)) {
-
-                          <div class="text-danger small">
-
-                            @for (
-                              error of getErrors(detail);
-                              track error
-                            ) {
-                              <div>{{ error }}</div>
-                            }
-
-                          </div>
-
-                        }
-                      }
-
                       @case ('boolean') {
-                        <input
-                          type="checkbox"
-                          [formControlName]="detail.key"
-                          [readOnly]="detail.readonly"
-                        />
+                        {{ detail.value ? 'Yes' : 'No' }}
                       }
 
-                      @case ('multi-select')
+                      @case ('multi-select') {
+                        {{ formatMultiSelect(detail.value) }}
+                      }
+
                       @case ('single-select') {
-                        <ng-select
-                          class="modern-select"
-                          [items]="detail.options"
-                          bindLabel="label"
-                          bufferAmount="10"
-                          [fixedPlaceholder]="false"
-                          [popover]="true"
-                          [virtualScroll]="true"
-                          [readonly]="detail.readonly"
-                          [multiple]="detail.type === 'multi-select'"
-                          [formControlName]="detail.key"
-                          [placeholder]="detail?.placeholder || 'Click to select'"
-                        >
+                        {{ detail.value?.label }}
+                      }
 
-                          <ng-template ng-header-tmp>
-                            <div class="select-all-wrapper">
-                              <button type="button" (click)="toggleSelectAll(detail)">
-                                {{ isAllSelected(detail) ? 'Deselect All' : 'Select All' }}
-                              </button>
-                            </div>
-                          </ng-template>
-
-                          <ng-template ng-label-tmp let-item="item">
-                            <div class="modern-select-label-item">
-
-                              <div class="modern-select-avatar">
-                                {{ item.label?.charAt(0) }}
-                              </div>
-
-                              <span>
-                                {{ item.label }}
-                              </span>
-
-                            </div>
-                          </ng-template>
-
-                          <ng-template ng-option-tmp let-item="item">
-
-                            <div class="modern-select-option">
-
-                              <div class="modern-select-avatar">
-                                {{ item.label?.charAt(0) }}
-                              </div>
-
-                              <div class="modern-select-option-content">
-
-                                <div class="modern-select-option-title">
-                                  {{ item.label }}
-                                </div>
-
-                                @if(item.description){
-                                  <div class="modern-select-option-description">
-                                    {{ item.description }}
-                                  </div>
-                                }
-
-                              </div>
-
-                            </div>
-
-                          </ng-template>
-
-                        </ng-select>
-
-                        @if (isInvalid(detail.key)) {
-
-                          <div class="text-danger small">
-
-                            @for (
-                              error of getErrors(detail);
-                              track error
-                            ) {
-                              <div>{{ error }}</div>
-                            }
-
-                          </div>
-
-                        }
+                      @default {
+                        {{ detail.value }}
                       }
 
                     }
+                  </div>
+                </div>
+              }
+
+              <!-- EDIT MODE -->
+              @if (isEdit() && !detail.readonly) {
+                <div
+                  class="detail-item"
+                  [class.full-width]="detail.type === 'textarea' || detail.fullwidth"
+                >
+                  <div class="detail-key">
+                    {{ detail.label }}:
+                  </div>
+
+                  <div class="detail-value">
+
+                      @switch (detail.type) {
+
+                        @case ('number')
+                        @case ('email')
+                        @case ('text')
+                        @case ('date')
+                        @default {
+                          <input
+                            [type]="detail.type ? detail.type : 'text'"
+                            class="form-control soma-input"
+                            [formControlName]="detail.key"
+                            [placeholder]="detail?.placeholder"
+                            [maxlength]="detail.maxlength"
+                            [readOnly]="detail.readonly"
+                          />
+
+                          @if (isInvalid(detail.key)) {
+
+                            <div class="text-danger small">
+
+                              @for (
+                                error of getErrors(detail);
+                                track error
+                              ) {
+                                <div>{{ error }}</div>
+                              }
+
+                            </div>
+
+                          }
+                        }
+
+                        @case ('file') {
+                          <input
+                            type="file"
+                            class="form-control soma-input"
+                            [formControlName]="detail.key"
+                            [placeholder]="detail?.placeholder"
+                            [maxlength]="detail.maxlength"
+                            [readOnly]="detail.readonly"
+                            (change)="onFileSelected($event, detail.key)"
+                          />
+
+                          @if (isInvalid(detail.key)) {
+
+                            <div class="text-danger small">
+
+                              @for (
+                                error of getErrors(detail);
+                                track error
+                              ) {
+                                <div>{{ error }}</div>
+                              }
+
+                            </div>
+
+                          }
+                        }
+
+                        @case ('textarea') {
+                          <textarea
+                            class="form-control soma-input"
+                            [formControlName]="detail.key"
+                            [placeholder]="detail?.placeholder"
+                            [maxlength]="detail.maxlength"
+                            [readOnly]="detail.readonly"
+                            style="field-sizing: content;"
+                          ></textarea>
+
+                          @if (isInvalid(detail.key)) {
+
+                            <div class="text-danger small">
+
+                              @for (
+                                error of getErrors(detail);
+                                track error
+                              ) {
+                                <div>{{ error }}</div>
+                              }
+
+                            </div>
+
+                          }
+                        }
+
+                        @case ('boolean') {
+                          <input
+                            type="checkbox"
+                            [formControlName]="detail.key"
+                            [readOnly]="detail.readonly"
+                          />
+                        }
+
+                        @case ('multi-select')
+                        @case ('single-select') {
+                          <ng-select
+                            class="modern-select"
+                            [items]="detail.options"
+                            bindLabel="label"
+                            bufferAmount="10"
+                            [fixedPlaceholder]="false"
+                            [popover]="true"
+                            [virtualScroll]="true"
+                            [readonly]="detail.readonly"
+                            [multiple]="detail.type === 'multi-select'"
+                            [formControlName]="detail.key"
+                            [placeholder]="detail?.placeholder || 'Click to select'"
+                          >
+
+                            <ng-template ng-header-tmp>
+                              <div class="select-all-wrapper">
+                                <button type="button" (click)="toggleSelectAll(detail)">
+                                  {{ isAllSelected(detail) ? 'Deselect All' : 'Select All' }}
+                                </button>
+                              </div>
+                            </ng-template>
+
+                            <ng-template ng-label-tmp let-item="item">
+                              <div class="modern-select-label-item">
+
+                                <div class="modern-select-avatar">
+                                  {{ item.label?.charAt(0) }}
+                                </div>
+
+                                <span>
+                                  {{ item.label }}
+                                </span>
+
+                              </div>
+                            </ng-template>
+
+                            <ng-template ng-option-tmp let-item="item">
+
+                              <div class="modern-select-option">
+
+                                <div class="modern-select-avatar">
+                                  {{ item.label?.charAt(0) }}
+                                </div>
+
+                                <div class="modern-select-option-content">
+
+                                  <div class="modern-select-option-title">
+                                    {{ item.label }}
+                                  </div>
+
+                                  @if(item.description){
+                                    <div class="modern-select-option-description">
+                                      {{ item.description }}
+                                    </div>
+                                  }
+
+                                </div>
+
+                              </div>
+
+                            </ng-template>
+
+                          </ng-select>
+
+                          @if (isInvalid(detail.key)) {
+
+                            <div class="text-danger small">
+
+                              @for (
+                                error of getErrors(detail);
+                                track error
+                              ) {
+                                <div>{{ error }}</div>
+                              }
+
+                            </div>
+
+                          }
+                        }
+
+                      }
+                  </div>
+
                 </div>
 
-              </div>
+              }
 
             }
-
           }
         </div>
       </form>

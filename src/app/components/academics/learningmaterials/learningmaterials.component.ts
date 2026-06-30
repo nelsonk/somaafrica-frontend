@@ -61,7 +61,8 @@ export class LearningmaterialsComponent implements OnInit{
     private apiHealth: ApiHealthService,
     private sessionStorage: SessionStorageService,
     private detail: DetailService,
-    private learning: LearningMaterialsService
+    private learning: LearningMaterialsService,
+    private auth: AuthService
   ){
     this.title.setTitle("SomaAfrica - Learning Materials");
   }
@@ -148,6 +149,14 @@ export class LearningmaterialsComponent implements OnInit{
         this.onSaveDetails(data);
 
         return
+      }else if (this.action === 'Quiz'){
+        this.auth.navigateToPage(
+          'profile/teacher/quiz',
+          'material',
+          row.guid
+        );
+
+        return
       }
 
       this.materialData = material;
@@ -195,11 +204,7 @@ export class LearningmaterialsComponent implements OnInit{
     this.crud.delete(`${this.materialsUrl}/${data.callback}`).subscribe(
       {
         next: () => {
-          this.notify.showNotification(
-            'Success',
-            'Teacher successfully deleted',
-            'success'
-          );
+          this.notify.showSuccess('Teacher successfully deleted');
 
           this.materialData = null;
 
@@ -213,11 +218,7 @@ export class LearningmaterialsComponent implements OnInit{
           );
         },
         error: (er:any) => {
-          this.notify.showNotification(
-            'Error',
-            JSON.stringify(er.error),
-            'error'
-          );
+          this.notify.showError(JSON.stringify(er.error));
         }
       }
     )
@@ -240,7 +241,7 @@ export class LearningmaterialsComponent implements OnInit{
         next: (response: any) => {
           this.materialData = null;
 
-          if (document){
+          if (document && response.type === 'reading'){
             const guid = response.guid
             const file_url = `${this.materialsUrl}/${guid}/upload_file`
 
@@ -257,11 +258,7 @@ export class LearningmaterialsComponent implements OnInit{
                   );
                 },
                 error: (er) => {
-                  this.notify.showNotification(
-                    'Error',
-                    JSON.stringify(er.error),
-                    'error'
-                  );
+                  this.notify.showError(JSON.stringify(er.error));
                 }
               }
             );
@@ -276,18 +273,10 @@ export class LearningmaterialsComponent implements OnInit{
             }
           );
 
-          this.notify.showNotification(
-            'Success',
-            `Teacher successfully ${method}d`,
-            'success'
-          );
+          this.notify.showSuccess(`Teacher successfully ${method}d`);
         },
         error: (er:any) => {
-          this.notify.showNotification(
-            'Error',
-            JSON.stringify(er.error),
-            'error'
-          );
+          this.notify.showError(JSON.stringify(er.error));
         }
       }
     );

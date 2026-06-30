@@ -2,7 +2,6 @@ import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { NavigationEnd, NavigationError, Event, Router, RouterOutlet } from '@angular/router';
 import { HeaderComponent } from './commons/header/header.component';
 import { FooterComponent } from './commons/footer/footer.component';
-import { FloatingButtonComponent } from "./commons/floating-button/floating-button.component";
 import { NotifyComponent } from './commons/notify/notify.component';
 import { ConfirmComponent } from './commons/confirm/confirm.component';
 import { filter } from 'rxjs';
@@ -11,7 +10,7 @@ import { FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 
 @Component({
     selector: 'app-root',
-    imports: [RouterOutlet, HeaderComponent, FooterComponent, FloatingButtonComponent, ConfirmComponent, NotifyComponent, FontAwesomeModule],
+    imports: [RouterOutlet, HeaderComponent, FooterComponent, ConfirmComponent, NotifyComponent, FontAwesomeModule],
     templateUrl: './app.component.html',
     styleUrl: './app.component.css'
 })

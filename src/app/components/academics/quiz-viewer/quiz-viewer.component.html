@@ -1,0 +1,204 @@
+<div class="quiz-builder">
+
+    <div class="header">
+        @if(timer && !submitted){
+            <div class="d-flex justify-content-end mb-3">
+                <button
+                type="button"
+                class="danger-btn"
+                (click)="timer_started=true"
+                [hidden]="timer_started"
+                >
+                Start Quiz timer
+                </button>
+
+                @if (timer_started){
+                    <div
+                    class="timer"
+                    [ngClass]="{
+                        'timer-safe': timeRemaining > 60,
+                        'timer-warning': timeRemaining <= 60 && timeRemaining > 15,
+                        'timer-danger': timeRemaining <= 15,
+                        'timer-critical': timeRemaining <= 5
+                    }"
+                    >
+                    ⏱ Time Remaining:
+                    {{ formattedTime }}
+                    </div>
+                }
+            </div>
+        }
+
+        <!-- RIGHT SIDE (CLOSE BUTTON) -->
+        <button
+            class="btn btn-link text-white d-flex align-items-center gap-2 p-0 close-btn"
+            (click)="close.emit()"
+        >
+            <i class="bi bi-arrow-left"></i>
+            <span>Back</span>
+        </button>
+    </div>
+
+    @if((timer && timer_started) || !timer) {
+        <form
+            [formGroup]="quizForm"
+        >
+            <div formArrayName="questions">
+                @for (
+                    question of questions.controls;
+                    track $index;
+                    let qIndex = $index
+                ) {
+                    <div
+                        class="question-card"
+                        [formGroupName]="qIndex"
+                    >
+
+                        <div class="question-header">
+                            <h3>
+                            Question {{ qIndex + 1 }}
+                            </h3>
+                        </div>
+
+                        <div class="question-text">
+                            {{ question.get('text')?.value }}
+                        </div>
+
+                        @if(
+                            question.hasError('noAnswer')
+                            &&
+                            question.touched
+                        ){
+                            <div class="validation-error">
+                            Question not answered
+                            </div>
+                        }
+
+                        <div
+                            class="answers-section"
+                            formArrayName="answers"
+                        >
+                            @for (
+                            answer of answers(qIndex).controls;
+                            track $index;
+                            let aIndex = $index
+                            ) {
+                                <div
+                                    class="answer-row"
+                                    [formGroupName]="aIndex"
+                                    [class.correct-answer]="submitted && answer.get('is_correct')?.value"
+                                    [class.wrong-answer]="
+                                    submitted &&
+                                    answer.get('selected')?.value &&
+                                    !answer.get('is_correct')?.value
+                                    "
+                                    [class.disabled-label]="submitted"
+                                >
+                                    @if(
+                                    question.get('question_type')
+                                    ?.value === 'single'
+                                    ){
+                                        <input
+                                            [id]="'answer-' + qIndex + '-' + aIndex"
+                                            type="radio"
+                                            [name]="'question-' + qIndex"
+                                            [checked]="answer.get('selected')?.value"
+                                            (change)="selectSingleAnswer(qIndex, aIndex)"
+                                        />
+                                    }
+                                    @else {
+                                        <input
+                                            [id]="'answer-' + qIndex + '-' + aIndex"
+                                            type="checkbox"
+                                            formControlName="selected"
+                                        />
+                                    }
+
+                                    <label
+                                        [for]="'answer-' + qIndex + '-' + aIndex"
+                                    >
+                                        {{ answer.get('text')?.value }}
+                                    </label>
+                                </div>
+                            }
+
+                        </div>
+
+                    </div>
+                }
+            </div>
+
+            <div class="sticky-footer">
+                @if(submitted){
+                    <div
+                        class="result-card"
+                        [class.excellent]="percentage >= 85"
+                        [class.good]="percentage >= 70 && percentage < 85"
+                        [class.average]="percentage >= 50 && percentage < 70"
+                        [class.poor]="percentage < 50"
+                    >
+                        <div class="score-circle">
+                            {{ percentage }}%
+                        </div>
+
+                        <h3>
+                            Score:
+                            <span>
+                                {{ score }} / {{ totalQuestions }}
+                            </span>
+                        </h3>
+
+                        <p class="result-message">
+                            @if(percentage >= 85){
+                                Excellent work! 🎉
+                            }
+
+                            @else if(percentage >= 70){
+                                Good job! Keep improving 👍
+                            }
+
+                            @else if(percentage >= 50){
+                                Nice attempt, keep practicing 💪
+                            }
+
+                            @else{
+                                Keep learning, you will get better 📚
+                            }
+                        </p>
+                    </div>
+                }
+
+                <div class="action-bar">
+                    @if(!submitted){
+                        <button
+                        type="button"
+                        class="secondary-btn"
+                        (click)="submitQuiz()"
+                        >
+                        Submit Quiz
+                        </button>
+                    }
+
+                    @if(submitted){
+                        <button
+                        type="button"
+                        class="success-btn"
+                        (click)="saveQuiz()"
+                        >
+                        Save Score
+                        </button>
+
+                        <button
+                        type="button"
+                        class="secondary-btn"
+                        (click)="retakeQuiz()"
+                        >
+                        Retake Quiz
+                        </button>
+                    }
+                </div>
+            </div>
+
+        </form>
+    }
+</div>

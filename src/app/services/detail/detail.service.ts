@@ -69,11 +69,7 @@ export class DetailService {
           return teachers_data
         }),
         catchError((er:any) => {
-          this.notify.showNotification(
-            'Error',
-            JSON.stringify(er.error),
-            'error'
-          );
+          this.notify.showError(JSON.stringify(er.error));
 
           return of([])
         })
@@ -117,11 +113,7 @@ export class DetailService {
           return persons_data;
         }),
         catchError((er:any) => {
-          this.notify.showNotification(
-            'Error',
-            JSON.stringify(er.error),
-            'error'
-          );
+          this.notify.showError(JSON.stringify(er.error));
 
           return of([])
         })
@@ -163,11 +155,7 @@ export class DetailService {
           }))
         ),
         catchError ((er:any) => {
-          this.notify.showNotification(
-            'Error',
-            JSON.stringify(er.error),
-            'error'
-          );
+          this.notify.showError(JSON.stringify(er.error));
 
           return of([]);
         })

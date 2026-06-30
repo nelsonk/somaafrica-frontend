@@ -155,11 +155,7 @@ export class TeacherComponent implements OnInit{
     this.crud.delete(`${this.teachersUrl}/${data.callback}`).subscribe(
       {
         next: () => {
-          this.notify.showNotification(
-            'Success',
-            'Teacher successfully deleted',
-            'success'
-          );
+          this.notify.showSuccess('Teacher successfully deleted');
 
           this.teacherData = null;
           this.teacher.getTeachers().subscribe(
@@ -172,11 +168,7 @@ export class TeacherComponent implements OnInit{
           );
         },
         error: (er:any) => {
-          this.notify.showNotification(
-            'Error',
-            JSON.stringify(er.error),
-            'error'
-          );
+          this.notify.showError(JSON.stringify(er.error));
         }
       }
     )
@@ -203,18 +195,10 @@ export class TeacherComponent implements OnInit{
             }
           );
 
-          this.notify.showNotification(
-            'Success',
-            `Teacher successfully ${method}d`,
-            'success'
-          );
+          this.notify.showSuccess(`Teacher successfully ${method}d`);
         },
         error: (er:any) => {
-          this.notify.showNotification(
-            'Error',
-            JSON.stringify(er.error),
-            'error'
-          );
+          this.notify.showError(JSON.stringify(er.error));
         }
       }
     );

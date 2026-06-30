@@ -1,0 +1,299 @@
+<div class="quiz-builder">
+
+    <div class="header">
+        <div>
+            <h2>{{ quizData().guid ? 'Edit Quiz' : 'Create Quiz' }}</h2>
+            <p>
+                Add questions and answers for this learning material.
+            </p>
+        </div>
+
+        <!-- RIGHT SIDE (CLOSE BUTTON) -->
+        <button
+            class="btn btn-link text-white d-flex align-items-center gap-2 p-0 close-btn"
+            (click)="close.emit()"
+        >
+            <i class="bi bi-arrow-left"></i>
+            <span>Back</span>
+        </button>
+    </div>
+
+    <form
+        [formGroup]="quizForm"
+    >
+        <div
+            class="question-card"
+        >
+            @if (
+                quizForm.get('material')?.hasError('required') &&
+                quizForm.get('material')?.touched
+            ) {
+                <div class="validation-error">
+                    Select a learning material
+                </div>
+            }
+
+            <div class="question-header">
+                <h3>
+                    Learning Material
+                </h3>
+            </div>
+
+            <ng-select
+                class="modern-select mb-3"
+                [items]="this.options"
+                bindLabel="title"
+                bufferAmount="10"
+                [fixedPlaceholder]="false"
+                [popover]="true"
+                [virtualScroll]="true"
+                [readonly]="quizData().deletable ? true : false"
+                formControlName="material"
+                placeholder="Click to select learning material"
+            >
+                <ng-template ng-label-tmp let-item="item">
+                    <div class="modern-select-label-item">
+
+                        <div class="modern-select-avatar">
+                        {{ item.title?.charAt(0) }}
+                        </div>
+
+                        <span>
+                        {{ item.title }}
+                        </span>
+
+                    </div>
+                </ng-template>
+
+                <ng-template ng-option-tmp let-item="item">
+
+                    <div class="modern-select-option">
+
+                        <div class="modern-select-avatar">
+                        {{ item.title?.charAt(0) }}
+                        </div>
+
+                        <div class="modern-select-option-content">
+
+                            <div class="modern-select-option-label">
+                                {{ item.title }}
+                            </div>
+
+                            @if(item.raw.description){
+                                <div class="modern-select-option-description">
+                                {{ item.raw.description }}
+                                </div>
+                            }
+
+                        </div>
+
+                    </div>
+                </ng-template>
+            </ng-select>
+        </div>
+
+        <div formArrayName="questions">
+            @for (
+                question of questions.controls;
+                track $index;
+                let qIndex = $index
+            ) {
+                <div
+                    class="question-card"
+                    [formGroupName]="qIndex"
+                >
+
+                    <div class="question-header">
+                        <h3>
+                        Question {{ qIndex + 1 }}
+                        </h3>
+                        <button
+                        type="button"
+                        class="danger-btn"
+                        [style.visibility]="quizData().deletable ? 'hidden' : 'visible'"
+                        (click)="removeQuestion(qIndex)">
+                        Remove
+                        </button>
+                    </div>
+
+                    <input
+                        class="input"
+                        formControlName="text"
+                        [readOnly]="quizData().deletable ? true : false"
+                        placeholder="Enter question..."
+                    />
+
+                    @if (
+                        question.get('text')?.hasError('required')
+                        &&
+                        (
+                            question.get('text')?.touched
+                            ||
+                            question.get('text')?.dirty
+                        )
+                    ) {
+                        <div class="validation-error">
+                            Question text is required.
+                        </div>
+                    }
+
+                    <label class="section-label mt-3">
+                    Question Type
+                    </label>
+                    <select
+                        class="question-type-select"
+                        formControlName="question_type"
+                        [style.pointer-events]="quizData().deletable ? 'none' : 'auto'"
+                    >
+                        <option value="single">
+                            Single Correct Answer
+                        </option>
+                        <option value="multiple">
+                            Multiple Correct Answers
+                        </option>
+                    </select>
+
+                    <div
+                        class="answers-section"
+                        formArrayName="answers"
+                    >
+
+                        <label class="section-label">
+                        Answers (Check/select correct one)
+                        </label>
+
+                        @for (
+                        answer of answers(qIndex).controls;
+                        track $index;
+                        let aIndex = $index
+                        ) {
+                            <div
+                                class="answer-row"
+                                [formGroupName]="aIndex"
+                            >
+                                @if(
+                                question.get('question_type')
+                                ?.value === 'single'
+                                ){
+                                    <input
+                                        type="radio"
+                                        [name]="'question-' + qIndex"
+                                        [checked]="answer.value.is_correct"
+                                        [style.pointer-events]="quizData().deletable ? 'none' : 'auto'"
+                                        (change)="selectCorrectAnswer(qIndex, aIndex)"
+                                    />
+                                }
+                                @else {
+                                    <input
+                                        type="checkbox"
+                                        formControlName="is_correct"
+                                        [style.pointer-events]="quizData().deletable ? 'none' : 'auto'"
+                                    />
+                                }
+                                <input
+                                    class="input answer-input"
+                                    formControlName="text"
+                                    placeholder="Answer text..."
+                                    [readOnly]="quizData().deletable ? true : false"
+                                />
+
+                                @if (
+                                    answer.get('text')?.hasError('required')
+                                    &&
+                                    (
+                                        answer.get('text')?.touched
+                                        ||
+                                        answer.get('text')?.dirty
+                                    )
+                                ) {
+                                    <div class="validation-error">
+                                        Answer text is required.
+                                    </div>
+                                }
+
+                                <button
+                                    type="button"
+                                    class="icon-btn"
+                                    [style.visibility]="quizData().deletable ? 'hidden' : 'visible'"
+                                    (click)="removeAnswer(qIndex, aIndex)"
+                                >
+                                ✕
+                                </button>
+                            </div>
+                        }
+
+                        <button
+                            type="button"
+                            class="secondary-btn"
+                            [hidden]="quizData().deletable"
+                            (click)="addAnswer(qIndex)"
+                        >
+                        + Add Answer
+                        </button>
+
+                    </div>
+
+                    @if (
+                        question.errors?.['noCorrectAnswer']
+                        &&
+                        question.touched
+                    ) {
+                        <div class="validation-error">
+                            Select at least one
+                            correct answer.
+                        </div>
+                    }
+
+                </div>
+            }
+        </div>
+
+        <div class="action-bar">
+
+            <button
+                type="button"
+                class="secondary-btn"
+                (click)="addQuestion()"
+                [style.visibility]="quizData().deletable ? 'hidden' : 'visible'"
+            >
+                + Add Question
+            </button>
+
+            @if (quizForm.invalid && quizForm.touched) {
+                <div class="validation-error">
+                    Please correct all highlighted fields before saving.
+                </div>
+            }
+
+            @if (quizData().questions) {
+                @if (quizData().deletable){
+                     <button
+                        (click)="deleteQuiz()"
+                        class="danger-btn"
+                    >
+                        Delete
+                    </button>
+                }
+                @else {
+                    <button
+                        (click)="updateQuiz()"
+                        class="save-btn"
+                    >
+                        Update
+                    </button>
+                }
+            }
+            @else {
+                <button
+                    (click)="saveQuiz()"
+                    class="save-btn"
+                >
+                    Save
+                </button>
+            }
+
+        </div>
+
+    </form>
+
+</div>
