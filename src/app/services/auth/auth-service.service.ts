@@ -7,6 +7,7 @@ import { environment } from '../../../environments/environment';
 import { tap } from 'rxjs';
 import { ApiService } from '../api/api.service';
 import { BaseResponse, TokenResponse } from '../../models/user.interface';
+import { NotificationService } from '../info/notification.service';
 
 @Injectable({
   providedIn: 'root'
@@ -137,8 +138,11 @@ export class AuthService {
     return this.api.patch<BaseResponse>(url, data, {bypass: true});
   }
 
-  navigateToPage(target?: string, source?:string){
-    this.router.navigate([`/${target}`], {queryParams: {source: source}});
+  navigateToPage(target?: string, source?:string, guid?: string){
+    this.router.navigate(
+      [`/${target}`],
+      {queryParams: {source: source, guid: guid}}
+    );
   }
 
   createPerson(data: {}){

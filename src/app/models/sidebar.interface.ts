@@ -47,8 +47,14 @@ export const SIDEBAR_LINKS: SidebarLink[] = [
     dataToggle: 'collapse',
     href: '/profile/teacher',
     controls: 'teacherlist',
-    subItems: ['All', 'Performance', 'Payments'],
-    subItemsHref: ['/profile/teacher', '#', '#'],
+    subItems: ['Teachers', 'Learning Materials', 'quiz', 'course', 'Payments'],
+    subItemsHref: [
+      '/profile/teacher',
+      '/profile/teacher/material',
+      '/profile/teacher/quiz',
+      '/profile/teacher/course',
+      '/profile/teacher/payment'
+    ],
   },
   {
     id: 'agent',

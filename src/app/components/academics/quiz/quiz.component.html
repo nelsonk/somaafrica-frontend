@@ -1,0 +1,42 @@
+<!-- Main Content -->
+<div class="d-flex align-items-start gap-3 mt-4 mx-2">
+  <!-- add min-width: 0 in adtion to the flex to allow dynamic shrinking and growing-->
+  @if (quizzesTable && !(quizData || takeQuiz)) {
+    <div [style.flex]="quizData ? '0 0 30%' : '1'" style="min-width: 0;">
+      <div class="d-md-flex justify-content-md-end">
+        <button class="btn btn-outline-primary action-btn" type="submit" (click)="createQuiz()">
+          Create Quiz
+        </button>
+      </div>
+      <app-table
+        [tableData]="quizzesTable"
+        (rowClicked)="onRowClick($event)"
+        (actionClicked)="onActionClick($event)"
+        [compact]="!!quizData"
+      ></app-table>
+    </div>
+  }
+
+  @if (quizData && !takeQuiz) {
+    <div style="flex: 1 1 auto; min-width: 0;">
+      <app-quiz-builder
+        [quizData]="quizData"
+        (close)="onClose()"
+        (save)="onSave($event)"
+        (update)="onUpdate($event)"
+        (delete)="onDelete($event)"
+      ></app-quiz-builder>
+    </div>
+  }
+
+  @if (takeQuiz) {
+    <div style="flex: 1 1 auto; min-width: 0;">
+      <app-quiz-viewer
+        [quizData]="takeQuiz"
+        (close)="onCloseTakenQuiz()"
+        (save)="onSaveTakenQuiz($event)"
+      ></app-quiz-viewer>
+    </div>
+  }
+</div>
+

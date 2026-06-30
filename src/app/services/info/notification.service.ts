@@ -28,4 +28,16 @@ export class NotificationService {
     // }
     this.notifySubject.next({title, message, type});
   }
+
+  showError(message: string) {
+    this.showNotification('Error', message, 'error');
+  }
+
+  showSuccess(message: string) {
+    this.showNotification('Success', message, 'success');
+  }
+
+  showInfo(message: string) {
+    this.showNotification('Information', message, 'info');
+  }
 }

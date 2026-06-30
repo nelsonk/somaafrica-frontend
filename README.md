@@ -115,3 +115,26 @@ ng-select css in styles.css
 
 # soma-input
 Use this class to style any input in any component, css in styles.css
+
+# FontAwesome icon class
+To use FontAwesome classes install package below
+`npm install @fortawesome/fontawesome-free`
+
+Add to angular.json
+"styles": [
+    "node_modules/@fortawesome/fontawesome-free/css/all.min.css"
+]
+
+Then you can use classes like this in any component
+
+`<i class="fa-solid fa-toggle-on"></i>`
+
+# Document viewer
+
+install this
+
+`npm install pdfjs-dist`
+
+Annotation service not currently used but could be used to get, delete, create annotations from API
+
+Thumbnail component and service are used to add small previews of document pages on the side and to easily jump to previewed page

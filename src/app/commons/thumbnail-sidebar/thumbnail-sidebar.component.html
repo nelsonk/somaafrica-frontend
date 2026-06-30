@@ -1,0 +1,29 @@
+<div class="thumbs">
+
+  @for (thumb of thumbnails; track $index; let i = $index) {
+
+    <div
+      class="thumb"
+      [attr.data-page]="i + 1"
+      (click)="selectPage(i + 1)"
+      [class.active]="currentPage === i + 1"
+    >
+
+      @if (thumb) {
+        <img [src]="thumb" />
+        <div class="page-number">
+          {{ i + 1 }}
+        </div>
+      }
+
+      @if (!thumb) {
+        <div class="placeholder">
+          Page {{ i + 1 }}
+        </div>
+      }
+
+    </div>
+
+  }
+
+</div>

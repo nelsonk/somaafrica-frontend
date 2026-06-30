@@ -88,7 +88,7 @@
                 <fa-icon [icon]="showPassword ? faEyeSlash : faEye"></fa-icon>
               </button>
             </div>
-            <button class="btn btn-outline-primary action-btn w-100" type="submit" [disabled]="!loginForm.valid || apiNotHealthy" >
+            <button class="btn btn-outline-primary action-btn w-100" type="submit" [disabled]="(loginForm.invalid && loginForm.touched) || apiNotHealthy" >
               Login
               @if (status == 'LOADING') {
                 <div class="spinner-border" role="status" >

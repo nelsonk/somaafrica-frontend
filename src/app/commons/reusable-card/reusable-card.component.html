@@ -1,11 +1,22 @@
 <div class="card-selection-container">
-  <h2 class="title">{{title}}</h2>
-  <p class="subtitle">{{description}}</p>
+  <h2 class="title">{{cardData().title}}</h2>
+  <p class="subtitle">{{cardData().description}}</p>
+
+  @if (cardData().search) {
+    <input
+      type="text"
+      class="search-input"
+      [placeholder]="search_by"
+      [(ngModel)]="searchTerm"
+    >
+  }
+
   <div class="card-grid">
-    @for (item of items; track item) {
+    @for (item of filteredItems; track item) {
       <div
         class="group-card"
-        [routerLink]="item.link"
+        [routerLink]="item.link ?? null"
+        (click) = "itemClicked(item)"
         >
         <div class="card-item">
           @if (item.image) {
@@ -13,9 +24,11 @@
           }
         </div>
         <div class="card-overlay">
-          <h3 class="card-name">{{item.title}}</h3>
+          <h3 class="card-name">{{item.title | slice:0:30}}{{item.title.length > 30 ? "..." : ""}}</h3>
           @if (item.desc) {
-            <p class="card-description"> {{item.desc | slice:0:length}} {{item.desc.length > length ? "..." : ""}}</p>
+            <p class="card-description">
+              {{item.desc | slice:0:desLength}}{{item.desc.length > desLength ? "..." : ""}}
+            </p>
           }
           @if (item.link) {
             <a [routerLink]="item.link" class="card-description">Learn More</a>
@@ -24,6 +37,10 @@
       </div>
     }
   </div>
+
+  @if (filteredItems.length === 0) {
+    <div class="no-results">
+      No matching items found.
+    </div>
+  }
 </div>
-
-

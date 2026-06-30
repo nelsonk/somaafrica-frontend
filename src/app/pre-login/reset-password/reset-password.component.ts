@@ -83,11 +83,13 @@ export class ResetPasswordComponent implements OnInit{
       {
         next: () => {
           this.status = STATUS_TYPE.SUCCESS
-          this.notificationService.showNotification("Success", "Password reset successfully", "success");
+          this.notificationService.showSuccess(
+            "Password reset successfully"
+          );
         },
         error: (err) => {
           this.status = STATUS_TYPE.ERROR;
-          this.notificationService.showNotification("Error", JSON.stringify(err.error), "error");
+          this.notificationService.showError(JSON.stringify(err.error));
         }
       }
     )

@@ -11,6 +11,8 @@ import { ResetPasswordComponent } from './pre-login/reset-password/reset-passwor
 import { TeacherComponent } from './components/teacher/teacher/teacher.component';
 import { ProfileLayoutComponent } from './commons/profile-layout/profile-layout.component';
 import { DashboardComponent } from './commons/dashboard/dashboard.component';
+import { LearningmaterialsComponent } from './components/academics/learningmaterials/learningmaterials.component';
+import { QuizComponent } from './components/academics/quiz/quiz.component';
 
 export const routes: Routes = [
     {
@@ -41,6 +43,14 @@ export const routes: Routes = [
             {
                 path: 'teacher',
                 component: TeacherComponent
+            },
+            {
+                path: 'teacher/material',
+                component: LearningmaterialsComponent
+            },
+            {
+                path: 'teacher/quiz',
+                component: QuizComponent
             }
         ],
         canActivate: [authGuardGuard, groupGuard]

@@ -11,7 +11,6 @@ import { AuthService } from '../../../services/auth/auth-service.service';
 import { ConfirmationService } from '../../../services/info/confirmation.service';
 import { NotificationService } from '../../../services/info/notification.service';
 import { SessionStorageService } from '../../../services/storage/session-storage.service';
-import { CardData, DEFAULT_CARD_DATA } from '../../../models/card.interface';
 import { Person, DEFAULT_PERSON } from '../../../models/person.interface';
 import { SidebarLink, SIDEBAR_LINKS } from '../../../models/sidebar.interface';
 import { User, DEFAULT_USER } from '../../../models/user.interface';
@@ -73,8 +72,6 @@ export class ProfileComponent implements OnInit{
   @ViewChild('collapseAboutMe') collapseAboutMe!: ElementRef;
 
   links:SidebarLink[] = SIDEBAR_LINKS;
-
-  cardData: CardData = { ...DEFAULT_CARD_DATA };
 
 
   constructor(
@@ -319,10 +316,8 @@ export class ProfileComponent implements OnInit{
         username: this.user.email
       }
     }else{
-      return this.notificationService.showNotification(
-        "Error",
-        "Both username and email empty, first set them on your profile",
-        "error"
+      return this.notificationService.showError(
+        "Both username and email empty, first set them on your profile"
       )
     }
 
@@ -333,21 +328,15 @@ export class ProfileComponent implements OnInit{
         next: () => {
           this.status = STATUS_TYPE.SUCCESS;
           this.errorMessage = "";
-          this.notificationService.showNotification(
-            'Success',
-            "Password updated successfully",
-            'success'
+          this.notificationService.showSuccess(
+            "Password updated successfully"
           );
         },
         error: (err) => {
           this.status = STATUS_TYPE.ERROR;
           this.errorMessage = JSON.stringify(err.error);
 
-          this.notificationService.showNotification(
-            'Error',
-            this.errorMessage,
-            'error'
-          );
+          this.notificationService.showError(this.errorMessage);
         }
       }
     );
@@ -363,12 +352,12 @@ export class ProfileComponent implements OnInit{
         next: () => {
           this.status = STATUS_TYPE.SUCCESS;
           this.userError = "";
-          this.notificationService.showNotification('Success', "Person created successfully", 'success');
+          this.notificationService.showSuccess('Person created successfully');
         },
         error: (err) => {
           this.status = STATUS_TYPE.ERROR;
           this.userError = JSON.stringify(err.error);
-          this.notificationService.showNotification('Error', this.userError, 'error');
+          this.notificationService.showError(this.userError);
         }
       }
     );
@@ -381,14 +370,14 @@ export class ProfileComponent implements OnInit{
           next: () => {
             this.status = STATUS_TYPE.SUCCESS;
             this.userError = "";
-            this.notificationService.showNotification('Success', 'User saved successfully', 'success');
+            this.notificationService.showSuccess('User saved successfully');
 
             this.auth.getUser(this.user.guid, true).subscribe();
           },
           error: (err) => {
             this.status = STATUS_TYPE.ERROR;
             this.userError = JSON.stringify(err.error);
-            this.notificationService.showNotification('Error', this.userError, 'error');
+            this.notificationService.showError(this.userError);
           }
         }
       );
@@ -422,10 +411,8 @@ export class ProfileComponent implements OnInit{
             this.personError = "No person details found";
             this.fetchedFromApi = true;
             this.openModal('profileModal', 'collapseAccount');
-            this.notificationService.showNotification(
-              'Info',
-              'No person found, please fill in the details below to create person',
-              'info'
+            this.notificationService.showInfo(
+              'No person found, please fill in the details below to create person'
             );
           }else{
             this.personError = "";
@@ -434,17 +421,13 @@ export class ProfileComponent implements OnInit{
 
             if (this.person.phone.length === 0 || this.person.address.length === 0) {
               this.openModal('profileModal', 'collapseContact');
-              this.notificationService.showNotification(
-                'Info',
-                'Some contact info missing, please fill in the details below to add contact',
-                'info'
+              this.notificationService.showInfo(
+                'Some contact info missing, please fill in the details below to add contact'
               );
             }else if (!this.person.user.email){
               this.openModal('profileModal', 'collapseAboutMe');
-              this.notificationService.showNotification(
-                'Info',
-                'Please provide email address, this is used in reseting password incase forgotten',
-                'info'
+              this.notificationService.showInfo(
+                'Please provide email address, this is used in reseting password incase forgotten'
               );
             }else{
               if(this.person.account_status === "Incomplete"){
@@ -457,7 +440,7 @@ export class ProfileComponent implements OnInit{
         error: (err) => {
           this.status = STATUS_TYPE.ERROR;
           this.personError = JSON.stringify(err.error);
-          this.notificationService.showNotification('Error', this.personError, 'error');
+          this.notificationService.showError(this.personError);
         }
       }
     );
@@ -474,7 +457,7 @@ export class ProfileComponent implements OnInit{
           this.status = STATUS_TYPE.SUCCESS;
           this.personError = "";
 
-          this.notificationService.showNotification('Success', 'Person saved successfully', 'success');
+          this.notificationService.showSuccess('Person saved successfully');
 
           if (Object.keys(user).length === 0) {
             this.addUser(this.user.guid);
@@ -486,7 +469,7 @@ export class ProfileComponent implements OnInit{
           this.status = STATUS_TYPE.ERROR;
           this.personError = JSON.stringify(err.error);
 
-          this.notificationService.showNotification('Error', this.personError, 'error');
+          this.notificationService.showError(this.personError);
 
           this.getPerson();
         }
@@ -516,7 +499,7 @@ export class ProfileComponent implements OnInit{
           this.status = STATUS_TYPE.ERROR;
           this.personError = JSON.stringify(err.error);
 
-          this.notificationService.showNotification('Error', this.personError, 'error');
+          this.notificationService.showError(this.personError);
 
           this.getPerson();
         }
@@ -566,7 +549,9 @@ export class ProfileComponent implements OnInit{
             this.status = STATUS_TYPE.SUCCESS;
             this.phoneError = "";
 
-            this.notificationService.showNotification('Success', 'Phone/s added/modified successfully', 'success');
+            this.notificationService.showSuccess(
+              'Phone/s added/modified successfully'
+            );
 
             // Reset new numbers only if all successfully added.
             this.phoneNumbers = "";
@@ -578,7 +563,7 @@ export class ProfileComponent implements OnInit{
             this.status = STATUS_TYPE.ERROR;
             this.phoneError = JSON.stringify(errs.error);
 
-            this.notificationService.showNotification('Error', this.phoneError, 'error');
+            this.notificationService.showError(this.phoneError);
           }
         }
       );
@@ -626,7 +611,9 @@ export class ProfileComponent implements OnInit{
             this.status = STATUS_TYPE.SUCCESS;
             this.addressError = "";
 
-            this.notificationService.showNotification('Success', 'Address/es added/modified successfully', 'success');
+            this.notificationService.showSuccess(
+              'Address/es added/modified successfully'
+            );
 
             // Reset new numbers only if all successfully added.
             this.addresses = "";
@@ -638,7 +625,7 @@ export class ProfileComponent implements OnInit{
             this.status = STATUS_TYPE.ERROR;
             this.addressError = JSON.stringify(errs.error);
 
-            this.notificationService.showNotification('Error', this.addressError, 'error');
+            this.notificationService.showError(this.addressError);
           }
         }
       );

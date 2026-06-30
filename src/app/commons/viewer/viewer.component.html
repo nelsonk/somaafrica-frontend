@@ -1,0 +1,153 @@
+<!-- viewer.component.html -->
+<div class="viewer-container" #viewerContainer [class.dark]="darkMode">
+
+  <!-- TOP TOOLBAR -->
+  <div class="toolbar">
+
+    <button (click)="prevPage()">◀</button>
+
+    <span>
+      Page {{pageNumber}} / {{totalPages}}
+    </span>
+
+    <button (click)="nextPage()">▶</button>
+
+    <div class="divider"></div>
+
+    <button (click)="zoomOut()">-</button>
+
+    <span>{{ (zoom * 100) | number:'1.0-0' }}%</span>
+
+    <button (click)="zoomIn()">+</button>
+
+    <div class="divider"></div>
+
+    <input
+      type="number"
+      min="1"
+      [max]="totalPages"
+      (change)="goToPage($event.target.valueAsNumber)"
+      placeholder="Go to page"
+    />
+
+    <div class="divider"></div>
+
+    <div class="search-box">
+
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (input)="onSearchInputChange()"
+        (keydown.enter)="handleSearchEnter($event)"
+        placeholder="Search document..."
+      />
+
+      <span class="match-counter">
+        {{ currentSearchIndex + 1 || 0 }} / {{ totalMatchCount }}
+      </span>
+
+      <button (click)="handleSearchEnter($event)">🔍</button>
+      <button (click)="prevSearchResult()">↑</button>
+      <button (click)="nextSearchResult()">↓</button>
+
+    </div>
+
+    <button (click)="toggleDarkMode()">🌙</button>
+
+    <button (click)="fullscreen()">
+      {{ isFullscreen ? '✕' : '⛶' }}
+    </button>
+
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="content">
+
+    <!-- SIDEBAR (THUMBNAILS PLACEHOLDER) -->
+    <app-thumbnail-sidebar
+      [pdf]="pdfDocument"
+      (pageSelect)="goToPage($event)"
+    >
+    </app-thumbnail-sidebar>
+
+    @if (showSearchSidebar) {
+      <div
+        class="search-sidebar"
+        [class.open]="showSearchSidebar"
+      >
+
+        <div class="search-header">
+
+          Search Results
+
+          <button
+            (click)="showSearchSidebar = false"
+          >
+            ✕
+          </button>
+
+        </div>
+
+        <div class="search-results">
+
+          @for (result of searchResults; track $index; let i = $index) {
+            <div
+              class="search-result"
+              [class.active]="
+                i === currentSearchIndex
+              "
+              (click)="goToSearchResult(result, i)"
+            >
+
+              <div class="page-label">
+                Match {{ i + 1 }}
+                •
+                Page {{ result.page }}
+              </div>
+
+              <div class="snippet">
+                {{ result.snippet }}
+              </div>
+
+              <div class="count">
+                Match {{ i + 1 }}
+              </div>
+
+            </div>
+          }
+
+        </div>
+
+      </div>
+    }
+
+    <!-- PDF VIEW -->
+    <div class="pdf-area">
+
+        <div class="canvas-wrapper">
+
+            <div class="pdf-scroll" #scrollContainer>
+              <div class="pages">
+                @for (page of pages; track $index) {
+                  <div
+                    class="page"
+                    [attr.data-page]="page"
+                  >
+                    <canvas class="pdf-canvas"></canvas>
+                    <canvas class="annotation-layer"></canvas>
+                    <div class="textLayer"></div>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <div class="watermark">
+                CONFIDENTIAL
+            </div>
+
+        </div>
+
+    </div>
+
+  </div>
+</div>

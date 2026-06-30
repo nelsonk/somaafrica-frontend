@@ -86,7 +86,7 @@
                 <fa-icon [icon]="showPassword2 ? faEyeSlash : faEye"></fa-icon>
               </button>
             </div>
-            <button class="btn btn-outline-primary action-btn w-100" type="submit" [disabled]="registerForm.invalid || passwordMismatch || usernameEmailRequired || apiNotHealthy">Register</button>
+            <button class="btn btn-outline-primary action-btn w-100" type="submit" [disabled]="(registerForm.invalid && registerForm.touched) || passwordMismatch || usernameEmailRequired || apiNotHealthy">Register</button>
             <div class="d-flex justify-content-center mt-3">
               @if (status == 'LOADING') {
                 <div class="spinner-border" role="status">

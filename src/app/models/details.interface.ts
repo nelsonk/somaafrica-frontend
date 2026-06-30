@@ -38,6 +38,7 @@ export interface DetailField {
 
 export interface Detail {
   title: string;
+  document?: string;
   details: DetailField[];
 }
 
@@ -84,4 +85,11 @@ export interface DetailSaveData {
     callback?: string;
     summary: any;
     detail: any;
+}
+
+export interface DetailRequest {
+    data?: any,
+    url?: string,
+    model: string,
+    column?: string
 }
